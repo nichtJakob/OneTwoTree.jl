@@ -4,18 +4,18 @@ module OneTwoTree
     Node
 
 A Node represents a decision in the Tree.
-It has at most one left and one right child.
+It is a leaf with a prediction or has exactly one true and one false child and a decision function.
 """
 struct Node
-    decision_is_right::Union{Function, Nothing} #returns True -> go to right child else left
-    left_child::Union{Node, Nothing} #decision is not True
-    right_child::Union{Node, Nothing} #decision returns True
+    decision::Union{Function, Nothing} #returns True -> go to right child else left
+    true_child::Union{Node, Nothing} #decision is True
+    false_child::Union{Node, Nothing} #decision is NOT true
     prediction::Union{Float64, Nothing} # for leaves
 end
 
 # Custom constructor for keyword arguments
-function Node(; decision_is_right=nothing, left_child=nothing, right_child=nothing, prediction=nothing)
-    Node(decision_is_right, left_child, right_child, prediction)
+function Node(; decision=nothing, true_child=nothing, false_child=nothing, prediction=nothing)
+    Node(decision, true_child, false_child, prediction)
 end
 
 
@@ -31,10 +31,10 @@ function tree_prediction(tree::Node, x)
     end
 
     #else check if decision(x) leads to right or left child
-    if tree.decision_is_right(x)
-        return tree_prediction(tree.right_child, x)
+    if tree.decision(x)
+        return tree_prediction(tree.true_child, x)
     else
-        return tree_prediction(tree.left_child, x)
+        return tree_prediction(tree.false_child, x)
     end
 end
 
