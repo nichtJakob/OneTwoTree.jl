@@ -1,4 +1,6 @@
-module OneTwoTree
+#This File contains the fundamentals for decision trees in Julia
+
+
 
 """
     Node
@@ -46,12 +48,3 @@ a basic decision function for testing and playing around
 function lessThan(x, threshold::Float64, featureindex::Int =1)::Bool
     return x[featureindex] < threshold
 end
-
-
-
-
-export lessThan,
-    tree_prediction,
-    Node
-
-end # end the module
