@@ -1,6 +1,6 @@
 name = "OneTwoTree"
 uuid = "ba1e7b89-03b6-4273-a638-c99556bacf5e"
-authors = ["Jakob Balasus <balasus@campus.tu-berlin.de>"]
+authors = ["Jakob Balasus <balasus@campus.tu-berlin.de>, Eloi Sandt <eloi.sandt@campus.tu-berlin.de>"]
 version = "1.0.0-DEV"
 
 [compat]
