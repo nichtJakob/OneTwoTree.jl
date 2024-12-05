@@ -24,29 +24,29 @@
 To get started, download the code using one of the following links:
 
   - **Normal HTTPS Link:**
-<br/>
+
       ``` bash
       git clone https://github.com/nichtJakob/OneTwoTree.jl.git
       ```
-<br/>
+
 
   - **SSH Link:**
-<br/>
+
       ``` bash
       git clone git@github.com:nichtJakob/OneTwoTree.jl.git
       ```
-<br/>
+
 
 2. 🔧 **Installation and Dependency Setup**
 
 Run the following commands in the package's root directory to install the dependencies and activate the package's virtual environment:
 
   - For Contributors:
-<br/>
+
       ```bash
       julia --project --banner=no
       ```
-<br/>
+
 
 3. ▶️ **Running The Code**
 
