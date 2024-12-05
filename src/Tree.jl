@@ -5,6 +5,10 @@
 
 A DecisionTree is a tree of Nodes.
 In addition to a root node it holds meta informations such as max_depth etc.
+Use `fit(tree, features, labels)` to create a tree from data
+
+# Arguments
+- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
 struct DecisionTree
     root::Union{Node, Nothing}
@@ -66,6 +70,7 @@ function build_tree(features::Array{Float64,2}, labels::Array{Float64,1},
                     max_depth::Int
                     #, min_samples_split::Int, pruning::Bool, rng=Random.GLOBAL_RNG
                     )::DecisionTree
+    #TODO: Implement CART
     error("Not implemented.")
 end
 
