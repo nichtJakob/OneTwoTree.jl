@@ -52,5 +52,9 @@ Run the following commands in the package's root directory to install the depend
 
 Use your Julia REPL :^]
 
+4. 📚 **Further Reading**
+
+If you are a contributor to this package, read [this](https://adrianhill.de/julia-ml-course/write/).
+
 ## 👩‍💻 Contributors
 [![Contributors](https://contrib.rocks/image?repo=nichtJakob/OneTwoTree.jl)](https://github.com/nichtJakob/OneTwoTree.jl/graphs/contributors)
