@@ -30,52 +30,36 @@ function gini_impurity(features::AbstractVector, labels::Vector{Bool}, decision_
     end
 
     #Calculate Gini
-    if length(labels) == 0
 
-        return 0
-    else
-        #Number of true in true_labels and false_labels
-        true_num_true = count(x -> x == true, true_labels)
-        false_num_true = count(x -> x == true, false_labels)
 
-        #Number of false in true_labels and false_labels
-        true_num_false = count(x -> x == false, true_labels)
-        false_num_false = count(x -> x == false, false_labels)
+    #Number of true in true_labels and false_labels
+    true_num_true = count(x -> x == true, true_labels)
+    false_num_true = count(x -> x == true, false_labels)
 
-        #Calculate proportions
-        total_true = length(true_labels)
-        total_false = length(false_labels)
+    #Number of false in true_labels and false_labels
+    true_num_false = count(x -> x == false, true_labels)
+    false_num_false = count(x -> x == false, false_labels)
 
-        #Gini for true nod
-        gini_true = 1 - (true_num_true/total_true)^2 - (true_num_false/total_true)^2
+    #Calculate proportions
+    total_true = length(true_labels)
+    total_false = length(false_labels)
 
-        #Gini for false nod
-        gini_false = 1 - (false_num_true/total_false)^2 - (false_num_false/total_false)^2
+    #Gini for true nod
+    gini_true = 1 - (true_num_true/total_true)^2 - (true_num_false/total_true)^2
 
-        #weighted gini
-        total_length_data = length(features)
-        gini_total = length(split_true)/total_length_data * gini_true + length(split_false)/total_length_data * gini_false
+    #Gini for false nod
+    gini_false = 1 - (false_num_true/total_false)^2 - (false_num_false/total_false)^2
 
-        return gini_total
+    #weighted gini
+    total_length_data = length(features)
+    gini_total = length(split_true)/total_length_data * gini_true + length(split_false)/total_length_data * gini_false
 
-    end
+    return gini_total
+
+
 end 
 
-features = [true, false, true, true, false]
-labels = [true, false, true, false, false]
-decision_fn = x -> x == true
 
-gini = gini_impurity(features, labels, decision_fn)
-println("Gini Impurity: $gini")
-
-
-features = [25, 40, 35, 22, 60]  # Ages as the features
-labels = [true, false, true, false, true]  # Whether they love "Cool as Ice"
-decision_fn = (x -> x > 30)  # Decision function: split based on age > 30
-
-# Calculate Gini impurity
-gini = gini_impurity(features, labels, decision_fn)
-println("Gini Impurity: $gini")
 
 
 
