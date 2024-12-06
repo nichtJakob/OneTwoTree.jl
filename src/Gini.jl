@@ -1,3 +1,6 @@
+module Gini
+
+export gini_impurity
 """
     gini_impurity(features::AbstractVector, labels::Vector{Bool}, decision_fn::Function) -> Float64
 
@@ -60,7 +63,7 @@ function gini_impurity(features::AbstractVector, labels::Vector{Bool}, decision_
 end 
 
 
-
+end
 
 
 

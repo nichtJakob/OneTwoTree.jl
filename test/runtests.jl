@@ -19,3 +19,6 @@ end
         @test tree_prediction(root, [-1.0]) == 1.0   
     end 
 end
+
+
+include("gini_tests.jl")
