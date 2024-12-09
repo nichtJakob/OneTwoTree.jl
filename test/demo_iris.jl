@@ -13,13 +13,18 @@ train_labels = targets[1:120]
 test_data = data[121:150, :]
 test_labels = targets[121:150]
 
-#now we use the OneTwoTree Package to build a Decision-Tree
+# now we use the OneTwoTree Package to build a Decision-Tree
 tree = DecisionTree() #TODO parameters
 fit!(tree, train_data, train_labels)
+
+# Now we can take a look at our Tree
+#TODO PrintTree
 
 #now we can classify the test set
 test_predictions = predict(tree, test_data)
 accuracy = sum(test_predictions .== test_labels) / length(test_labels)
 println("For the Iris dataset we have achieved an Accuracy of $(accuracy)%")
+
+
 
 
