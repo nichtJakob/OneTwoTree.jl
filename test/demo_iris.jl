@@ -1,4 +1,4 @@
-# Introtext: In this Example project we want to distinguish between 3 types of the Iris flower.
+#In this Example project we want to distinguish between 3 types of the Iris flower.
 #using the OneTwoTree Package
 using OneTwoTree
 
@@ -7,7 +7,7 @@ using OneTwoTree
 using MLDatasets
 data, targets = MLDatasets.Iris()
 
-# We split the Data in Training and test min_samples_split
+# We split the Data in Training and test sets
 train_data = data[1:120, :]
 train_labels = targets[1:120]
 test_data = data[121:150, :]
