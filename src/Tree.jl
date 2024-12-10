@@ -45,7 +45,7 @@ struct DecisionTree
     # rng=Random.GLOBAL_RNG
 
     # default constructor
-    function DecisionTree(root::Union{Node, Nothing}, max_depth::Int)
+    function DecisionTree(; root::Union{Node, Nothing}, max_depth::Int)
         new(root, max_depth)
     end
 end
