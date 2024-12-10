@@ -190,7 +190,11 @@ function _print_node(node::Node, prefix::String, is_left::Bool, indentation::Str
     if node.prediction !== nothing
         println(prefix, ": ", node.prediction)
     else
-        println(prefix, ": ", string(tree.root.decision_string), " ?")
+        if node.decision_string !== nothing
+            println(prefix, ": ", node.decision_string, " ?")
+        else
+            println(prefix, "Unknown decision")
+        end
         _print_node(node.true_child, prefix, false, indentation * "   ")
         _print_node(node.false_child, prefix, true, indentation * "   ")
     end
