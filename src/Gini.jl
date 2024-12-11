@@ -15,8 +15,9 @@ This function calculates the Gini impurity for a split in a decision tree.
 - The Gini impurity of the split.
 """
 
-function gini_impurity(features::Vector{Union{Real, String}}, labels::Vector{Union{Real, String}}, node_data::Vector{Int64}, decision_fn::Function)::Float64
-    # Filter features and labels using node_data
+#function gini_impurity(features::Vector{Union{Real, String}}, labels::Vector{Union{Real, String}}, node_data::Vector{Int64}, decision_fn::Function)::Float64
+function gini_impurity(features::Vector{Bool}, labels::Vector{Bool}, node_data::Vector{Int64}, decision_fn::Function)::Float64 
+# Filter features and labels using node_data
     features = features[node_data]
     labels = labels[node_data]
     
@@ -36,6 +37,11 @@ function gini_impurity(features::Vector{Union{Real, String}}, labels::Vector{Uni
     end
 
     #Calculate Gini
+
+    # Handle empty labels edge case
+    if isempty(true_labels) || isempty(false_labels)
+        return 0.0  # Return 0 if one of the splits is empty
+    end
 
 
     #Number of true in true_labels and false_labels
@@ -71,14 +77,24 @@ end
 using Test
 
 # Bring the module and its function into scope
-using .Gini  # The `.` ensures it looks for the module in the same file.
+using .Gini  #Wieso hier nur mit .?
 
-@testset "Test 1: Boolean features and labels" begin
-    features1 = [1.0, 0.0, 1.0, 1.0, 0.0]  # Real values instead of Bool
-    labels1 = [1.0, 0.0, 1.0, 0.0, 0.0]   # Real values instead of Bool
-    node_data1 = [1, 3]
-    decision_fn1 = x -> x == 1.0  # Decision function based on real numbers
-    gini1 = Gini.gini_impurity(features1, labels1, node_data1, decision_fn1)
-    @test isapprox(gini1, 0.5, atol=1e-2)
+@testset "Gini.jl Tests" begin
+    @testset "Test 1: Boolean features and labels" begin
+        features1 = [true, false, true, true, false]
+        labels1 = [true, false, true, false, false]
+        node_data1 = [1,2,3,4,5]
+        decision_fn1 = x -> x == true
+        gini1 = Gini.gini_impurity(features1, labels1, node_data1, decision_fn1)  # Fully qualified call
+        @test isapprox(gini1, 0.266, atol=1e-2)
+    end
+
+    @testset "Test 2: Boolean features and labels" begin
+        features2 = [true, false, true, true, false]
+        labels2 = [true, false, true, false, false]
+        node_data2 = [1,2,3,4]
+        decision_fn2 = x -> x == true
+        gini2 = Gini.gini_impurity(features2, labels2, node_data2, decision_fn2)  # Fully qualified call
+        @test isapprox(gini2, 0.333, atol=1e-2)
+    end
 end
-
