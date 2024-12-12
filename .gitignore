@@ -7,3 +7,4 @@
 
 # Editor files
 .vscode/
+**/Manifest.toml
