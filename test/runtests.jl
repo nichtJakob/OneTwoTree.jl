@@ -10,15 +10,16 @@ end
 
 
 @testset "Tree.jl" begin # Tests the functionality of Node, tree_prediction, less in Tree.jl
-
-    @testset "tree_prediction" begin
+    @testset "Tree Prediction" begin
         root = get_test_Tree_less_0_5()
-        @test tree_prediction(root, [1.0]) == 0.0 
+        @test tree_prediction(root, [1.0]) == 0.0
         @test tree_prediction(root, [0.0]) == 1.0
         @test tree_prediction(root, [55.0]) == 0.0
-        @test tree_prediction(root, [-1.0]) == 1.0   
-    end 
+        @test tree_prediction(root, [-1.0]) == 1.0
+    end
+
+    include("decision_tree_tests.jl")
 end
 
-
 include("gini_tests.jl")
+

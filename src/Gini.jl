@@ -19,6 +19,7 @@ function gini_impurity(features::AbstractVector, labels::AbstractVector, node_da
     features = features[node_data]
     labels = labels[node_data]
     
+
     #Split data in true and false
     split_true = [i for i in eachindex(features) if decision_fn(features[i])]
     split_false = [i for i in eachindex(features) if !decision_fn(features[i])]
@@ -35,6 +36,7 @@ function gini_impurity(features::AbstractVector, labels::AbstractVector, node_da
     end
 
     #Calculate Gini
+
 
     # Handle empty labels edge case
     if isempty(true_labels) || isempty(false_labels)
@@ -58,6 +60,7 @@ function gini_impurity(features::AbstractVector, labels::AbstractVector, node_da
     total_true = length(true_labels)
     total_false = length(false_labels)
 
+
     # Gini impurity for the true split
     gini_true = 1.0 - sum((count / total_true)^2 for count in values(label_counts_true))
 
@@ -67,6 +70,7 @@ function gini_impurity(features::AbstractVector, labels::AbstractVector, node_da
     # Weighted Gini impurity
     total_length_data = length(features)
     gini_total = (length(split_true) / total_length_data) * gini_true + (length(split_false) / total_length_data) * gini_false
+
 
     return gini_total
 
