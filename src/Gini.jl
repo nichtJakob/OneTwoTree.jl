@@ -42,12 +42,12 @@ function gini_impurity(features::Vector{Union{Real, String}}, labels::Vector{Uni
 
 
     #Number of true in true_labels and false_labels
-    true_num_true = count(x -> x == true, true_labels)
-    false_num_true = count(x -> x == true, false_labels)
+    true_num_true = count(x -> x == decision_fn(x), true_labels)
+    false_num_true = count(x -> x == decision_fn(x), false_labels)
 
     #Number of false in true_labels and false_labels
-    true_num_false = count(x -> x == false, true_labels)
-    false_num_false = count(x -> x == false, false_labels)
+    true_num_false = count(x -> x == decision_fn(x), true_labels)
+    false_num_false = count(x -> x == decision_fn(x), false_labels)
 
     #Calculate proportions
     total_true = length(true_labels)
@@ -67,3 +67,28 @@ function gini_impurity(features::Vector{Union{Real, String}}, labels::Vector{Uni
 
 
 end 
+
+using Test
+
+@testset "Gini Impurity Tests with Non-Boolean Labels" begin
+    # Test 1: Integer labels
+    @testset "Test with Integer Labels" begin
+        features1 = Union{Real, String}[1, 2, 3, 4]
+        labels1 = Union{Real, String}[1, 0, 1, 0]  # Integer labels
+        node_data1 = [1, 2, 3, 4]
+        decision_fn1 = x -> x <= 2
+        gini1 = gini_impurity(features1, labels1, node_data1, decision_fn1)
+        @test isapprox(gini1, 0.5, atol=1e-2)  # Replace with expected result
+    end
+
+    # Test 2: String labels
+    @testset "Test with String Labels" begin
+        features2 = Union{Real, String}["high", "low", "medium", "high"]
+        labels2 = Union{Real, String}["yes", "no", "yes", "no"]  # String labels
+        node_data2 = [1, 2, 3, 4]
+        decision_fn2 = x -> x == "high"
+        gini2 = gini_impurity(features2, labels2, node_data2, decision_fn2)
+        print(gini2)
+        @test isapprox(gini2, 0.5, atol=1e-2)  # Replace with expected result
+    end
+end
