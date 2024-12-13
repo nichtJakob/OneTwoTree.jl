@@ -53,8 +53,8 @@ function save_img_dataset_as_csv(dataset, filename, num_samples)
     df = convert_img_to_dataframe(images, labels)
 
     CSV.write(save_path, df)
-    println("Saved $(length(labels)) samples to \"$savepath\"")
+    println("Saved $(length(labels)) samples to \"$save_path\"")
 end
 
 #dataset_train = FashionMNIST(; split=:train)
-#save_img_dataset_as_csv(dataset_train, "test/data/fashion_mnist_1000.csv", 1000)
+#save_img_dataset_as_csv(dataset_train, "fashion_mnist_1000.csv", 1000)
