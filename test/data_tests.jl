@@ -1,7 +1,7 @@
 using Test
 using OneTwoTree
 
-@testset "Load data" begin
+@testset "Load Data" begin
     features, labels = load_data("fashion_mnist_1000")
     @test typeof(labels) == Array{Int64,1}
     @test typeof(features) == Array{Float64,2}

@@ -14,7 +14,7 @@ function load_data(name)
         df = DataFrame(CSV.File(data_path))
         labels = df.label
         features = Matrix(select(df, Not(:label)))
-        features = transpose(features)
+        features = Array(transpose(features))
         return features, labels
     end
 

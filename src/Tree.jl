@@ -46,7 +46,7 @@ struct DecisionTree
     # rng=Random.GLOBAL_RNG
 
     # default constructor
-    function DecisionTree(; root::Union{Node, Nothing}, max_depth::Int)
+    function DecisionTree(root::Union{Node, Nothing}, max_depth::Int)
         new(root, max_depth)
     end
 end
@@ -59,8 +59,6 @@ end
 - `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-
-
 function DecisionTree(; root=nothing, max_depth=-1)
     DecisionTree(root, max_depth)
 end
@@ -77,10 +75,11 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 # Arguments
 
 - `tree::DecisionTree`: the tree to be trained
-- `X::Array{Float64,2}`: the training data
-- `y::Array{Float64,1}`: the target labels
+- `features::Array{Float64,2}`: the training data
+- `labels::Array{Float64,1}`: the target labels
 """
-function fit!(tree::DecisionTree, features::Array{Float64,2}, labels::Array{Float64,1})
+#function fit!(tree::DecisionTree, features::Array{Float64,2}, labels::Array{Float64,1})
+function fit!(tree::DecisionTree, features::Matrix{S}, labels::Vector{T}) where {S, T}
     #TODO: Implement CART
     error("Not implemented.")
 end
@@ -94,8 +93,8 @@ Builds a decision tree from the given data using some algorithm (e.g. CART)
 # Arguments
 
 - `tree::DecisionTree`: the tree to be trained
-- `X::Array{Float64,2}`: the training data
-- `y::Array{Float64,1}`: the target labels
+- `features::Array{Float64,2}`: the training data
+- `labels::Array{Float64,1}`: the target labels
 """
 function build_tree(features::Array{Float64,2}, labels::Array{Float64,1},
                     max_depth::Int
@@ -104,7 +103,6 @@ function build_tree(features::Array{Float64,2}, labels::Array{Float64,1},
     #TODO: Implement CART
     error("Not implemented.")
 end
-
 
 """
     tree_prediction
@@ -125,6 +123,59 @@ function tree_prediction(tree::Node, x)
     end
 end
 
+"""
+    calc_accuracy(labels, predictions)
+
+Calculates the accuracy of the predictions compared to the labels.
+"""
+function calc_accuracy(labels, predictions)
+    if length(labels) != length(predictions)
+        error("Length of labels and predictions must be equal.")
+    end
+
+    if length(labels) == 0
+        return 0.0
+    end
+
+    correct = 0.0
+    for i in 1:lastindex(labels)
+        if labels[i] == predictions[i]
+            correct += 1.0
+        end
+    end
+
+    return correct / length(labels)
+end
+
+"""
+    depth(tree)
+
+Traverses the tree and returns the maximum depth.
+"""
+function calc_depth(tree::DecisionTree)
+
+    max_depth = 0
+    if tree.root === nothing
+        return max_depth
+    end
+
+    to_visit = [(tree.root, 0)]
+    while !isempty(to_visit)
+        node, cur_depth = popfirst!(to_visit)
+
+        if cur_depth > max_depth
+            max_depth = cur_depth
+        end
+
+        if node.true_child !== nothing
+            push!(to_visit, (node.true_child, cur_depth + 1))
+        end
+
+        if node.false_child !== nothing
+            push!(to_visit, (node.false_child, cur_depth + 1))
+        end
+    end
+end
 
 """
     lessThan
@@ -155,7 +206,6 @@ x < 28 ?
 └─ True: 683
 
 """
-
 function print_tree(tree::DecisionTree)
     if tree.root === nothing
         println("The tree is empty.")
@@ -172,6 +222,15 @@ function print_tree(tree::DecisionTree)
 end
 
 """
+    is_leaf(node)
+
+Do you seriously expect a description for this?
+"""
+function is_leaf(node::Node)::Bool
+    return node.prediction !== nothing
+end
+
+"""
     _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
 
 Recursive helper function to print the decision tree structure.
@@ -183,7 +242,6 @@ Recursive helper function to print the decision tree structure.
 - `is_left`: Boolean indicating if the node is a left (true branch) child.
 - `indentation`: The current indentation.
 """
-
 function _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
     if is_left
         prefix = indentation * "└─ True"

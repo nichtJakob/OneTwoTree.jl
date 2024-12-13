@@ -1,7 +1,7 @@
 using OneTwoTree
 using Test
 
-@testset "DecisionTree struct" begin
+@testset "DecisionTree Struct" begin
     t0 = DecisionTree()
     @test t0.root === nothing
     @test t0.max_depth === -1
