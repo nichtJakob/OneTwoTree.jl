@@ -1,5 +1,6 @@
 using Test
 using OneTwoTree
+using MLDatasets    # for FashionMNIST
 
 @testset "Load Data" begin
     features, labels = load_data("fashion_mnist_1000")
@@ -18,4 +19,18 @@ using OneTwoTree
         end
         @test err isa Exception
     end
+end
+
+@testset "Download Data" begin
+    dataset_train = FashionMNIST(; split=:train)
+    let err = nothing
+        try
+            save_img_dataset_as_csv(dataset_train, "fashion_mnist_1000.csv", 1000)
+        catch e
+            err = e
+        end
+        @test err === nothing
+    end
+    path = joinpath(@__DIR__, "data", "fashion_mnist_1000.csv")
+    @test isfile(path)
 end

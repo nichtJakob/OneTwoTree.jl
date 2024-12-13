@@ -1,6 +1,16 @@
 using DataFrames
 using CSV
 
+"""
+    load_data(name::String)
+
+Load a preconfigured dataset from a CSV file.
+
+# Arguments
+- `name::String`: the name of the dataset to load
+# Example
+`load_data("fashion_mnist_1000")`
+"""
 function load_data(name)
     datasets = ["fashion_mnist_1000"]
 
