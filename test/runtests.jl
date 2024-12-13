@@ -40,7 +40,7 @@ end
         false_child = decision_node1
     )
 
-    tree = DecisionTree(decision_node2, max_depth=3)
+    tree = DecisionTree(decision_node2, 3)
 
     # Capture the printed output
     output = capture_stdout() do
