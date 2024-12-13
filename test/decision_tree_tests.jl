@@ -46,8 +46,8 @@ end
     expected_string = """
 x < 161 ?
 ├─ False: x < 28 ?
-│   ├─ False: 842.0
-│   └─ True: 683.0
+│  ├─ False: 842.0
+│  └─ True: 683.0
 └─ True: 2493.0
 """
 
