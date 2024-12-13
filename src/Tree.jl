@@ -218,8 +218,8 @@ function _node_to_string(node::Node, prefix::String, is_left::Bool, indentation:
         else
             indentation = indentation * "│  "
         end
-        result *= _node_to_string(node.true_child, prefix, false, indentation)
-        result *= _node_to_string(node.false_child, prefix, true, indentation)
+        result *= _node_to_string(node.false_child, prefix, false, indentation)
+        result *= _node_to_string(node.true_child, prefix, true, indentation)
         return result
     end
 end
