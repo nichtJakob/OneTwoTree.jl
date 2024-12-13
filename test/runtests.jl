@@ -11,79 +11,16 @@ end
 
 
 @testset "Tree.jl" begin # Tests the functionality of Node, tree_prediction, less in Tree.jl
-
-    @testset "tree_creation" begin
-        dataset = [[3,4] [6,1] [0,2]]
-        cat_labels = ["Chicken", "Egg"]
-        reg_labels = [12.0, 4.5]
-
-        root = Node(dataset, cat_labels, true)
-        root = Node(dataset, reg_labels, false)
-
-        dataset1 = [[3.5,1.0,5.6] [9.1,1.2,3.3] [2.9,0.4,4.3]]
-        dataset2 = [["Snow","Lax","Arm"] ["Hard","Snow","Hard"] ["Arm","Page","Payoff"]]
-        dataset3 = [[3.1,"Lax","Arm"] [0.6,"Snow","Hard"] [4.2,"Page","Payoff"]]
-        cat_labels1 = ["Chicken", "Egg", "Egg"]
-        reg_labels1 = [12.0, 4.5, 6.7]
-
-        root = Node(dataset1, cat_labels1, true)
-        root = Node(dataset1, reg_labels1, false)
-        root = Node(dataset1, cat_labels1, true, max_depth=1)
-        root = Node(dataset1, reg_labels1, false, max_depth=1)
-        root = Node(dataset2, cat_labels1, true, max_depth=1)
-        root = Node(dataset2, reg_labels1, false, max_depth=1)
-        # @test tree_prediction(root, [1.0]) == 0.0
-        # @test tree_prediction(root, [0.0]) == 1.0
-        # @test tree_prediction(root, [55.0]) == 0.0
-        # @test tree_prediction(root, [-1.0]) == 1.0
+    @testset "Tree Prediction" begin
+        root = get_test_Tree_less_0_5()
+        @test tree_prediction(root, [1.0]) == 0.0
+        @test tree_prediction(root, [0.0]) == 1.0
+        @test tree_prediction(root, [55.0]) == 0.0
+        @test tree_prediction(root, [-1.0]) == 1.0
     end
 
-    @testset "tree_prediction" begin
-        # TODO: I changed the Node signature, so this needs to be updated as well
-        # root = get_test_Tree_less_0_5()
-        # @test tree_prediction(root, [1.0]) == 0.0
-        # @test tree_prediction(root, [0.0]) == 1.0
-        # @test tree_prediction(root, [55.0]) == 0.0
-        # @test tree_prediction(root, [-1.0]) == 1.0
-    end
+    include("decision_tree_tests.jl")
 end
 
+include("gini_tests.jl")
 
-@testset "Test 1: Exact Output Matching" begin # Test: Tree with multiple decision nodes
-    leaf1 = Node(prediction=842)
-    leaf2 = Node(prediction=2493)
-    leaf3 = Node(prediction=683)
-
-    decision_node1 = Node(
-        decision = x -> x < 28,
-        decision_string = "x < 28",
-        true_child = leaf3,
-        false_child = leaf1
-    )
-
-    decision_node2 = Node(
-        decision = x -> x < 161,
-        decision_string = "x < 161",
-        true_child = leaf2,
-        false_child = decision_node1
-    )
-
-    tree = DecisionTree(decision_node2, max_depth=3)
-
-    # Capture the printed output
-    output = capture_stdout() do
-        print_tree(tree)
-    end
-
-    # Expected output string with the exact structure
-    expected_output = """
-x < 161 ?
-├─ False: x < 28 ?
-│   ├─ False: 842.0
-│   └─ True: 683.0
-└─ True: 2493.0
-"""
-
-    # Check if the exact expected output matches the printed output
-    @test output == expected_output
-end
