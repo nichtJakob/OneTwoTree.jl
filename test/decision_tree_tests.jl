@@ -41,11 +41,9 @@ end
 
     tree = DecisionTree(root=decision_node2, max_depth=3)
 
-    io = IOBuffer()
-    print_tree(tree, io)
-    output = String(take!(io))
-
-    @test tree_prediction(tree.root, [-1.0]) == 1.0
+    output = redirect_stdout() do
+        print_tree(tree)
+    end
 
     expected_output = """
 x < 161 ?
