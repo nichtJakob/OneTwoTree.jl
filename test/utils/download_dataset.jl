@@ -39,7 +39,7 @@ Save a subset of an image dataset to a CSV file.
 """
 function save_img_dataset_as_csv(dataset, filename, num_samples)
 
-    save_path = joinpath(@__DIR__, "..", "..", "test", "data")
+    save_path = joinpath(@__DIR__, "..", "data")
     if !isdir(save_path)
         error("Directory \"$save_path$filename\" does not exist.")
     end
