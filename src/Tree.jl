@@ -140,7 +140,6 @@ end
     print_tree(tree::DecisionTree)
 
 Prints a textual visualization of the decision tree.
-For each decision node, it displays the condition, and for each leaf, it displays the prediction.
 
 # Arguments
 
@@ -153,28 +152,43 @@ x < 28 ?
    ├─ False: 842
    └─ True: 2493
 └─ True: 683
+"""
+function print_tree(tree::DecisionTree)
+    println(tree_to_string(tree))
+end
+
 
 """
+    tree_to_string(tree::DecisionTree)
 
-function print_tree(tree::DecisionTree)
+Returns a textual visualization of the decision tree.
+For each decision node, displays the condition, and for each leaf, displays the prediction.
+
+# Arguments
+
+- `tree`: The `DecisionTree` instance to print.
+"""
+
+function tree_to_string(tree::DecisionTree)
     if tree.root === nothing
-        println("The tree is empty.")
+        return "The tree is empty.\n"
     else
         # If leaf
         if tree.root.prediction !== nothing
-            println("The tree is only a leaf with prediction = ", tree.root.prediction, ".")
+            return "The tree is only a leaf with prediction = $(tree.root.prediction).\n"
         else
-            println(string(tree.root.decision_string), " ?")
-            _print_node(tree.root.true_child, "", false, "")
-            _print_node(tree.root.false_child, "", true, "")
+            result = "$(tree.root.decision_string) ?\n"
+            result *= _node_to_string(tree.root.false_child, "", false, "")
+            result *= _node_to_string(tree.root.true_child, "", true, "")
+            return result
         end
     end
 end
 
 """
-    _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
+    _node_to_string(node::Node, prefix::String, is_left::Bool, indentation::String)
 
-Recursive helper function to print the decision tree structure.
+Recursive helper function to stringify the decision tree structure.
 
 # Arguments
 
@@ -184,7 +198,7 @@ Recursive helper function to print the decision tree structure.
 - `indentation`: The current indentation.
 """
 
-function _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
+function _node_to_string(node::Node, prefix::String, is_left::Bool, indentation::String)
     if is_left
         prefix = indentation * "└─ True"
     else
@@ -192,14 +206,20 @@ function _print_node(node::Node, prefix::String, is_left::Bool, indentation::Str
     end
     # If leaf
     if node.prediction !== nothing
-        println(prefix, ": ", node.prediction)
+        return "$(prefix): $(node.prediction)\n"
     else
         if node.decision_string !== nothing
-            println(prefix, ": ", node.decision_string, " ?")
+            result = "$(prefix): $(node.decision_string) ?\n"
         else
-            println(prefix, "Unknown decision")
+            result = "$(prefix): Unknown decision \n"
         end
-        _print_node(node.true_child, prefix, false, indentation * "   ")
-        _print_node(node.false_child, prefix, true, indentation * "   ")
+        if is_left
+            indentation = indentation * "   "
+        else
+            indentation = indentation * "│  "
+        end
+        result *= _node_to_string(node.true_child, prefix, false, indentation)
+        result *= _node_to_string(node.false_child, prefix, true, indentation)
+        return result
     end
 end

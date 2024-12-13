@@ -20,7 +20,7 @@ using Test
     @test t3.max_depth === -1
 end
 
-@testset "Print Tree" begin # Test: print tree with multiple decision nodes
+@testset "Tree to string" begin # Test: stringify tree with multiple decision nodes
     leaf1 = Node(prediction=842)
     leaf2 = Node(prediction=2493)
     leaf3 = Node(prediction=683)
@@ -41,11 +41,9 @@ end
 
     tree = DecisionTree(root=decision_node2, max_depth=3)
 
-    output = redirect_stdout() do
-        print_tree(tree)
-    end
+    returned_string = tree_to_string(tree)
 
-    expected_output = """
+    expected_string = """
 x < 161 ?
 ├─ False: x < 28 ?
 │   ├─ False: 842.0
@@ -53,5 +51,5 @@ x < 161 ?
 └─ True: 2493.0
 """
 
-    @test output == expected_output
+    @test returned_string == expected_output
 end
