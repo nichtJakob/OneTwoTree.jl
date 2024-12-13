@@ -46,4 +46,9 @@ end
         # @test tree_prediction(root, [55.0]) == 0.0
         # @test tree_prediction(root, [-1.0]) == 1.0
     end
+
+    include("decision_tree_tests.jl")
 end
+
+include("gini_tests.jl")
+

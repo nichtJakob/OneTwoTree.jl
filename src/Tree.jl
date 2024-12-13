@@ -27,6 +27,8 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
 
     # TODO: should implement split_function; split function should only work if this node is a leaf
     decision::Union{Function, Nothing} #returns True -> go to right child else left
+    decision_string::Union{String, Nothing} # *Optional* string for printing
+
     true_child::Union{Node, Nothing} #decision is True
     false_child::Union{Node, Nothing} #decision is NOT true
     prediction::Union{T, Nothing} # for leaves
@@ -228,7 +230,8 @@ A DecisionTree is a tree of Nodes.
 In addition to a root node it holds meta informations such as max_depth etc.
 Use `fit(tree, features, labels)` to create a tree from data
 
-# Arguments
+# Parameters
+- root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
 struct DecisionTree
@@ -250,10 +253,13 @@ end
 
 # Arguments
 
+- `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-function DecisionTree(; max_depth=-1)
-    DecisionTree(nothing, max_depth)
+
+
+function DecisionTree(; root=nothing, max_depth=-1)
+    DecisionTree(root, max_depth)
 end
 
 # ----------------------------------------------------------------
@@ -338,4 +344,68 @@ A basic categorical decision function for testing and playing around.
 """
 function equal(x, class::String, featureindex::Int = 1)::Bool
     return x[featureindex] == class
+end
+
+"""
+    print_tree(tree::DecisionTree)
+
+Prints a textual visualization of the decision tree.
+For each decision node, it displays the condition, and for each leaf, it displays the prediction.
+
+# Arguments
+
+- `tree`: The `DecisionTree` instance to print.
+
+# Example output:
+
+x < 28 ?
+├─ False: y < 161 ?
+   ├─ False: 842
+   └─ True: 2493
+└─ True: 683
+
+"""
+
+function print_tree(tree::DecisionTree)
+    if tree.root === nothing
+        println("The tree is empty.")
+    else
+        # If leaf
+        if tree.root.prediction !== nothing
+            println("The tree is only a leaf with prediction = ", tree.root.prediction, ".")
+        else
+            println(string(tree.root.decision_string), " ?")
+            _print_node(tree.root.true_child, "", false, "")
+            _print_node(tree.root.false_child, "", true, "")
+        end
+    end
+end
+
+"""
+    _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
+
+Recursive helper function to print the decision tree structure.
+
+# Arguments
+
+- `node`: The current node to print.
+- `prefix`: A string used for formatting the tree structure.
+- `is_left`: Boolean indicating if the node is a left (true branch) child.
+- `indentation`: The current indentation.
+"""
+
+function _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
+    if is_left
+        prefix = indentation * "└─ True"
+    else
+        prefix = indentation * "├─ False"
+    end
+    # If leaf
+    if node.prediction !== nothing
+        println(prefix, ": ", node.prediction)
+    else
+        println(prefix, ": ", string(tree.root.decision_string), " ?")
+        _print_node(node.true_child, prefix, false, indentation * "   ")
+        _print_node(node.false_child, prefix, true, indentation * "   ")
+    end
 end
