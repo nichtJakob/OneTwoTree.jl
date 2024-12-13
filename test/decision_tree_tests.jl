@@ -51,5 +51,5 @@ x < 161 ?
 └─ True: 2493.0
 """
 
-    @test returned_string == expected_output
+    @test returned_string == expected_string
 end
