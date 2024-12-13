@@ -20,7 +20,7 @@ using Test
     @test t3.max_depth === -1
 end
 
-@testset "Print Tree" begin # Test: Tree with multiple decision nodes
+@testset "Print Tree" begin # Test: print tree with multiple decision nodes
     leaf1 = Node(prediction=842)
     leaf2 = Node(prediction=2493)
     leaf3 = Node(prediction=683)
@@ -41,12 +41,12 @@ end
 
     tree = DecisionTree(root=decision_node2, max_depth=3)
 
-    output = capture_stdout() do
-        print_tree(tree)
-        @test tree_prediction(root, [-1.0]) == 1.0
-    end
+    io = IOBuffer()
+    print_tree(tree, io)
+    output = String(take!(io))
 
-    # Expected output string with the exact structure
+    @test tree_prediction(tree.root, [-1.0]) == 1.0
+
     expected_output = """
 x < 161 ?
 ├─ False: x < 28 ?
@@ -55,6 +55,5 @@ x < 161 ?
 └─ True: 2493.0
 """
 
-    # Check if the exact expected output matches the printed output
     @test output == expected_output
 end
