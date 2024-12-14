@@ -92,4 +92,15 @@ using Test
         gini9 = gini_impurity(features9, labels9, node_data9, decision_fn9)
         @test gini9 == 0.0  # Expect 0 because no labels match the decision function
     end
+
+    # Test 10: Cool as Ice
+    @testset "Test 10: Cool as Ice" begin
+        features10 = ["Yes", "Yes", "No", "No","Yes", "Yes", "No"]
+        labels10 = ["No", "No", "Yes", "Yes", "Yes", "No", "No"]
+        node_data10 = [1, 2, 3, 4, 5, 6, 7]  # All elements included
+        decision_fn10 = x -> x == "Yes"  # No match in decision_fn
+        gini10 = gini_impurity(features10, labels10, node_data10, decision_fn10)
+        print(gini10)
+        @test isapprox(gini10, 0.405, atol=1e-2)  # Expect value from Video
+    end
 end
