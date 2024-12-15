@@ -459,7 +459,7 @@ end
 
 A basic numerical decision function for testing and playing around.
 """
-function lessThanOrEqual(x, threshold::Float64, feature::Int64 = 1)::Bool
+function lessThanOrEqual(x, threshold::Float64; feature::Int64 = 1)::Bool
     return x[feature] <= threshold
 end
 
@@ -468,7 +468,7 @@ end
 
 A basic categorical decision function for testing and playing around.
 """
-function equal(x, class::String, feature::Int64 = 1)::Bool
+function equal(x, class::String; feature::Int64 = 1)::Bool
     return x[feature] == class
 end
 
