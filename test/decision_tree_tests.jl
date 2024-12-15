@@ -32,7 +32,7 @@ end
     )
 
     decision_node_less_than_28 = Node(
-        decision = DecisionFn(x -> lessThan(x, 28.0, 1), 28.0), # x < 28.0
+        decision = DecisionFn(x -> lessThan(x, 28.0), 28.0), # x < 28.0
         true_child = leaf_683,
         false_child = decision_node_equals_161
     )
@@ -43,7 +43,7 @@ end
 
     expected_string = """
 x < 28.0 ?
-├─ False: y == 161.0 ?
+├─ False: x == 161.0 ?
 │  ├─ False: 842.0
 │  └─ True: 2493.0
 └─ True: 683.0

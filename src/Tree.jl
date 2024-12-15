@@ -166,7 +166,7 @@ function tree_prediction(tree::Node, x)
     end
 
     #else check if decision(x) leads to right or left child
-    if tree.decision(x)
+    if tree.decision.fn(x)
         return tree_prediction(tree.true_child, x)
     else
         return tree_prediction(tree.false_child, x)
