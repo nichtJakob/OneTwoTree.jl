@@ -9,7 +9,7 @@ reg_labels = [12.0, 4.5]
 
 # In this form the inner arrays are interpreted as column vectors of the matrix, not row vectors!
 # But our implementation wants the datapoints to be the row vectors, which is meh
-# So for [[] [] []] you have to set transpose_matrix to true when creating a node
+# So for [[] [] []] you have to set column_data to true when creating a node
 dataset1 = [[3.5,1.0,5.6] [9.1,1.2,3.3] [2.9,0.4,4.3]]
 dataset2 = [["Snow","Lax","Arm"] ["Hard","Snow","Hard"] ["Arm","Page","Payoff"]]
 dataset3 = [[3.1,"Lax","Arm"] [0.6,"Snow","Hard"] [4.2,"Page","Payoff"]]
