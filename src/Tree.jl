@@ -4,6 +4,21 @@
 # MARK: Structs & Constructors
 # ----------------------------------------------------------------
 
+struct Decision{S<:Union{Real, String}}
+    fn::Function
+    param::S
+    feature::Int64
+
+    function Decision(fn::Function, feature::Int64, param::S) where S
+        # TODO: feature index can be chosen out of bounds... Idk, just be careful?
+        new{S}(fn, param, feature)
+    end
+end
+
+function call(decision::Decision, datapoint::Vector{S}) where S
+    return decision.fn(datapoint, param, feature=decision.feature)
+end
+
 """
     Node
 
@@ -26,7 +41,8 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
     depth::Int64
 
     # TODO: should implement split_function; split function should only work if this node is a leaf
-    decision::Union{Function, Nothing} #returns True -> go to right child else left
+    # decision::Union{Function, Nothing} #returns True -> go to right child else left
+    decision::Union{Decision, Nothing} #returns True -> go to right child else left
     decision_string::Union{String, Nothing} # *Optional* string for printing
 
     true_child::Union{Node, Nothing} #decision is True
@@ -44,26 +60,26 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
         if classify
             # in classification, we simply choose the most frequent label as our prediction
             N.prediction = most_frequent_class(labels, node_data)
+            # calculate gini impurity if this was a leaf node
+            N.impurity = gini_impurity(dataset, labels, node_data)
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
+            N.impurity = 0.65 # TODO: in regression Sum-of-squares error is used as measure of impurity
         end
 
-        N.impurity = 0.65 # TODO: dummy impurity; remove once the actual impurity can be calculated
-        # TODO: N.impurity = gini_impurity(dataset, labels, node_data) # TODO: create gini_impurity function that works with an index list
-        # N.impurity = gini_impurity(dataset[node_data, :], labels[node_data, :]) # This version uses the index list to index into the dataset before calling the method
-        # TODO: gini_impurity also needs to support non true/false labels (As it is, I can't use it right now)
-
-        # TODO: This is where the actual work is at
-        # split_info = calc_best_split()
-        split(N)
-        if should_split(N, max_depth)
+        N.decision, post_split_impurity = split(N)
+        if should_split(N, post_split_impurity, max_depth)
             # N.decision_column = split_info...
-            # N.decision = ...
             # Partition dataset into true/false datasets & pass them to the children
-            # N.true_child = ...
-            # N.false_child = ...
-
+            true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)
+            N.true_child = Node(dataset, labels, true_data, classify, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
+            N.false_child = Node(dataset, labels, false_data, classify, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
+            # TODO: Do we want to set prediction to nothing in non-leaf nodes? It could be neat to just have it, if we already had to calculate it anyways.
+            N.prediction = nothing
+        else
+            # Clear decision as we don't want to split
+            N.decision = nothing
         end
         return N
     end
@@ -71,13 +87,18 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
 end
 
 # Custom constructor for keyword arguments
-function Node(dataset, labels, classify; node_data=nothing, max_depth=0)
+function Node(dataset, labels, classify; column_data=false, node_data=nothing, max_depth=0)
 
+    # This is meant for when initializing a matrix like [[] [] []]. Then the inner []'s are inserted into the matrix as column vectors.
+    # But since we would like them to be interpreted as row-vectors, we provide the option to transpose in this case.
+    if column_data == true
+        dataset = copy(transpose(dataset))
+    end
     # if no subset was passed
     if node_data == nothing
         node_data = collect(1:size(dataset, 1))
     end
-    return Node(dataset, labels, node_data, classify)
+    return Node(dataset, labels, node_data, classify, max_depth=max_depth)
 end
 
 # function Node(dataset; node_data=nothing, decision=nothing, true_child=nothing, false_child=nothing, prediction=nothing)
@@ -85,142 +106,98 @@ end
 # end
 
 function split(N::Node)
+    decision::Union{Decision, Nothing} = nothing
+
     # 1. find best feature to split i.e. calc best split for each feature
     num_features = size(N.dataset)[2]
     best_feature = -1
-    # best_split_threshold = nothing
-    # best_split_choice = nothing
-    best_split_function = nothing
-    best_impurity = -1
+    best_decision::Union{Decision, Nothing} = nothing
+    best_impurity = -1.0
 
+    data = N.dataset[N.node_data, :]
     for i in range(1, num_features)
         # NOTE: This determination of whether a column is categorical or numerical assumes, that the types do not vary among a column
         is_categorical = (typeof(N.dataset[1, i]) == String)
+        # @info "\n\n\nChecking decisions for feature $(i) where is_categorical=$(is_categorical): "
+        # for categorical features, we calculate the gini impurity for each split (e.g. feature == class1, feature == class2, ...)
         if is_categorical
+            # TODO: Test & Debug Categorical case
+            # TODO: collect from data not N.dataset or write another collect_classes that takes a node_data index list as well
             classes = collect_classes(N.dataset, i)
             for class in classes
 
-                # TODO: impurity = gini_impurity()
-                impurity = 0.65
+                decision = Decision(equal, i, class)
+                impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
 
                 if best_feature == -1 || (impurity < best_impurity)
                     best_feature = i
                     best_impurity = impurity
-                    # TODO: set correct split function: best_split_function = equal(, i, class)
+                    best_decision = decision
                 end
             end
+        # for numerical features, we sort them and calculate the gini impurity for each split (splitting at the mean between each two list neighbors)
         else
             # sort dataset matrix by column
-            feature_value_sorting = sortperm(N.dataset[:, i])
-            for j in range(1, size(feature_value_sorting)[1]-1)
-                value = N.dataset[feature_value_sorting[j]]
-                next_value = N.dataset[feature_value_sorting[j+1]]
-                midpoint =  (value + next_value)/2.0
+            feature_value_sorting = sortperm(data[:, i])
+            j = 1
+            while j < length(feature_value_sorting)
+                value = data[feature_value_sorting[j], i]
+                next_value = data[feature_value_sorting[j+1], i]
+                # if next_value == value there is no discriminating decision,
+                # thus we forward to the next distinct value
+                while next_value == value
+                    j += 1
+                    if j < size(feature_value_sorting)[1]
+                        next_value = data[feature_value_sorting[j+1], i]
+                    else
+                        j = -1
+                        break
+                    end
+                end
+                if j == -1
+                    break
+                end
+                # calculate threshold used to discriminate between two values
+                midpoint = (value + next_value)/2.0
 
-                # TODO: actually calculate impurity
-                impurity = 0.65
+                # calculate splitting impurity
+                decision = Decision(lessThanOrEqual, i, midpoint)
+                impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
 
+                # check if we found an improving decision
                 if best_feature == -1 || (impurity < best_impurity)
                     best_feature = i
                     best_impurity = impurity
-                    # TODO: set correct split function: best_split_function = lessThan(, i, threshold)
+                    best_decision = decision
                 end
+                j += 1
             end
         end
     end
 
-    # there are sortperm() and sortrows() for this
-    # or maybe its best to use dataframes, which offer this functionality as well
-    # => copy and sort? Or use index-permutations to quantify order?
-
-    # for numerical features, we sort them and calculate the gini impurity for each split (splitting at the mean between each two list neighbors)
-    # for categorical features, we calculate the gini impurity for each split (e.g. feature == class1, feature == class2, ...)
-
-    # Then we choose the overall best split we found
-
-    # best_split = nothing
-    # foreach feature
-    #     foreach possible split
-    #         calculate splitting criterion e.g. gini impurity
-    #         if this_split is better than best_split (according to criterion)
-    #             best_split = this_split
-    # return best_split
+    # if best_decision == nothing, this means that no split could be found.
+    return best_decision, best_impurity
 end
 
-function should_split(N::Node, max_depth::Int64)
+function should_split(N::Node, post_split_impurity::Float64, max_depth::Int64)
     # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should be impure i.e. impurity > 0 and the max_depth hasn't been reached.
+    if N.decision == nothing || post_split_impurity == -1.0
+        # @info "Could not find optimal split => No Split"
+        return false
+    end
     if N.impurity == 0.0
+        # @info "Node impurity == 0.0 => No Split"
         return false
     end
     if N.depth == max_depth
+        # @info "max_depth has been reached => No Split"
       return false
     end
-    # if impurity - impurity_after_split < min_purity_gain
+    # if impurity - post_split_impurity < min_purity_gain
     #   return false
     # end
-
     return true
-end
-
-# split node_data indices according to decision function
-function split_indices(dataset::Matrix{S}, node_data::Vector{Int64}, decision_fn::Function) where S
-    true_child_data::Vector{Int64} = []
-    false_child_data::Vector{Int64} = []
-    for datapoint_idx in node_data
-        if decision_fn(dataset[datapoint_idx, :])
-            push!(true_child_data, datapoint_idx)
-        else
-            push!(false_child_data, datapoint_idx)
-        end
-    end
-    return true_child_data, false_child_data
-end
-
-function collect_classes(dataset::Matrix{S}, column::Int64) where S
-    classes = Dict{String, Bool}()
-    # TODO: check if passed column is out of bounds
-    rows = size(dataset)[1]
-    for i in range(1, rows)
-        value = dataset[i, column]
-        if !haskey(classes, value)
-            classes[value] = true
-        end
-    end
-    return collect(keys(classes))
-end
-
-function most_frequent_class(labels::Vector{String}, indices::Vector{Int64})
-    class_frequencies = Dict{String, Int64}()
-    most_frequent = nothing
-
-    for index in indices
-        class = labels[index]
-        if haskey(class_frequencies, class)
-            class_frequencies[class] = class_frequencies[class] + 1
-            if class_frequencies[class] > class_frequencies[most_frequent]
-                most_frequent = class
-            end
-        else
-            class_frequencies[class] = 1
-            if most_frequent == nothing
-                most_frequent = labels[index]
-            end
-        end
-    end
-    return most_frequent
-end
-
-function label_mean(labels::Vector{T}, indices::Vector{Int64}) where T<:Real
-    sum = 0.0
-    foreach(index -> sum += labels[index], indices)
-    return sum / size(labels[indices])[1]
-end
-
-function label_mean(labels::Vector{T}) where T<:Real
-    sum = 0.0
-    foreach(label -> sum += label, labels)
-    return sum / size(labels)[1]
 end
 
 """
@@ -230,11 +207,11 @@ A DecisionTree is a tree of Nodes.
 In addition to a root node it holds meta informations such as max_depth etc.
 Use `fit(tree, features, labels)` to create a tree from data
 
-# Parameters
+# Arguments
 - root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-struct DecisionTree
+mutable struct DecisionTree
     root::Union{Node, Nothing}
     max_depth::Int
 
@@ -274,13 +251,14 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 # Arguments
 
 - `tree::DecisionTree`: the tree to be trained
-- `X::Array{Float64,2}`: the training data
-- `y::Array{Float64,1}`: the target labels
+- `dataset::Matrix{Union{Real, String}}`: the training data
+- `labels::Vector{Union{Real, String}}`: the target labels
+- `max_depth::Int`: the maximum depth of the created tree
+- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 """
-function fit!(tree::DecisionTree, features::Array{Float64,2}, labels::Array{Float64,1})
-# TODO: function fit!(tree::DecisionTree, dataset::Matrix{S}, labels::Vector{T}) <: {S, T}
-    #TODO: Implement CART
-    error("Not implemented.")
+function fit!(tree::DecisionTree, features::Matrix{S}, labels::Vector{T}, max_depth::Int; column_data=false) where {S<:Union{Real, String}, T<:Union{Real, String}}
+    classify = (labels[1] isa String)
+    tree.root = Node(features, labels, classify, max_depth=max_depth, column_data=column_data)
 end
 
 
@@ -292,28 +270,76 @@ Builds a decision tree from the given data using some algorithm (e.g. CART)
 # Arguments
 
 - `tree::DecisionTree`: the tree to be trained
-- `X::Array{Float64,2}`: the training data
-- `y::Array{String,1}`: the target labels
-- `max_depth::Int`: maximum depth of the created tree
+- `dataset::Matrix{Union{Real, String}}`: the training data
+- `labels::Vector{Union{Real, String}}`: the target labels
+- `max_depth::Int`: the maximum depth of the created tree
+- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 """
-# TODO: overload this function by a regression version with y::Vector{Float64} and a classification version with y::Vector{String} and remove 
-function build_tree(features::Array{Float64,2}, labels::Array{String,1},
-                    max_depth::Int, classify::Bool
+function build_tree(dataset::Matrix{S}, labels::Vector{T},
+                    max_depth::Int;
+                    column_data=false
                     #, min_samples_split::Int, pruning::Bool
-                    )::DecisionTree
-    #TODO: Implement CART
-    # TODO: build tree via root node
+                    )::DecisionTree where {S<:Union{Real, String}, T<:Union{Real, String}}
+
+    # TODO: probably move these checks to a dedicated consistency function
+    if isempty(labels)
+        error("build_tree: Cannot build tree from empty label set.")
+    end
+    if isempty(dataset)
+        error("build_tree: Cannot build tree from empty dataset.")
+    end
+    if max_depth < 0
+        error("build_tree: Cannot build tree with negative depth, but got max_depth=$(max_depth).")
+    end
+    if (!column_data && size(dataset, 1) != length(labels))
+        error("build_tree: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?")
+    end
+    if (column_data && size(dataset, 2) != length(labels))
+        error("build_tree: Dimension mismatch! Number of datapoints $(size(dataset, 2)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=false helps?")
+    end
+    for label in labels
+        if typeof(label) != typeof(labels[1])
+            error("build_tree: Encountered heterogeneous label types. Please make sure all labels are of the same type.")
+        end
+    end
+
+    # TODO: 
+    # TODO: check if columns of dataset have consistent type either Real or String
+    # if !column_data
+    #     for i in range(1, size(dataset, 2))
+    #         for j in range(1, size(dataset, 1))
+    #             if typeof(dataset[j, i]) != typeof(dataset[1, i])
+    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
+    #             end
+    #         end
+    #     end
+    # end
+
+    # if column_data
+    #     for i in range(1, size(dataset, 1))
+    #         for j in range(1, size(dataset, 2))
+    #             if typeof(dataset[i, j]) != typeof(dataset[i, 1])
+    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
+    #             end
+    #         end
+    #     end
+    # end
+
+    # classify = (labels[1] isa String)
+    # root = Node(dataset, labels, classify, max_depth=max_depth, column_data=column_data)
+    tree = DecisionTree(nothing, max_depth)
+    fit!(tree, dataset, labels, max_depth, column_data=column_data)
     # TODO: pruning
-    error("Not implemented.")
+    return tree
 end
 
 
 """
-    tree_prediction
+    predict
 
 Traverses the tree for a given datapoint x and returns that trees prediction.
 """
-function tree_prediction(tree::Node, x)
+function predict(tree::Node, x)
     #Check if leaf
     if tree.prediction !== nothing
         return tree.prediction
@@ -327,14 +353,13 @@ function tree_prediction(tree::Node, x)
     end
 end
 
-
 """
-    lessThan
+    lessThanOrEqual
 
 A basic numerical decision function for testing and playing around.
 """
-function lessThan(x, threshold::Float64, featureindex::Int = 1)::Bool
-    return x[featureindex] < threshold
+function lessThanOrEqual(x, threshold::Float64, feature::Int64 = 1)::Bool
+    return x[feature] <= threshold
 end
 
 """
@@ -342,8 +367,8 @@ end
 
 A basic categorical decision function for testing and playing around.
 """
-function equal(x, class::String, featureindex::Int = 1)::Bool
-    return x[featureindex] == class
+function equal(x, class::String, feature::Int64 = 1)::Bool
+    return x[feature] == class
 end
 
 """
@@ -370,19 +395,22 @@ function print_tree(tree::DecisionTree)
     if tree.root === nothing
         println("The tree is empty.")
     else
+        # TODO: You cannot decide whether a node is a leaf or not by whether it has a predictiona associated with it.
         # If leaf
-        if tree.root.prediction !== nothing
-            println("The tree is only a leaf with prediction = ", tree.root.prediction, ".")
-        else
-            println(string(tree.root.decision_string), " ?")
-            _print_node(tree.root.true_child, "", false, "")
-            _print_node(tree.root.false_child, "", true, "")
-        end
+        # if tree.root.prediction !== nothing
+        #     println("The tree is only a leaf with prediction = ", tree.root.prediction, ".")
+        # else
+        # TODO: please don't use assumed to be pre-stored decision strings, and calculate them yourself
+        # println(string(tree.root.decision_string), " ?")
+        println("DECISION: $(tree.root.decision)")
+        _print_node(tree.root.true_child, "", true, "")
+        _print_node(tree.root.false_child, "", false, "")
+        # end
     end
 end
 
 """
-    _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
+    _print_node(node::Node, prefix::String, is_true_child::Bool, indentation::String)
 
 Recursive helper function to print the decision tree structure.
 
@@ -390,22 +418,24 @@ Recursive helper function to print the decision tree structure.
 
 - `node`: The current node to print.
 - `prefix`: A string used for formatting the tree structure.
-- `is_left`: Boolean indicating if the node is a left (true branch) child.
+- `is_true_child`: Boolean indicating if the node is a true branch child.
 - `indentation`: The current indentation.
 """
 
-function _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
-    if is_left
-        prefix = indentation * "└─ True"
+function _print_node(node::Node, prefix::String, is_true_child::Bool, indentation::String)
+    if is_true_child
+        prefix = indentation * "├─ True"
     else
-        prefix = indentation * "├─ False"
+        prefix = indentation * "└─ False"
     end
     # If leaf
+    # TODO: You cannot decide whether a node is a leaf or not by whether it has a predictiona associated with it.
     if node.prediction !== nothing
         println(prefix, ": ", node.prediction)
     else
-        println(prefix, ": ", string(tree.root.decision_string), " ?")
-        _print_node(node.true_child, prefix, false, indentation * "   ")
-        _print_node(node.false_child, prefix, true, indentation * "   ")
+        # println(prefix, ": ", string(tree.root.decision_string), " ?")
+        println("DECISION: $(node.decision)")
+        _print_node(node.true_child, prefix, true, indentation * "   ")
+        _print_node(node.false_child, prefix, false, indentation * "   ")
     end
 end

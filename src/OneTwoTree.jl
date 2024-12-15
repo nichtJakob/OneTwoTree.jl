@@ -2,10 +2,12 @@ module OneTwoTree
 
 
 #Main Module file
-export lessThan, tree_prediction, Node, DecisionTree, print_tree
+export tree_prediction, Node, DecisionTree, build_tree, fit!, print_tree
+export lessThanOrEqual, equal
 export gini_impurity
 
 include("Tree.jl")
+include("CARTutils.jl")
 include("Gini.jl")
 
 

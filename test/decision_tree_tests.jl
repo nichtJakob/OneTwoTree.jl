@@ -10,14 +10,15 @@ using Test
     @test t1.root === nothing
     @test t1.max_depth === 5
 
-    n2 = Node(prediction=1.0)
-    t2 = DecisionTree(root=n2, max_depth=5)
-    @test t2.root === n2
-    @test t2.max_depth === 5
+    # TODO: deprecated. We currently don't have a prediction keyword argument
+    # n2 = Node(prediction=1.0)
+    # t2 = DecisionTree(root=n2, max_depth=5)
+    # @test t2.root === n2
+    # @test t2.max_depth === 5
 
-    t3 = DecisionTree(root=n2)
-    @test t3.root === n2
-    @test t3.max_depth === -1
+    # t3 = DecisionTree(root=n2)
+    # @test t3.root === n2
+    # @test t3.max_depth === -1
 end
 
 # @testset "Print Tree" begin # Test: Tree with multiple decision nodes
