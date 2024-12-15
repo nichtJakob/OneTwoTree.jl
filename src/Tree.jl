@@ -448,6 +448,7 @@ function calc_depth(tree::AbstractDecisionTree)
             push!(to_visit, (node.false_child, cur_depth + 1))
         end
     end
+    return max_depth
 end
 
 """
