@@ -63,6 +63,20 @@ using OneTwoTree
     
         #print_tree(r4_tree)
         @test all(isapprox.(r4_predictions, [1.5, 3.5], atol=0.1))
-        end
+    end
+
+    @testset "Regression max depth = 100 000" begin
+
+        #Tree generation
+        tree = DecisionTreeRegressor(max_depth = 100000)
+        fit!(tree, r1_features, r1_labels)
+    
+        #predicting
+        predictions = predict(tree, r1_test_features)
+        #print(predictions)
+    
+        #print_tree(tree)
+        @test all(isapprox.(predictions, [1.5, 3.5], atol=0.1))
+    end
     
 end
