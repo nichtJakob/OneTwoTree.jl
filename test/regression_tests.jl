@@ -15,5 +15,6 @@ using OneTwoTree
     #predicting
     r1_predictions = predict(r1_tree, r1_test_features)
 
+    #print_tree(r1_tree)
     @test all(isapprox.(r1_predictions, [1.5, 3.5], atol=0.1))
 end
