@@ -19,6 +19,10 @@ function call(decision::Decision, datapoint::Vector{S}) where S
     return decision.fn(datapoint, param, feature=decision.feature)
 end
 
+function call(decision::Decision, datapoint::Matrix{S}) where S
+    return decision.fn(datapoint, param, feature=decision.feature)
+end
+
 """
     Node
 
@@ -389,7 +393,7 @@ function predict(node::Node, x)
     end
 
     #else check if decision(x) leads to right or left child
-    if node.decision(x)
+    if call(node.decision, x)
         return predict(node.true_child, x)
     else
         return predict(node.false_child, x)
