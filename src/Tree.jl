@@ -239,6 +239,9 @@ end
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
 function DecisionTreeClassifier(; root=nothing, max_depth=-1)
+    if max_depth < -1
+        error("DecisionTreeClassifier: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)")
+    end
     DecisionTreeClassifier(root, max_depth)
 end
 
@@ -267,6 +270,9 @@ end
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
 function DecisionTreeRegressor(; root=nothing, max_depth=-1)
+    if max_depth < -1
+        error("DecisionTreeRegressor: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)")
+    end
     DecisionTreeRegressor(root, max_depth)
 end
 
