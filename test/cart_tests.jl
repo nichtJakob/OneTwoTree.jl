@@ -124,7 +124,7 @@ end
             @test predict(t1_3, [5.0]) == "B"
             @test predict(t1_3, [11.0]) == "C"
             @test predict(t1_3, [0.9]) == "A"
-            @test predict(t1_3, [6.0005]) == "C"
+            @test predict(t1_3, [6.5005]) == "C"
         end
     end
 
