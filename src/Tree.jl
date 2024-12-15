@@ -26,7 +26,7 @@ A Node represents a decision in the Tree.
 It is a leaf with a prediction or has exactly one true and one false child and a decision
 function.
 """
-mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
+mutable struct Node{S<:Union{Real, String}, T<:Union{Number, String}}
     # Reference to whole dataset governed by the tree (This is not a copy as julia doesn't copy but only binds new aliases to the same object)
     # data points are rows, data features are columns
     dataset::Union{Matrix{S}, Nothing}
