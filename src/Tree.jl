@@ -80,7 +80,7 @@ A DecisionTree is a tree of Nodes.
 In addition to a root node it holds meta informations such as max_depth etc.
 Use `fit(tree, features, labels)` to create a tree from data
 
-# Arguments
+# Parameters
 - root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
@@ -196,7 +196,7 @@ Prints a textual visualization of the decision tree.
 # Example output:
 
 x < 28.0 ?
-├─ False: y == 161.0 ?
+├─ False: x == 161.0 ?
 │  ├─ False: 842
 │  └─ True: 2493
 └─ True: 683
