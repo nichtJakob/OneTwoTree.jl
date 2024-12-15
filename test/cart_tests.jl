@@ -228,7 +228,7 @@ end
         end
 
         @testset "Invalid Depth" begin
-            @test_throws error DecisionTreeClassifier(max_depth=-2)
+            @test_throws "DecisionTreeClassifier: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)" DecisionTreeClassifier(max_depth=-2)
         end
     end
 end
