@@ -54,6 +54,8 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
     function Node(dataset::Matrix{S}, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; depth=0, min_purity_gain=nothing, max_depth=0) where {S, T}
         N = new{S, T}(dataset, labels, node_data)
         N.depth = depth
+        N.true_child = nothing
+        N.false_child = nothing
 
         # Determine the best prediction in this node if it is/were a leaf node
         # (We calculate the prediction even in non-leaf nodes, because we need it to decide whether to split this node. This is because we also consider how much purity is gained by splitting this node.)
