@@ -5,6 +5,55 @@
 # ----------------------------------------------------------------
 
 """
+    DecisionFn
+
+A structure representing a decision with a function and its parameter.
+
+# Parameters
+- `fn::Function`: The decision function.
+- `param::Union{Real, String}`: The parameter for the decision function.
+    - Real: for comparison functions (e.g. x < 5.0)
+    - String: for True/False functions (e.g. x == "red" or x != 681)
+"""
+struct DecisionFn
+    fn::Function
+    param::Union{Real, String}
+end
+
+# """
+#     Show representation of DecisionFn
+
+# Displays the decision function.
+# """
+# Base.show(io::IO, ::MIME"text/plain", d::DecisionFn) = printDecisionFn(io, d)
+
+# function printDecisionFn(io::IO, d::DecisionFn)
+#     if isa(d.param, Real)
+#         print(io, "x < ", d.param)
+#     else
+#         print(io, "x ", d.param)
+#     end
+# end
+
+"""
+    DecisionFn_to_string(d::DecisionFn)
+
+Returns a string representation of the decision function.
+
+# Arguments
+- `d::DecisionFn`: The decision function to convert to a string.
+"""
+
+function DecisionFn_to_string(d::DecisionFn)
+    if isa(d.param, Real)
+        return "x < " * string(d.param)
+    else
+        return "x " * string(d.param)
+    end
+end
+
+
+"""
     Node
 
 A Node represents a decision in the Tree.
@@ -12,16 +61,15 @@ It is a leaf with a prediction or has exactly one true and one false child and a
 function.
 """
 struct Node
-    decision::Union{Function, Nothing} # returns True -> go to left child, else right
-    decision_string::Union{String, Nothing} # *Optional* string for printing
-    true_child::Union{Node, Nothing} #decision is True
-    false_child::Union{Node, Nothing} #decision is NOT true
+    decision::Union{DecisionFn, Nothing} # decision function
+    true_child::Union{Node, Nothing} # decision is True
+    false_child::Union{Node, Nothing} # decision is NOT true
     prediction::Union{Float64, Nothing} # for leaves
 end
 
 # Custom constructor for keyword arguments
-function Node(; decision=nothing, decision_string=nothing, true_child=nothing, false_child=nothing, prediction=nothing)
-    Node(decision, decision_string, true_child, false_child, prediction)
+function Node(; decision=nothing, true_child=nothing, false_child=nothing, prediction=nothing)
+    Node(decision, true_child, false_child, prediction)
 end
 
 
@@ -32,7 +80,7 @@ A DecisionTree is a tree of Nodes.
 In addition to a root node it holds meta informations such as max_depth etc.
 Use `fit(tree, features, labels)` to create a tree from data
 
-# Parameters
+# Arguments
 - root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
@@ -147,10 +195,10 @@ Prints a textual visualization of the decision tree.
 
 # Example output:
 
-x < 28 ?
-├─ False: y < 161 ?
-   ├─ False: 842
-   └─ True: 2493
+x < 28.0 ?
+├─ False: y == 161.0 ?
+│  ├─ False: 842
+│  └─ True: 2493
 └─ True: 683
 """
 function print_tree(tree::DecisionTree)
@@ -177,7 +225,7 @@ function tree_to_string(tree::DecisionTree)
         if tree.root.prediction !== nothing
             return "The tree is only a leaf with prediction = $(tree.root.prediction).\n"
         else
-            result = "$(tree.root.decision_string) ?\n"
+            result = "$(DecisionFn_to_string(tree.root.decision)) ?\n"
             result *= _node_to_string(tree.root.false_child, "", false, "")
             result *= _node_to_string(tree.root.true_child, "", true, "")
             return result
@@ -208,11 +256,7 @@ function _node_to_string(node::Node, prefix::String, is_left::Bool, indentation:
     if node.prediction !== nothing
         return "$(prefix): $(node.prediction)\n"
     else
-        if node.decision_string !== nothing
-            result = "$(prefix): $(node.decision_string) ?\n"
-        else
-            result = "$(prefix): Unknown decision \n"
-        end
+        result = "$(prefix): $(DecisionFn_to_string(node.decision)) ?\n"
         if is_left
             indentation = indentation * "   "
         else

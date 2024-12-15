@@ -21,34 +21,32 @@ using Test
 end
 
 @testset "Tree to string" begin # Test: stringify tree with multiple decision nodes
-    leaf1 = Node(prediction=842)
-    leaf2 = Node(prediction=2493)
-    leaf3 = Node(prediction=683)
+    leaf_842 = Node(prediction=842)
+    leaf_2493 = Node(prediction=2493)
+    leaf_683 = Node(prediction=683)
 
-    decision_node1 = Node(
-        decision = x -> x < 28,
-        decision_string = "x < 28",
-        true_child = leaf3,
-        false_child = leaf1
+    decision_node_equals_161 = Node(
+        decision = DecisionFn(x -> x == 161.0, "== 161.0"),  # x == 161.0
+        true_child = leaf_2493,
+        false_child = leaf_842
     )
 
-    decision_node2 = Node(
-        decision = x -> x < 161,
-        decision_string = "x < 161",
-        true_child = leaf2,
-        false_child = decision_node1
+    decision_node_less_than_28 = Node(
+        decision = DecisionFn(x -> lessThan(x, 28.0, 1), 28.0), # x < 28.0
+        true_child = leaf_683,
+        false_child = decision_node_equals_161
     )
 
-    tree = DecisionTree(root=decision_node2, max_depth=3)
+    tree = DecisionTree(root=decision_node_less_than_28, max_depth=3)
 
     returned_string = tree_to_string(tree)
 
     expected_string = """
-x < 161 ?
-├─ False: x < 28 ?
+x < 28.0 ?
+├─ False: y == 161.0 ?
 │  ├─ False: 842.0
-│  └─ True: 683.0
-└─ True: 2493.0
+│  └─ True: 2493.0
+└─ True: 683.0
 """
 
     @test returned_string == expected_string
