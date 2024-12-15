@@ -16,10 +16,9 @@ struct Decision{S<:Union{Real, String}}
 end
 
 function call(decision::Decision, datapoint::Vector{S}) where S
-    return decision.fn(datapoint, param, feature=decision.feature)
-end
-
-function call(decision::Decision, datapoint::Matrix{S}) where S
+    if length(datapoint) < decision.feature
+        error("call: passed datapoint of insufficient dimensionality!")
+    end
     return decision.fn(datapoint, param, feature=decision.feature)
 end
 
