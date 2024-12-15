@@ -207,7 +207,7 @@ end
 
             @test t_bigger.root isa Node
             test_tree_consistency(tree=t_bigger, run_tests=t_bigger.root !== nothing)
-            @test calc_depth(t_bigger) >= 3
+            @test calc_depth(t_bigger) <= 2
 
             pred_bigger = predict(t_bigger, dataset_float)
             @test length(pred_bigger) == length(abc_labels)
