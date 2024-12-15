@@ -3,7 +3,8 @@ using OneTwoTree
 
 @testset "DecisionTreeRegressor" begin
 
-    #Data
+    @testset "Regression positiv" begin
+        #Data
     r1_features = [1.0 2.0; 2.0 3.0; 3.0 4.0; 4.0 5.0]
     r1_labels = [1.5, 2.5, 3.5, 4.5]
     r1_test_features = [1.5 2.5; 3.5 4.5]
@@ -17,4 +18,23 @@ using OneTwoTree
 
     #print_tree(r1_tree)
     @test all(isapprox.(r1_predictions, [1.5, 3.5], atol=0.1))
+    end
+
+    @testset "Regression negative" begin
+        #Data
+    r2_features = [-1.0 -2.0; -2.0 -3.0; -3.0 -4.0; -4.0 -5.0]
+    r2_labels = [-1.5, -2.5, -3.5, -4.5]
+    r2_test_features = [-1.5 -2.5; -3.5 -4.5]
+
+    #Tree generation
+    r2_tree = DecisionTreeRegressor(max_depth=3)
+    fit!(r2_tree, r2_features, r2_labels)
+
+    #predicting
+    r2_predictions = predict(r2_tree, r2_test_features)
+
+    print_tree(r2_tree)
+    @test all(isapprox.(r2_predictions, [-2.5, -4.5], atol=0.1))
+    end
+    
 end
