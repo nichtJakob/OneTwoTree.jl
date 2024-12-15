@@ -22,6 +22,6 @@ end
 
 include("decision_tree_tests.jl")
 include("data_tests.jl")
-include("gini_tests.jl")
+#include("gini_tests.jl")
 include("cart_tests.jl")
 

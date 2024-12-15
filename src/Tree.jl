@@ -251,12 +251,11 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 - `tree::DecisionTree`: the tree to be trained
 - `dataset::Matrix{Union{Real, String}}`: the training data
 - `labels::Vector{Union{Real, String}}`: the target labels
-- `max_depth::Int`: the maximum depth of the created tree
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 """
-function fit!(tree::DecisionTree, features::Matrix{S}, labels::Vector{T}, max_depth::Int; column_data=false) where {S<:Union{Real, String}, T<:Union{Real, String}}
+function fit!(tree::DecisionTree, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Real, String}}
     classify = (labels[1] isa String)
-    tree.root = Node(features, labels, classify, max_depth=max_depth, column_data=column_data)
+    tree.root = Node(features, labels, classify, max_depth=tree.max_depth, column_data=column_data)
 end
 
 
@@ -301,7 +300,7 @@ function build_tree(dataset::Matrix{S}, labels::Vector{T},
         end
     end
 
-    # TODO: 
+    # TODO:
     # TODO: check if columns of dataset have consistent type either Real or String
     # if !column_data
     #     for i in range(1, size(dataset, 2))
@@ -326,7 +325,7 @@ function build_tree(dataset::Matrix{S}, labels::Vector{T},
     # classify = (labels[1] isa String)
     # root = Node(dataset, labels, classify, max_depth=max_depth, column_data=column_data)
     tree = DecisionTree(nothing, max_depth)
-    fit!(tree, dataset, labels, max_depth, column_data=column_data)
+    fit!(tree, dataset, labels, column_data=column_data)
     # TODO: pruning
     return tree
 end
@@ -335,18 +334,29 @@ end
     predict
 
 Traverses the tree for a given datapoint x and returns that trees prediction.
+
+# Arguments
+- `tree::DecisionTree`: the tree to predict with
+- `x::Union{Matrix{S}, Vector{S}`: the datapoint to predict on
 """
-function predict(tree::Node, x)
-    #Check if leaf
-    if tree.prediction !== nothing
-        return tree.prediction
+function predict(tree::DecisionTree, x::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+    if tree.root === nothing
+        error("Cannot predict from an empty tree.")
+    end
+
+    return predict(tree.root, x)
+end
+
+function predict(node::Node, x)
+    if isleaf(node)
+        return node.prediction
     end
 
     #else check if decision(x) leads to right or left child
-    if tree.decision(x)
-        return predict(tree.true_child, x)
+    if node.decision(x)
+        return predict(node.true_child, x)
     else
-        return predict(tree.false_child, x)
+        return predict(node.false_child, x)
     end
 end
 

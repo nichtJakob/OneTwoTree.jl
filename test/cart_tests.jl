@@ -58,29 +58,27 @@ function test_tree_consistency(; tree::DecisionTree, run_tests::Bool=true)
     @test calc_depth(tree) <= tree.max_depth
 end
 
-
 @testset "FashionMNIST-1000" begin
     features, labels = load_data("fashion_mnist_1000")
     tree = DecisionTree(max_depth=10)
 
     @testset "Tree Construction" begin
-        err = nothing
-        try
-            fit!(tree, features, labels)
-        catch e
-            err = e
-        end
-        @test_skip err === nothing
-        @test_skip tree.root isa Node
-        @test_skip tree.max_depth == 10
-        test_tree_consistency(tree=tree, run_tests=false)
+        fit!(tree, features, labels)
+
+        @test tree.root isa Node
+        @test tree.max_depth == 10
+        test_tree_consistency(tree=tree, run_tests=true)
     end
 
-    @warn "Skipping prediction tests"
-    # @testset "Prediction" begin
-    #     pred = predict(tree, features)
-    #     @test_skip length(pred) == length(labels)
-    #     @test_skip calc_accuracy(labels, pred) > 0.2
-    # end
+    #@warn "Skipping prediction tests"
+    if(tree.root === nothing)
+        @warn "Skipping prediction tests"
+        return
+    end
+    @testset "Prediction" begin
+        pred = predict(tree, features)
 
+        @test length(pred) == length(labels)
+        @test calc_accuracy(labels, pred) > 0.2
+    end
 end
