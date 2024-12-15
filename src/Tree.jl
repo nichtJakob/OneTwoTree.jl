@@ -384,7 +384,7 @@ function predict(tree::AbstractDecisionTree, x::Union{Matrix{S}, Vector{S}}) whe
 end
 
 function predict(node::Node, x)
-    if isleaf(node)
+    if is_leaf(node)
         return node.prediction
     end
 
@@ -448,6 +448,7 @@ function calc_depth(tree::AbstractDecisionTree)
             push!(to_visit, (node.false_child, cur_depth + 1))
         end
     end
+    return max_depth
 end
 
 """
