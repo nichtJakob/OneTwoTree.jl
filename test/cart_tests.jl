@@ -181,6 +181,12 @@ end
     end
 
     @testset "Max Depth" begin
+        @testset "Zero Depth" begin
+            t_zero_depth = DecisionTreeClassifier(max_depth=0)
+            fit!(t_zero_depth, dataset_float, abc_labels)
+            @test calc_depth(t_zero_depth) == 0
+        end
+
         # unlimited depth
         @testset "Unlimited Depth" begin
             t_unlimited = DecisionTreeClassifier(max_depth=-1)
