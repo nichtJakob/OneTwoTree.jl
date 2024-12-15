@@ -59,17 +59,39 @@ function test_tree_consistency(; tree::AbstractDecisionTree, run_tests::Bool=tru
     end
 
     # test depth consistency
-    @test calc_depth(tree) <= tree.max_depth
+    if tree.max_depth > 0
+        @test calc_depth(tree) <= tree.max_depth
+    end
 end
 
 @testset "Basic Classification" begin
-    @testset "Fit and Predict" begin
-        dataset1 = [
-            3.0 6.0 0.0
-            4.0 1.0 2.0
-        ]
-        cat_labels1 = ["Chicken", "Egg"]
+    # some datasets
+    dataset1 = [
+        3.0 6.0 0.0
+        4.0 1.0 2.0
+    ]
+    cat_labels1 = ["Chicken", "Egg"]
 
+    dataset_float = [
+        3.5 9.1 2.9
+        1.0 1.2 0.4
+        5.6 3.3 4.3
+    ]
+    dataset_string = [
+        "Snow" "Hard" "Arm"
+        "Lax" "Snow" "Page"
+        "Arm" "Hard" "Payoff"
+    ]
+    dataset_int = [
+        7 0 4
+        3 4 4
+        3 2 3
+        1 0 7
+        8 9 2
+        0 6 2
+    ]
+    abc_labels = ["A", "B", "C"]
+    @testset "Fit and Predict" begin
         t1 = DecisionTreeClassifier(max_depth=1)
         fit!(t1, dataset1, cat_labels1)
 
@@ -83,24 +105,6 @@ end
     end
 
     @testset "Data Types" begin
-        dataset_float = [
-            3.5 9.1 2.9
-            1.0 1.2 0.4
-            5.6 3.3 4.3
-        ]
-        dataset_string = [
-            "Snow" "Hard" "Arm"
-            "Lax" "Snow" "Page"
-            "Arm" "Hard" "Payoff"
-        ]
-        dataset_int = [
-            7 0 4
-            3 4 4
-            3 2 3
-            1 0 7
-            8 9 2
-            0 6 2
-        ]
         if !USE_INT_FEATURES
             dataset_int = convert(Matrix{Float64}, dataset_int)
         end
@@ -109,9 +113,9 @@ end
         t_string = DecisionTreeClassifier(max_depth=3)
         t_int = DecisionTreeClassifier(max_depth=3)
 
-        fit!(t_float, dataset_float, ["A", "B", "C"])
-        fit!(t_string, dataset_string, ["A", "B", "C"])
-        fit!(t_int, dataset_int, ["A", "B", "C"])
+        fit!(t_float, dataset_float, abc_labels)
+        fit!(t_string, dataset_string,  abc_labels)
+        fit!(t_int, dataset_int, abc_labels)
 
         test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
         test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
@@ -127,18 +131,56 @@ end
         @test length(pred_float) == 3
         @test length(pred_string) == 3
         @test length(pred_int) == 3
-        @test calc_accuracy(["A", "B", "C"], pred_float) == 1.0
-        @test calc_accuracy(["A", "B", "C"], pred_string) == 1.0
-        @test calc_accuracy(["A", "B", "C"], pred_int) == 1.0
+        @test calc_accuracy(abc_labels, pred_float) == 1.0
+        @test calc_accuracy(abc_labels, pred_string) == 1.0
+        @test calc_accuracy(abc_labels, pred_int) == 1.0
+
+        #TODO: test mixed type and int features
         #TODO: test invalid inputs, should throw errors
     end
 
     @testset "Max Depth" begin
         # unlimited depth
-        # bigger depth than necessary
-        # smaller depth than necessary
-        # depth 0
-        # depth < -1
+        @testset "Unlimited Depth" begin
+            t_unlimited = DecisionTreeClassifier(max_depth=-1)
+
+            fit!(t_unlimited, dataset_float, abc_labels)
+            test_tree_consistency(tree=t_unlimited, run_tests=t_unlimited.root !== nothing)
+            @test calc_depth(t_unlimited) > 1
+
+            pred_unlimited = predict(t_unlimited, dataset_float)
+            @test length(pred_unlimited) == length(abc_labels)
+            @test calc_accuracy(abc_labels, pred_unlimited) == 1.0
+        end
+
+        @testset "Bigger Depth Than Necessary" begin
+            t_bigger = DecisionTreeClassifier(max_depth=12)
+
+            fit!(t_bigger, dataset_float, abc_labels)
+            test_tree_consistency(tree=t_bigger, run_tests=t_bigger.root !== nothing)
+            @test calc_depth(t_bigger) >= 3
+
+            pred_bigger = predict(t_bigger, dataset_float)
+            @test length(pred_bigger) == length(abc_labels)
+            @test calc_accuracy(abc_labels, pred_bigger) == 1.0
+        end
+
+        @testset "Smaller Depth Than Necessary" begin
+            t_smaller = DecisionTreeClassifier(max_depth=1)
+
+            fit!(t_smaller, dataset_float, abc_labels)
+            test_tree_consistency(tree=t_smaller, run_tests=t_smaller.root !== nothing)
+            @test calc_depth(t_smaller) == 1
+
+            pred_smaller = predict(t_smaller, dataset_float)
+            @test length(pred_smaller) == length(abc_labels)
+            @test calc_accuracy(abc_labels, pred_smaller) > 0.5
+        end
+
+        @testset "Invalid Depth" begin
+            @test_throws error DecisionTreeClassifier(max_depth=0)
+            @test_throws error DecisionTreeClassifier(max_depth=-2)
+        end
     end
 end
 
