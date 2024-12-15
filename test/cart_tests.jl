@@ -11,7 +11,7 @@ Checks if the properties of the node are consistent with the type of the node.
 """
 function test_node_consistency(node::Node)
     if is_leaf(node)
-        @test node.prediction isa Real || node.prediction isa String
+        @test node.prediction isa Number || node.prediction isa String
         @test node.true_child === nothing
         @test node.false_child === nothing
         @test node.decision === nothing
@@ -19,7 +19,7 @@ function test_node_consistency(node::Node)
         @test node.prediction === nothing
         @test node.true_child isa Node
         @test node.false_child isa Node
-        @test node.decision isa Function
+        @test node.decision isa OneTwoTree.Decision
     end
 end
 
@@ -60,6 +60,26 @@ function test_tree_consistency(; tree::AbstractDecisionTree, run_tests::Bool=tru
     # test depth consistency
     @test calc_depth(tree) <= tree.max_depth
 end
+
+@testset "Basic Classification" begin
+    @testset "Example 1" begin
+        dataset1 = [
+            3.0 6.0 0.0
+            4.0 1.0 2.0
+        ]
+        cat_labels1 = ["Chicken", "Egg"]
+
+        t1 = DecisionTreeClassifier(max_depth=1)
+        fit!(t1, dataset1, cat_labels1)
+
+        print_tree(t1)
+
+        @test t1.root isa Node
+        @test t1.max_depth == 1
+        test_tree_consistency(tree=t1, run_tests=t1.root !== nothing)
+    end
+end
+
 
 @testset "FashionMNIST-1000" begin
     if !RUN_MNIST
