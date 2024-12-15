@@ -59,11 +59,11 @@ Determine the most frequent class among a subset of class labels.
 
 # Arguments
 
-- `labels::Vector{String}`: class labels
+- `labels::Vector{Union{Int, String}}`: class labels
 - `indices::Vector{Int64}`: the indices of the class labels, to be considered/counted
 """
-function most_frequent_class(labels::Vector{String}, indices::Vector{Int64})
-    class_frequencies = Dict{String, Int64}()
+function most_frequent_class(labels::Vector{T}, indices::Vector{Int64}) where T <: Union{Int, String}
+    class_frequencies = Dict{T, Int64}()
     most_frequent = nothing
 
     for index in indices
@@ -75,7 +75,7 @@ function most_frequent_class(labels::Vector{String}, indices::Vector{Int64})
             end
         else
             class_frequencies[class] = 1
-            if most_frequent == nothing
+            if most_frequent === nothing
                 most_frequent = labels[index]
             end
         end

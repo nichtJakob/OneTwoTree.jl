@@ -95,7 +95,7 @@ function Node(dataset, labels, classify; column_data=false, node_data=nothing, m
         dataset = copy(transpose(dataset))
     end
     # if no subset was passed
-    if node_data == nothing
+    if node_data === nothing
         node_data = collect(1:size(dataset, 1))
     end
     return Node(dataset, labels, node_data, classify, max_depth=max_depth)
@@ -182,7 +182,7 @@ end
 function should_split(N::Node, post_split_impurity::Float64, max_depth::Int64)
     # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should be impure i.e. impurity > 0 and the max_depth hasn't been reached.
-    if N.decision == nothing || post_split_impurity == -1.0
+    if N.decision === nothing || post_split_impurity == -1.0
         # @info "Could not find optimal split => No Split"
         return false
     end
@@ -200,10 +200,13 @@ function should_split(N::Node, post_split_impurity::Float64, max_depth::Int64)
     return true
 end
 
-"""
-    DecisionTree
+#MARK: DecisionTree
+abstract type AbstractDecisionTree end
 
-A DecisionTree is a tree of Nodes.
+"""
+    DecisionTreeClassifier
+
+A DecisionTreeClassifier is a tree of decision nodes. It can predict classes based on the input data.
 In addition to a root node it holds meta informations such as max_depth etc.
 Use `fit(tree, features, labels)` to create a tree from data
 
@@ -211,18 +214,9 @@ Use `fit(tree, features, labels)` to create a tree from data
 - root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-mutable struct DecisionTree
+mutable struct DecisionTreeClassifier <: AbstractDecisionTree
     root::Union{Node, Nothing}
     max_depth::Int
-
-    # TODO: add additional needed properties here
-    # min_samples_split::Int
-    # pruning::Bool
-
-    # default constructor
-    function DecisionTree(root::Union{Node, Nothing}, max_depth::Int)
-        new(root, max_depth)
-    end
 end
 
 """
@@ -233,9 +227,39 @@ end
 - `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-function DecisionTree(; root=nothing, max_depth=-1)
-    DecisionTree(root, max_depth)
+function DecisionTreeClassifier(; root=nothing, max_depth=-1)
+    DecisionTreeClassifier(root, max_depth)
 end
+
+"""
+    DecisionTreeRegressor
+
+A DecisionTreeRegressor is a tree of decision nodes. It can predict function values based on the input data.
+In addition to a root node it holds meta informations such as max_depth etc.
+Use `fit(tree, features, labels)` to create a tree from data
+
+# Arguments
+- root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
+- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
+"""
+mutable struct DecisionTreeRegressor <: AbstractDecisionTree
+    root::Union{Node, Nothing}
+    max_depth::Int
+end
+
+"""
+    Initialises a decision tree model.
+
+# Arguments
+
+- `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
+- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
+"""
+function DecisionTreeRegressor(; root=nothing, max_depth=-1)
+    DecisionTreeRegressor(root, max_depth)
+end
+
+
 
 # ----------------------------------------------------------------
 # MARK: Functions
@@ -248,13 +272,20 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 
 # Arguments
 
-- `tree::DecisionTree`: the tree to be trained
+- `tree::AbstractDecisionTree`: the tree to be trained
 - `dataset::Matrix{Union{Real, String}}`: the training data
 - `labels::Vector{Union{Real, String}}`: the target labels
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 """
-function fit!(tree::DecisionTree, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Real, String}}
-    classify = (labels[1] isa String)
+function fit!(tree::AbstractDecisionTree, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+    if isempty(labels)
+        error("Cannot build tree from empty label set.")
+    end
+    if tree isa DecisionTreeRegressor && !(labels[1] isa String)
+        error("Cannot train a DecisionTreeRegressor on a dataset with categorical labels.")
+    end
+
+    classify = (tree isa DecisionTreeClassifier)
     tree.root = Node(features, labels, classify, max_depth=tree.max_depth, column_data=column_data)
 end
 
@@ -266,7 +297,7 @@ Builds a decision tree from the given data using some algorithm (e.g. CART)
 
 # Arguments
 
-- `tree::DecisionTree`: the tree to be trained
+- `tree::AbstractDecisionTree`: the tree to be trained
 - `dataset::Matrix{Union{Real, String}}`: the training data
 - `labels::Vector{Union{Real, String}}`: the target labels
 - `max_depth::Int`: the maximum depth of the created tree
@@ -276,7 +307,7 @@ function build_tree(dataset::Matrix{S}, labels::Vector{T},
                     max_depth::Int;
                     column_data=false
                     #, min_samples_split::Int, pruning::Bool
-                    )::DecisionTree where {S<:Union{Real, String}, T<:Union{Real, String}}
+                    )::AbstractDecisionTree where {S<:Union{Real, String}, T<:Union{Real, String}}
 
     # TODO: probably move these checks to a dedicated consistency function
     if isempty(labels)
@@ -322,9 +353,13 @@ function build_tree(dataset::Matrix{S}, labels::Vector{T},
     #     end
     # end
 
-    # classify = (labels[1] isa String)
+    classify = (labels[1] isa String)
     # root = Node(dataset, labels, classify, max_depth=max_depth, column_data=column_data)
-    tree = DecisionTree(nothing, max_depth)
+    if(classify)
+        tree = DecisionTreeClassifier(nothing, max_depth)
+    else
+        tree = DecisionTreeRegressor(nothing, max_depth)
+    end
     fit!(tree, dataset, labels, column_data=column_data)
     # TODO: pruning
     return tree
@@ -336,10 +371,10 @@ end
 Traverses the tree for a given datapoint x and returns that trees prediction.
 
 # Arguments
-- `tree::DecisionTree`: the tree to predict with
+- `tree::AbstractDecisionTree`: the tree to predict with
 - `x::Union{Matrix{S}, Vector{S}`: the datapoint to predict on
 """
-function predict(tree::DecisionTree, x::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+function predict(tree::AbstractDecisionTree, x::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
     if tree.root === nothing
         error("Cannot predict from an empty tree.")
     end
@@ -389,7 +424,7 @@ end
 
 Traverses the tree and returns the maximum depth.
 """
-function calc_depth(tree::DecisionTree)
+function calc_depth(tree::AbstractDecisionTree)
 
     max_depth = 0
     if tree.root === nothing
@@ -433,14 +468,14 @@ function equal(x, class::String, feature::Int64 = 1)::Bool
 end
 
 """
-    print_tree(tree::DecisionTree)
+    print_tree(tree::AbstractDecisionTree)
 
 Prints a textual visualization of the decision tree.
 For each decision node, it displays the condition, and for each leaf, it displays the prediction.
 
 # Arguments
 
-- `tree`: The `DecisionTree` instance to print.
+- `tree::AbstractDecisionTree` The `DecisionTree` instance to print.
 
 # Example output:
 
@@ -451,7 +486,7 @@ x < 28 ?
 └─ True: 683
 
 """
-function print_tree(tree::DecisionTree)
+function print_tree(tree::AbstractDecisionTree)
     if tree.root === nothing
         println("The tree is empty.")
     else

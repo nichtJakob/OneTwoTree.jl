@@ -6,7 +6,7 @@ include("utils/load_data.jl")
 include("CARTutils.jl")
 include("Gini.jl")
 
-export Node, DecisionTree
+export Node, DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
 export predict, fit!, build_tree, print_tree
 export calc_depth, calc_accuracy, is_leaf
 export lessThanOrEqual, equal

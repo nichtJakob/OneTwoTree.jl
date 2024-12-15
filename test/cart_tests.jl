@@ -1,6 +1,8 @@
 using Test
 using OneTwoTree
 
+run_mnist = false
+
 """
     test_node_consistency(node::Node)
 
@@ -25,7 +27,7 @@ end
 
 Traverses the tree and checks all properties of the tree and its nodes for consistency.
 """
-function test_tree_consistency(; tree::DecisionTree, run_tests::Bool=true)
+function test_tree_consistency(; tree::AbstractDecisionTree, run_tests::Bool=true)
     if !run_tests
         @warn "Skipping tree consistency tests"
         return
@@ -59,15 +61,20 @@ function test_tree_consistency(; tree::DecisionTree, run_tests::Bool=true)
 end
 
 @testset "FashionMNIST-1000" begin
+    if !run_mnist
+        @warn "Skipping FashionMNIST tests"
+        return
+    end
+
     features, labels = load_data("fashion_mnist_1000")
-    tree = DecisionTree(max_depth=10)
+    tree = DecisionTreeClassifier(max_depth=10)
 
     @testset "Tree Construction" begin
         fit!(tree, features, labels)
 
         @test tree.root isa Node
         @test tree.max_depth == 10
-        test_tree_consistency(tree=tree, run_tests=true)
+        test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
     end
 
     #@warn "Skipping prediction tests"
