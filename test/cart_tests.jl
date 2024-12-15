@@ -147,9 +147,9 @@ end
         test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
         test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
         test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
-        @test max_depth(t_float) == 3
-        @test max_depth(t_string) == 3
-        @test max_depth(t_int) == 3
+        @test calc_depth(t_float) == 3
+        @test calc_depth(t_string) == 3
+        @test calc_depth(t_int) == 3
 
         pred_float = predict(t_float, dataset_float)
         pred_string = predict(t_string, dataset_string)
@@ -173,7 +173,7 @@ end
 
         @test t_int_label.root isa Node
         test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
-        @test max_depth(t_int_label) == 3
+        @test calc_depth(t_int_label) == 3
 
         pred_int_label = predict(t_int_label, dataset_float)
         @test length(pred_int_label) == 3
