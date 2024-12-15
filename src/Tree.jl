@@ -16,7 +16,17 @@ struct Decision{S<:Union{Real, String}}
 end
 
 function call(decision::Decision, datapoint::Vector{S}) where S
-    return decision.fn(datapoint, param, feature=decision.feature)
+    if length(datapoint) < decision.feature
+        error("call: passed datapoint of insufficient dimensionality!")
+    end
+    return decision.fn(datapoint, decision.param, feature=decision.feature)
+end
+
+function call(decision::Decision, dataset::Matrix{S}) where S
+    if size(dataset, 2) < decision.feature
+        error("call: passed dataset with data of insufficient dimensionality!")
+    end
+    return [decision.fn(datapoint, decision.param, feature=decision.feature) for datapoint in dataset]
 end
 
 """
@@ -373,27 +383,44 @@ Traverses the tree for a given datapoint x and returns that trees prediction.
 
 # Arguments
 - `tree::AbstractDecisionTree`: the tree to predict with
-- `x::Union{Matrix{S}, Vector{S}`: the datapoint to predict on
+- `X::Union{Matrix{S}, Vector{S}`: the data to predict on
 """
-function predict(tree::AbstractDecisionTree, x::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+function predict(tree::AbstractDecisionTree, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
     if tree.root === nothing
         error("Cannot predict from an empty tree.")
     end
 
-    return predict(tree.root, x)
+    return predict(tree.root, X)
 end
 
-function predict(node::Node, x)
+function predict(node::Node, datapoint::Vector{S}) where S<:Union{Real, String}
     if is_leaf(node)
         return node.prediction
     end
 
-    #else check if decision(x) leads to right or left child
-    if node.decision(x)
-        return predict(node.true_child, x)
+    if call(node.decision, datapoint)
+        return predict(node.true_child, datapoint)
     else
-        return predict(node.false_child, x)
+        return predict(node.false_child, datapoint)
     end
+end
+
+function predict(node::Node, dataset::Matrix{S}) where S<:Union{Real, String}
+    if is_leaf(node)
+        return node.prediction * ones(size(dataset, 1))
+    end
+
+    result = []
+
+    for i in range(1, size(dataset, 1))
+        datapoint = dataset[i, :]
+        if call(node.decision, datapoint)
+            push!(result, predict(node.true_child, datapoint))
+        else
+            push!(result, predict(node.false_child, datapoint))
+        end
+    end
+    return result
 end
 
 """
@@ -456,7 +483,7 @@ end
 
 A basic numerical decision function for testing and playing around.
 """
-function lessThanOrEqual(x, threshold::Float64, feature::Int64 = 1)::Bool
+function lessThanOrEqual(x, threshold::Float64; feature::Int64 = 1)::Bool
     return x[feature] <= threshold
 end
 
@@ -465,7 +492,7 @@ end
 
 A basic categorical decision function for testing and playing around.
 """
-function equal(x, class::String, feature::Int64 = 1)::Bool
+function equal(x, class::String; feature::Int64 = 1)::Bool
     return x[feature] == class
 end
 

@@ -19,7 +19,7 @@ function split_indices(dataset::Matrix{S}, node_data::Vector{Int64}, decision_fn
     true_child_data::Vector{Int64} = []
     false_child_data::Vector{Int64} = []
     for datapoint_idx in node_data
-        if decision_fn(dataset[datapoint_idx, :], decision_param, decision_feature)
+        if decision_fn(dataset[datapoint_idx, :], decision_param, feature=decision_feature)
             push!(true_child_data, datapoint_idx)
         else
             push!(false_child_data, datapoint_idx)
