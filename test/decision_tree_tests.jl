@@ -2,23 +2,25 @@ using OneTwoTree
 using Test
 
 @testset "DecisionTree Struct" begin
-    # t0 = DecisionTree()
-    # @test t0.root === nothing
-    # @test t0.max_depth === -1
+    t0 = DecisionTreeClassifier()
+    @test t0.root === nothing
+    @test t0.max_depth === -1
 
-    # t1 = DecisionTree(max_depth=5)
-    # @test t1.root === nothing
-    # @test t1.max_depth === 5
+    t1 = DecisionTreeClassifier(max_depth=5)
+    @test t1.root === nothing
+    @test t1.max_depth === 5
 
-    # TODO: deprecated. We currently don't have a prediction keyword argument
-    # n2 = Node(prediction=1.0)
-    # t2 = DecisionTree(root=n2, max_depth=5)
-    # @test t2.root === n2
-    # @test t2.max_depth === 5
+    dataset = [1.0 2.0; 3.0 4.0; 5.0 6.0]  # A 3x2 matrix of Real numbers
+    labels = ["yes", "no", "yes"]
+    n2 = Node(dataset, labels, true)
 
-    # t3 = DecisionTree(root=n2)
-    # @test t3.root === n2
-    # @test t3.max_depth === -1
+    t2 = DecisionTreeClassifier(root=n2, max_depth=5)
+    @test t2.root === n2
+    @test t2.max_depth === 5
+
+    t3 = DecisionTreeClassifier(root=n2)
+    @test t3.root === n2
+    @test t3.max_depth === -1
 end
 
 # @testset "Print Tree" begin # Test: Tree with multiple decision nodes

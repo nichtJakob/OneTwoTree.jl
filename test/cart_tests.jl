@@ -1,7 +1,8 @@
 using Test
 using OneTwoTree
 
-run_mnist = false
+
+const RUN_MNIST = false
 
 """
     test_node_consistency(node::Node)
@@ -61,7 +62,7 @@ function test_tree_consistency(; tree::AbstractDecisionTree, run_tests::Bool=tru
 end
 
 @testset "FashionMNIST-1000" begin
-    if !run_mnist
+    if !RUN_MNIST
         @warn "Skipping FashionMNIST tests"
         return
     end

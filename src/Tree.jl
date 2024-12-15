@@ -83,7 +83,6 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Real, String}}
         end
         return N
     end
-
 end
 
 # Custom constructor for keyword arguments
