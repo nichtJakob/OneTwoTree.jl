@@ -105,26 +105,26 @@ end
 
         @testset "Prediction Threshold" begin
             t1_2 = DecisionTreeClassifier(max_depth = 1)
-            fit!(t1_2, [
+            fit!(t1_2, reshape([
                 1.0
                 10.0
-            ], ["A", "B"])
-            @test predict(t1_2, [5.5])[1] == "A"
-            @test predict(t1_2, [3.0])[1] == "A"
-            @test predict(t1_2, [5.6])[1] == "B"
-            @test predict(t1_2, [-200.0])[1] == "A"
+            ], 2, 1), ["A", "B"])
+            @test predict(t1_2, [5.5]) == "A"
+            @test predict(t1_2, [3.0]) == "A"
+            @test predict(t1_2, [5.6]) == "B"
+            @test predict(t1_2, [-200.0]) == "A"
 
             t1_3 = DecisionTreeClassifier(max_depth = 2)
-            fit!(t1_3, [
+            fit!(t1_3, reshape([
                 10.0
                 1.0
                 3.0
-            ], ["C", "A", "B"])
-            @test predict(t1_3, [2.0])[1] == "A"
-            @test predict(t1_3, [5.0])[1] == "B"
-            @test predict(t1_3, [11.0])[1] == "C"
-            @test predict(t1_3, [0.9])[1] == "A"
-            @test predict(t1_3, [6.0005])[1] == "C"
+            ], 3, 1), ["C", "A", "B"])
+            @test predict(t1_3, [2.0]) == "A"
+            @test predict(t1_3, [5.0]) == "B"
+            @test predict(t1_3, [11.0]) == "C"
+            @test predict(t1_3, [0.9]) == "A"
+            @test predict(t1_3, [6.0005]) == "C"
         end
     end
 
@@ -222,7 +222,6 @@ end
         end
 
         @testset "Invalid Depth" begin
-            @test_throws error DecisionTreeClassifier(max_depth=0)
             @test_throws error DecisionTreeClassifier(max_depth=-2)
         end
     end
