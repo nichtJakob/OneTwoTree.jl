@@ -282,7 +282,7 @@ function fit!(tree::AbstractDecisionTree, features::Matrix{S}, labels::Vector{T}
     if isempty(labels)
         error("Cannot build tree from empty label set.")
     end
-    if tree isa DecisionTreeRegressor && !(labels[1] isa String)
+    if tree isa DecisionTreeRegressor && (labels[1] isa String) # vorher: !(labels[1] isa String)
         error("Cannot train a DecisionTreeRegressor on a dataset with categorical labels.")
     end
 
