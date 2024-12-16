@@ -3,6 +3,8 @@
 
 Determine the optimal split of a node. Handles numerical and categorical data and labels.
 
+# Arguments
+
 - `N::Node`: The node to be split. All additional information for the split calculation (e.g. dataset, labels, node_data) is contained in N.
 """
 function split(N::Node)
@@ -79,6 +81,17 @@ function split(N::Node)
     return best_decision, best_impurity
 end
 
+"""
+    should_split(N, post_split_impurity, max_depth)
+
+Determines whether to split the node N given.
+
+# Arguments
+
+- `N::Node`: Node that may be split. N contains further fields relevant to the decision like the best splitting decision function, it's leaf impurity and depth.
+- `post_split_impurity::Float64`: The impurity of N after it's optimal split.
+- `max_depth::Int64`: The maximum depth of the tree N is part of.
+"""
 function should_split(N::Node, post_split_impurity::Float64, max_depth::Int64)
     # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should be impure i.e. impurity > 0 and the max_depth hasn't been reached.
