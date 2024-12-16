@@ -56,11 +56,11 @@ using OneTwoTree
         #Tree generation
         r4_tree = DecisionTreeRegressor()
         fit!(r4_tree, r1_features, r1_labels)
-    
+
         #predicting
         r4_predictions = predict(r4_tree, r1_test_features)
         #print(r4_predictions)
-    
+
         #print_tree(r4_tree)
         @test all(isapprox.(r4_predictions, [1.5, 3.5], atol=0.1))
     end
@@ -70,13 +70,12 @@ using OneTwoTree
         #Tree generation
         tree = DecisionTreeRegressor(max_depth = 100000)
         fit!(tree, r1_features, r1_labels)
-    
+
         #predicting
         predictions = predict(tree, r1_test_features)
         #print(predictions)
-    
+
         #print_tree(tree)
         @test all(isapprox.(predictions, [1.5, 3.5], atol=0.1))
     end
-    
 end
