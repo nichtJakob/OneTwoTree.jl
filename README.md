@@ -53,13 +53,55 @@
       ```
 
 
-3. ▶️ **Running The Code**
+3. ▶️ **Example: Running a Simple Example**
 
-    Use your Julia REPL :^]
+    ### Classification
+    ```julia
+    using OneTwoTree
 
-4. 📚 **Further Reading**
+    # The rows are the different data points
+    dataset = [
+      3.5 9.1 2.9
+      1.0 1.2 0.4
+      5.6 3.3 4.3
+    ]
+    labels = ["A", "B", "C"]
 
-    If you are a contributor to this package, read [this](https://adrianhill.de/julia-ml-course/write/).
+    tree = DecisionTreeClassifier(max_depth=2)
+    fit!(tree, dataset, labels)
+    print(tree)
+
+    prediction = predict([
+      2.0 4.0 6.0
+    ])
+    print("The tree predicted class $(prediction).")
+    ```
+    - Note that the classifier currently only supports training datasets of type `Real` and labels of type `String`
+    - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
+
+    ### Regression
+    ```julia
+    using OneTwoTree
+    dataset = [
+      1.0 2.0
+      2.0 3.0
+      3.0 4.0
+      4.0 5.0
+    ]
+    labels = [1.5, 2.5, 3.5, 4.5]
+    
+    tree = DecisionTreeRegressor(max_depth=3)
+    fit!(tree, dataset, labels)
+
+    prediction = predict([
+      1.0 4.0
+    ])
+    print("The tree predicted $(prediction).")
+    ```
+
+5. 📚 **Further Reading**
+
+    If you are a contributor to this package, read [this](https://adrianhill.de/julia-ml-course/write/) for information on how to add code, write tests, add dependencies, etc.
 
 ## 👩‍💻 Contributors
 [![Contributors](https://contrib.rocks/image?repo=nichtJakob/OneTwoTree.jl)](https://github.com/nichtJakob/OneTwoTree.jl/graphs/contributors)
