@@ -99,6 +99,8 @@
     ])
     print("The tree predicted $(prediction[1]).")
     ```
+   ### Loading Datasets
+   You can find a more extensive example which utilises the `Iris` dataset from `MLDatasets` in `demo_iris.jl`. :)
 
 5. 📚 **Further Reading**
 
