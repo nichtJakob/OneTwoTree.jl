@@ -71,10 +71,10 @@
     fit!(tree, dataset, labels)
     print(tree)
 
-    prediction = predict([
+    prediction = predict(tree, [
       2.0 4.0 6.0
     ])
-    print("The tree predicted class $(prediction).")
+    print("The tree predicted class $(prediction[1]).")
     ```
     - Note that the classifier currently only supports training datasets of type `Real` and labels of type `String`
     - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
@@ -92,11 +92,12 @@
     
     tree = DecisionTreeRegressor(max_depth=3)
     fit!(tree, dataset, labels)
+    print(tree)
 
-    prediction = predict([
+    prediction = predict(tree, [
       1.0 4.0
     ])
-    print("The tree predicted $(prediction).")
+    print("The tree predicted $(prediction[1]).")
     ```
 
 5. 📚 **Further Reading**
