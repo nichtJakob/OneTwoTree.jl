@@ -1,57 +1,10 @@
 #This File contains the fundamentals for decision trees in Julia
 
+include("DecisionFunction.jl")
+
 # ----------------------------------------------------------------
 # MARK: Structs & Constructors
 # ----------------------------------------------------------------
-
-"""
-    DecisionFn
-
-A structure representing a decision with a function and its parameter.
-
-# Parameters
-- `fn::Function`: The decision function.
-- `param::Union{Real, String}`: The parameter for the decision function.
-    - Real: for comparison functions (e.g. x < 5.0)
-    - String: for True/False functions (e.g. x == "red" or x != 681)
-"""
-struct DecisionFn
-    fn::Function
-    param::Union{Real, String}
-end
-
-# """
-#     Show representation of DecisionFn
-
-# Displays the decision function.
-# """
-# Base.show(io::IO, ::MIME"text/plain", d::DecisionFn) = printDecisionFn(io, d)
-
-# function printDecisionFn(io::IO, d::DecisionFn)
-#     if isa(d.param, Real)
-#         print(io, "x < ", d.param)
-#     else
-#         print(io, "x ", d.param)
-#     end
-# end
-
-"""
-    DecisionFn_to_string(d::DecisionFn)
-
-Returns a string representation of the decision function.
-
-# Arguments
-- `d::DecisionFn`: The decision function to convert to a string.
-"""
-
-function DecisionFn_to_string(d::DecisionFn)
-    if isa(d.param, Real)
-        return "x < " * string(d.param)
-    else
-        return "x " * string(d.param)
-    end
-end
-
 
 """
     Node
@@ -61,7 +14,7 @@ It is a leaf with a prediction or has exactly one true and one false child and a
 function.
 """
 struct Node
-    decision::Union{DecisionFn, Nothing} # decision function
+    decision::Union{DecisionFunction, Nothing} # decision function
     true_child::Union{Node, Nothing} # decision is True
     false_child::Union{Node, Nothing} # decision is NOT true
     prediction::Union{Float64, Nothing} # for leaves
@@ -205,6 +158,8 @@ function print_tree(tree::DecisionTree)
     println(tree_to_string(tree))
 end
 
+#TODO: Base.show(io::IO, tree::DecisionTree) to print tree nicely
+
 
 """
     tree_to_string(tree::DecisionTree)
@@ -222,10 +177,10 @@ function tree_to_string(tree::DecisionTree)
         return "The tree is empty.\n"
     else
         # If leaf
-        if tree.root.prediction !== nothing
+        if tree.root.prediction !== nothing #TODO: change to is_leaf
             return "The tree is only a leaf with prediction = $(tree.root.prediction).\n"
         else
-            result = "$(DecisionFn_to_string(tree.root.decision)) ?\n"
+            result = "$(tree.root.decision) ?\n"
             result *= _node_to_string(tree.root.false_child, "", false, "")
             result *= _node_to_string(tree.root.true_child, "", true, "")
             return result
