@@ -293,6 +293,7 @@ end
 Traverses the tree for a given datapoint x and returns that trees prediction.
 
 # Arguments
+
 - `tree::AbstractDecisionTree`: the tree to predict with
 - `X::Union{Matrix{S}, Vector{S}`: the data to predict on
 """
