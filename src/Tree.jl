@@ -165,72 +165,33 @@ end
 # ----------------------------------------------------------------
 
 """
-    fit!(tree, features, labels)
-
-Train a decision tree on the given data using some algorithm (e.g. CART).
-
-# Arguments
-
-- `tree::AbstractDecisionTree`: the tree to be trained
-- `dataset::Matrix{Union{Real, String}}`: the training data
-- `labels::Vector{Union{Real, String}}`: the target labels
-- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
+Some guards to ensure the input data is valid for training a tree.
 """
-function fit!(tree::AbstractDecisionTree, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+function _verify_fit!_args(tree, dataset, labels, column_data)
     if isempty(labels)
-        error("Cannot build tree from empty label set.")
+        error("fit!: Cannot build tree from empty label set.")
+    end
+    if isempty(dataset)
+        error("fit!: Cannot build tree from empty dataset.")
+    end
+    if tree.max_depth < -1
+        error("fit!: Cannot build tree with negative depth, but got max_depth=$(max_depth).")
+    end
+    if (!column_data && size(dataset, 1) != length(labels))
+        error("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?")
+    end
+    if (column_data && size(dataset, 2) != length(labels))
+        error("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 2)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=false helps?")
+    end
+    for label in labels
+        if typeof(label) != typeof(labels[1])
+            error("fit!: Encountered heterogeneous label types. Please make sure all labels are of the same type.")
+        end
     end
     if tree isa DecisionTreeRegressor && (labels[1] isa String) # vorher: !(labels[1] isa String)
         error("Cannot train a DecisionTreeRegressor on a dataset with categorical labels.")
     end
 
-    classify = (tree isa DecisionTreeClassifier)
-    tree.root = Node(features, labels, classify, max_depth=tree.max_depth, column_data=column_data)
-end
-
-
-"""
-    build_tree(features, labels, max_depth, ...)
-
-Builds a decision tree from the given data using some algorithm (e.g. CART)
-
-# Arguments
-
-- `tree::AbstractDecisionTree`: the tree to be trained
-- `dataset::Matrix{Union{Real, String}}`: the training data
-- `labels::Vector{Union{Real, String}}`: the target labels
-- `max_depth::Int`: the maximum depth of the created tree
-- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
-"""
-function build_tree(dataset::Matrix{S}, labels::Vector{T},
-                    max_depth::Int;
-                    column_data=false
-                    #, min_samples_split::Int, pruning::Bool
-                    )::AbstractDecisionTree where {S<:Union{Real, String}, T<:Union{Real, String}}
-
-    # TODO: probably move these checks to a dedicated consistency function
-    if isempty(labels)
-        error("build_tree: Cannot build tree from empty label set.")
-    end
-    if isempty(dataset)
-        error("build_tree: Cannot build tree from empty dataset.")
-    end
-    if max_depth < 0
-        error("build_tree: Cannot build tree with negative depth, but got max_depth=$(max_depth).")
-    end
-    if (!column_data && size(dataset, 1) != length(labels))
-        error("build_tree: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?")
-    end
-    if (column_data && size(dataset, 2) != length(labels))
-        error("build_tree: Dimension mismatch! Number of datapoints $(size(dataset, 2)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=false helps?")
-    end
-    for label in labels
-        if typeof(label) != typeof(labels[1])
-            error("build_tree: Encountered heterogeneous label types. Please make sure all labels are of the same type.")
-        end
-    end
-
-    # TODO:
     # TODO: check if columns of dataset have consistent type either Real or String
     # if !column_data
     #     for i in range(1, size(dataset, 2))
@@ -251,17 +212,25 @@ function build_tree(dataset::Matrix{S}, labels::Vector{T},
     #         end
     #     end
     # end
+end
 
-    classify = (labels[1] isa String)
-    # root = Node(dataset, labels, classify, max_depth=max_depth, column_data=column_data)
-    if(classify)
-        tree = DecisionTreeClassifier(nothing, max_depth)
-    else
-        tree = DecisionTreeRegressor(nothing, max_depth)
-    end
-    fit!(tree, dataset, labels, column_data=column_data)
-    # TODO: pruning
-    return tree
+"""
+    fit!(tree, features, labels)
+
+Train a decision tree on the given data using some algorithm (e.g. CART).
+
+# Arguments
+
+- `tree::AbstractDecisionTree`: the tree to be trained
+- `dataset::Matrix{Union{Real, String}}`: the training data
+- `labels::Vector{Union{Real, String}}`: the target labels
+- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
+"""
+function fit!(tree::AbstractDecisionTree, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+    _verify_fit!_args(tree, features, labels, column_data)
+
+    classify = (tree isa DecisionTreeClassifier)
+    tree.root = Node(features, labels, classify, max_depth=tree.max_depth, column_data=column_data)
 end
 
 """
