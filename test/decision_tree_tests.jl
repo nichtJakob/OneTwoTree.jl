@@ -39,6 +39,25 @@ x[1] <= 5.0 ?
 ├─ True: A
 └─ False: B
 "
+    @test returned_string == expected_string
 
+    dataset1 = reshape([
+        1.0;
+        3.0;
+        5.0
+    ], 3, 1)
+    labels1 = ["A", "B", "C"]
+
+    t = DecisionTreeClassifier(max_depth=2)
+    fit!(t, dataset1, labels1)
+
+    returned_string = OneTwoTree._tree_to_string(t)
+    expected_string = "
+x[1] <= 2.0 ?
+├─ True: A
+└─ False: x[1] <= 4.0 ?
+│  ├─ True: B
+│  └─ False: C
+"
     @test returned_string == expected_string
 end
