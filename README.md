@@ -44,7 +44,12 @@
   - For Contributors:
 
       ```bash
-      julia --project --banner=no
+      julia --project
+      ```
+    It might be necessary to resolve dependencies.
+    Go into the package manager by pressing `]`. Then type
+      ```julia
+      resolve
       ```
 
 
