@@ -2,6 +2,7 @@ module OneTwoTree
 
 #Main Module file
 include("utils/load_data.jl")
+include("Node.jl")
 include("Tree.jl")
 include("CART.jl")
 include("CARTutils.jl")
@@ -23,4 +24,3 @@ export gini_impurity
 export calc_depth, calc_accuracy, is_leaf
 
 end # end the module
-
