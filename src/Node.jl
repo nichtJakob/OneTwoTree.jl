@@ -128,3 +128,7 @@ function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
         return result
     end
 end
+
+function Base.show(io::IO, node::Node)
+    print(io, _node_to_string(node))
+end
