@@ -36,35 +36,35 @@ using OneTwoTree
 
     @testset "Means" begin
         @testset "Total Mean" begin
-            @test label_mean(nums1) == 58.4
-            @test label_mean(nums2) == 50.0
-            @test isapprox(label_mean(nums3), 48.818181818182)
+            @test OneTwoTree.label_mean(nums1) == 58.4
+            @test OneTwoTree.label_mean(nums2) == 50.0
+            @test isapprox(OneTwoTree.label_mean(nums3), 48.818181818182)
 
-            @test label_mean(negs1) == -10.4
-            @test isapprox(label_mean(negs2), -14.571428571429)
-            @test isapprox(label_mean(negs3), -3.2727272727273)
+            @test OneTwoTree.label_mean(negs1) == -10.4
+            @test isapprox(OneTwoTree.label_mean(negs2), -14.571428571429)
+            @test isapprox(OneTwoTree.label_mean(negs3), -3.2727272727273)
 
-            @test label_mean(fracs1) == 51.132
-            @test isapprox(label_mean(fracs2), 54.327142857143)
-            @test isapprox(label_mean(fracs3), 62.204545454545)
+            @test OneTwoTree.label_mean(fracs1) == 51.132
+            @test isapprox(OneTwoTree.label_mean(fracs2), 54.327142857143)
+            @test isapprox(OneTwoTree.label_mean(fracs3), 62.204545454545)
 
-            @test isapprox(label_mean(combs1), -0.99545454545455)
+            @test isapprox(OneTwoTree.label_mean(combs1), -0.99545454545455)
         end
 
         @testset "Subset Mean" begin
-            @test label_mean(nums1, inds3) == 64.75
-            @test label_mean(nums2, inds4) == 56.8
-            @test label_mean(nums3, inds5) == 52.0
+            @test OneTwoTree.label_mean(nums1, inds3) == 64.75
+            @test OneTwoTree.label_mean(nums2, inds4) == 56.8
+            @test OneTwoTree.label_mean(nums3, inds5) == 52.0
 
-            @test label_mean(negs1, inds3) == -15.75
-            @test label_mean(negs2, inds4) == -15.4
-            @test isapprox(label_mean(negs3, inds5), -6.1428571428571)
+            @test OneTwoTree.label_mean(negs1, inds3) == -15.75
+            @test OneTwoTree.label_mean(negs2, inds4) == -15.4
+            @test isapprox(OneTwoTree.label_mean(negs3, inds5), -6.1428571428571)
 
-            @test label_mean(fracs1, inds3) == 44.6
-            @test isapprox(label_mean(fracs2, inds4), 55.828)
-            @test isapprox(label_mean(fracs3, inds5), 56.464285714286)
+            @test OneTwoTree.label_mean(fracs1, inds3) == 44.6
+            @test isapprox(OneTwoTree.label_mean(fracs2, inds4), 55.828)
+            @test isapprox(OneTwoTree.label_mean(fracs3, inds5), 56.464285714286)
 
-            @test isapprox(label_mean(combs1, inds5), -10.837142857143)
+            @test isapprox(OneTwoTree.label_mean(combs1, inds5), -10.837142857143)
         end
     end
 end
