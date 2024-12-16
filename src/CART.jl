@@ -1,3 +1,10 @@
+"""
+    split(N)
+
+Determine the optimal split of a node. Handles numerical and categorical data and labels.
+
+- `N::Node`: The node to be split. All additional information for the split calculation (e.g. dataset, labels, node_data) is contained in N.
+"""
 function split(N::Node)
     decision::Union{Decision, Nothing} = nothing
 
