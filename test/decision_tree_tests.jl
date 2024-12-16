@@ -39,6 +39,7 @@ x[1] <= 5.0 ?
 ├─ True: A
 └─ False: B
 "
+
     @test returned_string == expected_string
 
     dataset1 = reshape([
@@ -59,5 +60,6 @@ x[1] <= 2.0 ?
 │  ├─ True: B
 │  └─ False: C
 "
+
     @test returned_string == expected_string
 end

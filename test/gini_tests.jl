@@ -2,7 +2,7 @@
 using OneTwoTree
 using Test
 
-@testset "Gini Impurity Tests with Non-Boolean Labels" begin
+@testset "Gini Impurity" begin
     # Test 1: Integer labels
     @testset "Test with Integer Labels" begin
         features1 = collect(transpose([1 2 3 4]))  # Integer features
