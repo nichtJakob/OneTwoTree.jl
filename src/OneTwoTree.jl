@@ -11,6 +11,8 @@ include("Gini.jl")
 export Node, DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
 export fit!, predict, print_tree
 
+#TODO: add build_tree guards to fit since we only export fit
+
 # Private Utilities
 export lessThanOrEqual, equal
 export load_data

@@ -23,34 +23,22 @@ using Test
     @test t3.max_depth === -1
 end
 
-# @testset "Tree to string" begin # Test: stringify tree with multiple decision nodes
-#     leaf_842 = Node(prediction=842)
-#     leaf_2493 = Node(prediction=2493)
-#     leaf_683 = Node(prediction=683)
+@testset "Print Tree" begin # Test: stringify tree with multiple decision nodes
+    dataset = reshape([
+        1.0;
+        9.0
+    ], 2, 1)
+    labels = ["A", "B"]
 
-#     decision_node_equals_161 = Node(
-#         decision = DecisionFn(x -> x == 161.0, "== 161.0"),  # x == 161.0
-#         true_child = leaf_2493,
-#         false_child = leaf_842
-#     )
+    t = DecisionTreeClassifier(max_depth=1)
+    fit!(t, dataset, labels)
 
-#     decision_node_less_than_28 = Node(
-#         decision = DecisionFn(x -> lessThan(x, 28.0), 28.0), # x < 28.0
-#         true_child = leaf_683,
-#         false_child = decision_node_equals_161
-#     )
+    returned_string = OneTwoTree._tree_to_string(t)
+    expected_string = "
+x[1] <= 5.0 ?
+├─ True: A
+└─ False: B
+"
 
-#     tree = DecisionTree(root=decision_node_less_than_28, max_depth=3)
-
-#     returned_string = tree_to_string(tree)
-
-#     expected_string = """
-# x < 28.0 ?
-# ├─ False: x == 161.0 ?
-# │  ├─ False: 842.0
-# │  └─ True: 2493.0
-# └─ True: 683.0
-# """
-
-#     @test returned_string == expected_string
-# end
+    @test returned_string == expected_string
+end
