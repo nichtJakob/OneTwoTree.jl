@@ -33,7 +33,7 @@ end
     t = DecisionTreeClassifier(max_depth=1)
     fit!(t, dataset, labels)
 
-    returned_string = OneTwoTree._tree_to_string(t)
+    returned_string = OneTwoTree._tree_to_string(t, false)
     expected_string = "
 x[1] <= 5.0 ?
 ├─ True: A
@@ -52,7 +52,7 @@ x[1] <= 5.0 ?
     t = DecisionTreeClassifier(max_depth=2)
     fit!(t, dataset1, labels1)
 
-    returned_string = OneTwoTree._tree_to_string(t)
+    returned_string = OneTwoTree._tree_to_string(t, false)
     expected_string = "
 x[1] <= 2.0 ?
 ├─ True: A
