@@ -114,21 +114,35 @@ function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
         prefix = indentation * "└─ False"
     end
 
+    if node === nothing
+        return "$(prefix): <Nothing>\n"
+    end
     if is_leaf(node)
         return "$(prefix): $(node.prediction)\n"
-    else
-        result = "$(prefix): $(node.decision) ?\n"
-        if is_true_child
-            indentation = indentation * "   "
-        else
-            indentation = indentation * "│  "
-        end
-        result *= _node_to_string(node.true_child, true, indentation)
-        result *= _node_to_string(node.false_child, false, indentation)
-        return result
     end
+
+    result = "$(prefix): $(node.decision) ?\n"
+    if is_true_child
+        indentation = indentation * "   "
+    else
+        indentation = indentation * "│  "
+    end
+    result *= _node_to_string(node.true_child, true, indentation)
+    result *= _node_to_string(node.false_child, false, indentation)
+    return result
+end
+
+function _node_to_string_as_root(node::Node)
+    if is_leaf(node)
+        return "\nPrediction: $(node.prediction)\n"
+    end
+
+    result = "\n$(node.decision) ?\n"
+    result *= _node_to_string(node.true_child, true, "")
+    result *= _node_to_string(node.false_child, false, "")
+    return result
 end
 
 function Base.show(io::IO, node::Node)
-    print(io, _node_to_string(node))
+    print(io, _node_to_string_as_root(node))
 end

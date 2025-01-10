@@ -268,18 +268,16 @@ x < 28.0 ?
 │  └─ True: 2493
 └─ True: 683
 """
-function _tree_to_string(tree::AbstractDecisionTree)
+function _tree_to_string(tree::AbstractDecisionTree, print_parameters=true)
     if tree.root === nothing
-        return "\n<Empty Tree>\n"
+        return "\nTree(max_depth=$(tree.max_depth), root=nothing)\n"
     end
 
-    if is_leaf(tree.root)
-        return "\nRoot Prediction: $(tree.root.prediction).\n"
+    result = ""
+    if print_parameters
+        result *= "Tree(max_depth=$(tree.max_depth))"
     end
-
-    result = "\n$(tree.root.decision) ?\n"
-    result *= _node_to_string(tree.root.true_child, true, "")
-    result *= _node_to_string(tree.root.false_child, false, "")
+    result *= _node_to_string_as_root(tree.root)
     return result
 end
 
@@ -305,5 +303,5 @@ x < 28.0 ?
 └─ True: 683
 """
 function print_tree(tree::AbstractDecisionTree)
-    print(tree)
+    print(_tree_to_string(tree, false))
 end
