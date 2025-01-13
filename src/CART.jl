@@ -24,17 +24,18 @@ function split(N::Node)
         # for categorical features, we calculate the gini impurity for each split (e.g. feature == class1, feature == class2, ...)
         if is_categorical
             # TODO: Test & Debug Categorical case
-            # TODO: collect from data not N.dataset or write another collect_classes that takes a node_data index list as well
-            classes = collect_classes(N.dataset, i)
-            for class in classes
+            classes = collect_classes(N.dataset, N.node_data, i)
+            if size(classes)[1] >= 2
+                for class in classes
 
-                decision = Decision(equal, i, class)
-                impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    decision = Decision(equal, i, class)
+                    impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
 
-                if best_feature == -1 || (impurity < best_impurity)
-                    best_feature = i
-                    best_impurity = impurity
-                    best_decision = decision
+                    if best_feature == -1 || (impurity < best_impurity)
+                        best_feature = i
+                        best_impurity = impurity
+                        best_decision = decision
+                    end
                 end
             end
         # for numerical features, we sort them and calculate the gini impurity for each split (splitting at the mean between each two list neighbors)

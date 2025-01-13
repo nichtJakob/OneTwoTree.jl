@@ -7,10 +7,10 @@ A Node represents a decision in the Tree.
 It is a leaf with a prediction or has exactly one true and one false child and a decision
 function.
 """
-mutable struct Node{S<:Union{Real, String}, T<:Union{Number, String}}
+mutable struct Node{T<:Union{Number, String}}
     # Reference to whole dataset governed by the tree (This is not a copy as julia doesn't copy but only binds new aliases to the same object)
     # data points are rows, data features are columns
-    dataset::Union{Matrix{S}, Nothing}
+    dataset::Union{AbstractMatrix, Nothing}
     # labels can be categorical => String or numerical => Real
     labels::Union{Vector{T}, Nothing}
     # Indices of the data in the dataset being governed by this node
@@ -32,8 +32,8 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::Matrix{S}, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; depth=0, min_purity_gain=nothing, max_depth=0) where {S, T}
-        N = new{S, T}(dataset, labels, node_data)
+    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; depth=0, min_purity_gain=nothing, max_depth=0) where {S, T}
+        N = new{T}(dataset, labels, node_data)
         N.depth = depth
         N.true_child = nothing
         N.false_child = nothing
@@ -59,6 +59,7 @@ mutable struct Node{S<:Union{Real, String}, T<:Union{Number, String}}
             N.true_child = Node(dataset, labels, true_data, classify, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
             N.false_child = Node(dataset, labels, false_data, classify, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
             # TODO: Do we want to set prediction to nothing in non-leaf nodes? It could be neat to just have it, if we already had to calculate it anyways.
+            # NOTE: The reason it is set to nothing here atm, is because N.prediction being nothing is later used to identify non-leaf nodes.
             N.prediction = nothing
         else
             # Clear decision as we don't want to split

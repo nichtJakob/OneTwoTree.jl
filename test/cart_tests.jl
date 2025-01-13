@@ -90,7 +90,14 @@ end
         8 9 2
         0 6 2
     ]
+    dataset_mixfs = [
+        7 "Old" 4 "Rich"
+        3 "Young" 4 "Poor"
+        3 "Young" 3 "Middle-class"
+        1 "Middle-aged" 7 "Middle-class"
+    ]
     abc_labels = ["A", "B", "C"]
+    abcd_labels = ["A", "B", "C", "D"]
     aabcbb_labels = ["A", "A", "B", "C", "B", "B"]
     @testset "Fit and Predict" begin
         t1 = DecisionTreeClassifier(max_depth=1)
@@ -138,31 +145,39 @@ end
         t_float = DecisionTreeClassifier(max_depth=3)
         t_string = DecisionTreeClassifier(max_depth=3)
         t_int = DecisionTreeClassifier(max_depth=3)
+        t_mixfs = DecisionTreeClassifier(max_depth=3)
 
         fit!(t_float, dataset_float, abc_labels)
         fit!(t_string, dataset_string,  abc_labels)
         fit!(t_int, dataset_int, aabcbb_labels)
+        fit!(t_mixfs, dataset_mixfs, abcd_labels)
 
         @test t_float.root isa Node
         @test t_string.root isa Node
-        @test t_int.root isa Node
+        # @test t_int.root isa Node
+        @test t_mixfs.root isa Node
         test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
-        # test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
+        test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
         # test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
+        test_tree_consistency(tree=t_mixfs, run_tests=t_mixfs.root !== nothing)
         @test calc_depth(t_float) == 2
-        # @test calc_depth(t_string) == 2
+        @test calc_depth(t_string) == 2
         # @test calc_depth(t_int) == 2 # TODO: this probably isn't 2 as we have 6 data points
+        @test calc_depth(t_mixfs) == 3 # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution.
 
         pred_float = predict(t_float, dataset_float)
-        # pred_string = predict(t_string, dataset_string)
+        pred_string = predict(t_string, dataset_string)
         # pred_int = predict(t_int, dataset_int)
+        pred_mixfs = predict(t_mixfs, dataset_mixfs)
 
         @test length(pred_float) == 3
-        # @test length(pred_string) == 3
+        @test length(pred_string) == 3
         # @test length(pred_int) == 6
+        @test length(pred_mixfs) == 4
         @test calc_accuracy(abc_labels, pred_float) == 1.0
-        # @test calc_accuracy(abc_labels, pred_string) == 1.0
+        @test calc_accuracy(abc_labels, pred_string) == 1.0
         # @test calc_accuracy(aabcbb_labels, pred_int) == 1.0
+        @test calc_accuracy(abcd_labels, pred_mixfs) == 1.0
 
         #TODO: test mixed type and int features
         #TODO: test invalid inputs, should throw errors

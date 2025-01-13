@@ -9,13 +9,13 @@ Split the dataset indices contained in node_data into two sets via the decision 
 
 # Arguments
 
-- `dataset::Matrix{Union{Real, String}}`: the dataset to split on (the datapoints are assumed to be contained rowwise)
+- `dataset::AbstractMatrix`: the dataset to split on (the datapoints are assumed to be contained rowwise)
 - `node_data::Vector{Int64}`: the index list, indexing dataset, to be split
 - `decision_fn::Function`: the decision function taking as input a datapoint, decision_param and decision_feature and returning a Bool
 - `decision_param::Union{Real, String}`: a parameter to the decision function. This can be a class name or a numeric threshold.
 - `decision_feature::Int64`: the index of the dimension of datapoints along which to split
 """
-function split_indices(dataset::Matrix{S}, node_data::Vector{Int64}, decision_fn::Function, decision_param::T, decision_feature::Int64) where {S<:Union{Real, String}, T<:Union{Real, String}}
+function split_indices(dataset::AbstractMatrix, node_data::Vector{Int64}, decision_fn::Function, decision_param::T, decision_feature::Int64) where {T<:Union{Real, String}}
     true_child_data::Vector{Int64} = []
     false_child_data::Vector{Int64} = []
     for datapoint_idx in node_data
@@ -35,11 +35,11 @@ Split the dataset indices contained in node_data into two sets via the decision 
 
 # Arguments
 
-- `dataset::Matrix{Union{Real, String}}`: the dataset to split on (the datapoints are assumed to be contained rowwise)
+- `dataset::AbstractMatrix`: the dataset to split on (the datapoints are assumed to be contained rowwise)
 - `node_data::Vector{Int64}`: the index list, indexing the dataset, to be split
 - `decision_fn::Function`: the decision function taking as input a datapoint and returning a Bool
 """
-function split_indices(dataset::Matrix{S}, node_data::Vector{Int64}, decision_fn::Function) where S<:Union{Real, String}
+function split_indices(dataset::AbstractMatrix, node_data::Vector{Int64}, decision_fn::Function)
     true_child_data::Vector{Int64} = []
     false_child_data::Vector{Int64} = []
     for datapoint_idx in node_data
@@ -90,15 +90,40 @@ Collect all unique classes among the specified column of the dataset.
 
 # Arguments
 
-- `dataset::Matrix{Union{Real, String}}`: the dataset to collect classes on
+- `dataset::AbstractMatrix`: the dataset to collect classes on
 - `column::Int64`: the index of the dataset column/feature to collect the classes on
 """
-function collect_classes(dataset::Matrix{S}, column::Int64) where S<:Union{Real, String}
+function collect_classes(dataset::AbstractMatrix, column::Int64)
     classes = Dict{String, Bool}()
     # TODO: check if passed column is out of bounds
     # TODO: check if passed column is categorical
     rows = size(dataset)[1]
     for i in range(1, rows)
+        value = dataset[i, column]
+        if !haskey(classes, value)
+            classes[value] = true
+        end
+    end
+    return collect(keys(classes))
+end
+
+"""
+    collect_classes(dataset, column)
+
+Collect all unique classes among a subset of the specified column of the dataset.
+
+# Arguments
+
+- `dataset::AbstractMatrix`: the dataset to collect classes on
+- `indices::Vector{Int64}`: the indices of the numeric labels to be considered
+- `column::Int64`: the index of the dataset column/feature to collect the classes on
+"""
+function collect_classes(dataset::AbstractMatrix, indices::Vector{Int64}, column::Int64)
+    classes = Dict{String, Bool}()
+    # TODO: check if passed column is out of bounds
+    # TODO: check if passed column is categorical
+    rows = size(dataset[indices])[1]
+    for i in indices
         value = dataset[i, column]
         if !haskey(classes, value)
             classes[value] = true
