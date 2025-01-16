@@ -42,14 +42,14 @@ end
 #--------------------------------------
 
 """
-    DecisionFn_to_string(d::DecisionFn)
+    _decision_to_string(d::DecisionFn)
 
 Returns a string representation of the decision function.
 
 # Arguments
 - `d::DecisionFn`: The decision function to convert to a string.
 """
-function DecisionFn_to_string(d::Decision)
+function _decision_to_string(d::Decision)
     if isa(d.param, Number)
         return "x[" * string(d.feature) * "] <= " * string(d.param)
     else
@@ -58,7 +58,7 @@ function DecisionFn_to_string(d::Decision)
 end
 
 function Base.show(io::IO, d::Decision)
-    print(io, DecisionFn_to_string(d))
+    print(io, _decision_to_string(d))
 end
 
 #--------------------------------------
@@ -66,11 +66,11 @@ end
 #--------------------------------------
 
 """
-    lessThanOrEqual
+    less_than_or_equal
 
 A basic numerical decision function for testing and playing around.
 """
-function lessThanOrEqual(x, threshold::Float64; feature::Int64 = 1)::Bool
+function less_than_or_equal(x, threshold::Float64; feature::Int64 = 1)::Bool
     return x[feature] <= threshold
 end
 

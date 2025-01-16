@@ -7,20 +7,17 @@ include("Tree.jl")
 include("CART.jl")
 include("CARTutils.jl")
 include("Gini.jl")
+include("infoGain.jl")
 
 
 # Public API
-export Node, DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
-export fit!, predict, print_tree
+export DecisionTreeClassifier, DecisionTreeRegressor
+export fit!, predict
+export calc_accuracy, print_tree
 
-#TODO: add build_tree guards to fit since we only export fit
-
-# Private Utilities
-export lessThanOrEqual, equal
-export load_data
 export gini_impurity
 
-# Testing
-export calc_depth, calc_accuracy, is_leaf
+export information_gain
+export less_than_or_equal, equal
 
 end # end the module
