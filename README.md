@@ -107,7 +107,7 @@ using OneTwoTree
       julia --project
       ```
     - It might be necessary to resolve dependencies.
-    Go into the package manager by pressing `]`. Then type
+    Go into `Pkg>` mode by pressing `]`. Then type
       ```julia
       resolve
       ```
