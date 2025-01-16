@@ -141,7 +141,7 @@ function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vect
     _verify_fit!_args(tree, features, labels, column_data)
 
     classify = (tree isa DecisionTreeClassifier)
-    tree.root = Node(features, labels, classify, entropy_metric=gini_impurity, max_depth=tree.max_depth, column_data=column_data)
+    tree.root = Node(features, labels, classify, gini_impurity, max_depth=tree.max_depth, column_data=column_data)
 end
 
 """
