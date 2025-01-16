@@ -24,13 +24,13 @@
 ## 🚀 Getting Started
 
 #### ✨ Downloading the Package
-Via `Pkg>` mode (press `]` in Julia REPL):
+- Via `Pkg>` mode (press `]` in Julia REPL):
 
 ```bash
 add https://github.com/nichtJakob/OneTwoTree.jl
 ```
 
-For Pluto notebooks: We can't use Pluto's environments but have to create our own:
+- For Pluto notebooks: We can't use Pluto's environments but have to create our own:
 ```julia
 using Pkg
 Pkg.activate("MyEnvironment")
@@ -101,20 +101,22 @@ using OneTwoTree
 
 2. 🔧 **Installation and Dependency Setup**
 
-    Run the following commands in the package's root directory to install the dependencies and activate the package's virtual environment:
-
-  - For Contributors:
+    - Run the following commands in the package's root directory to install the dependencies and activate the package's virtual environment:
 
       ```bash
       julia --project
       ```
-    It might be necessary to resolve dependencies.
+    - It might be necessary to resolve dependencies.
     Go into the package manager by pressing `]`. Then type
       ```julia
       resolve
       ```
+   - To execute the tests, type in `Pkg>` mode:
+     ```julia
+     test
+     ```
 
-    For a quick mini guide on how to develop julia packages, write tests, ...,  read [this](https://adrianhill.de/julia-ml-course/write/).
+    For a quick guide on how to develop julia packages, write tests, ...,  read [this](https://adrianhill.de/julia-ml-course/write/).
 
 ## 👩‍💻 Contributors
 [![Contributors](https://contrib.rocks/image?repo=nichtJakob/OneTwoTree.jl)](https://github.com/nichtJakob/OneTwoTree.jl/graphs/contributors)
