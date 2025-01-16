@@ -76,6 +76,7 @@ Tests different and also mixed data types.
 Tests whether constructed trees predict expected values and conform to given constraints
 (e.g. max_depth).
 """
+
 @testset "Basic Classification" begin
     # some datasets
     dataset1 = [
@@ -267,6 +268,7 @@ end
 Loads large FashionMNIST dataset from MLDatasets and tests tree construction and prediction
 as well as consistency in the tree.
 """
+
 @testset "FashionMNIST-1000" begin
     if !RUN_MNIST
         #@warn "Skipping FashionMNIST tests"
@@ -300,6 +302,7 @@ end
 """
 Runs the examples from the ReadMe to make sure that they work.
 """
+
 @testset "ReadMe Examples" begin
     @testset "Classification" begin
         dataset = [
