@@ -1,6 +1,6 @@
 using Test
 using OneTwoTree
-using MLDatasets    # for FashionMNIST
+# using MLDatasets    # for FashionMNIST
 
 @testset "Load Data" begin
     features, labels = load_data("fashion_mnist_1000")
