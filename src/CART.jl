@@ -64,7 +64,7 @@ function split(N::Node)
                 midpoint = (value + next_value)/2.0
 
                 # calculate splitting impurity
-                decision = Decision(lessThanOrEqual, i, midpoint)
+                decision = Decision(less_than_or_equal, i, midpoint)
                 impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
 
                 # check if we found an improving decision

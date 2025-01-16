@@ -2,8 +2,12 @@
 #using the OneTwoTree Package
 using OneTwoTree
 
-# First we load the iris dataset. Targets are here the 3 types of the Flower
-# and data contains mesurements of flowers
+# If you want to execute this example in your julia REPL you will first need to
+# 1) install a dependency for the dataset: Pkg.add("MLDatasets")
+# 2) execute the code in your REPL: include("demo_iris.jl")
+
+# First we load the iris dataset. Targets are the 3 types of the flowers
+# and data contains measurements of flowers
 using MLDatasets
 
 dataset = MLDatasets.Iris()

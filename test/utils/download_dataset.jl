@@ -1,3 +1,5 @@
+### Download existing datasets (e.g. Iris) from MLDatasets and save them as .csv files.
+
 using MLDatasets
 using DataFrames
 using CSV
