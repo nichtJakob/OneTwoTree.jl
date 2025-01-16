@@ -115,6 +115,11 @@ using OneTwoTree
      ```julia
      test
      ```
+     or in your julia REPL run:
+     ```julia
+     include("runtests.jl")         # run all tests
+     include("regression_tests.jl") # run specific test (example)
+     ```
 
     For a quick guide on how to develop julia packages, write tests, ...,  read [this](https://adrianhill.de/julia-ml-course/write/).
 
