@@ -1,3 +1,7 @@
+### Main file containing all the available tests
+### execute `test` in Pkg> mode (by pressing `]` in julia REPL)
+### or in your julia REPL execute `include("test/runtests.jl")`
+
 using OneTwoTree
 using Test
 
