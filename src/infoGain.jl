@@ -1,5 +1,5 @@
 # Spliting criterion Information Gain using entropy
-
+using StatsBase
 """
     entropy(features::AbstractVector) -> Float64
 
@@ -15,7 +15,7 @@ This function calculates the entropy of set of lables
     and P() beeing the Probability 
 """
 function entropy(labels)
-    num_occurences = countsmap(labels)
+    num_occurences = countmap(labels)
     wkeiten = [occurence / length(labels) for occurence in num_occurences.values]
     return -sum(p * log2(p) for p in wkeiten if p > 0)
 end
@@ -36,11 +36,11 @@ This function calculates the information gain spliting criterion
 - calculated as follows:
     Information gain = entropy(parent) - [weightes] * entropy(children) 
 """
-function information_gain(parent_labels, child_1_labels, child_2_labels) -> Float64
+function information_gain(parent_labels, child_1_labels, child_2_labels) :: Float64
     total = length(parent_labels) 
 
-    child_1_weight = lenth(child_1_labels) / total
-    child_2_weight = lenth(child_2_labels) / total
+    child_1_weight = length(child_1_labels) / total
+    child_2_weight = length(child_2_labels) / total
 
     weighted_entropy_1 = child_1_weight * entropy(child_1_labels) 
     weighted_entropy_2 = child_2_weight * entropy(child_2_labels) 
