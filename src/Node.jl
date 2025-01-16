@@ -32,7 +32,7 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; entropy_metric::Function, depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
         N.depth = depth
         N.true_child = nothing
@@ -43,16 +43,16 @@ mutable struct Node{T<:Union{Number, String}}
         if classify
             # in classification, we simply choose the most frequent label as our prediction
             N.prediction = most_frequent_class(labels, node_data)
-            # calculate gini impurity if this was a leaf node
-            N.impurity = gini_impurity(dataset, labels, node_data)
+            # calculate entropy if this was a leaf node
+            N.entropy = entropy_metric(dataset, labels, node_data)
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
-            N.impurity = 0.65 # TODO: in regression Sum-of-squares error is used as measure of impurity
+            N.entropy = 0.65 # TODO: in regression Sum-of-squares error is used as measure of entropy
         end
 
-        N.decision, post_split_impurity = split(N)
-        if should_split(N, post_split_impurity, max_depth)
+        N.decision, post_split_entropy = split(N)
+        if should_split(N, post_split_entropy, max_depth)
             # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)

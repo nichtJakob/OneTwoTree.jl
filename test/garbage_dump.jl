@@ -27,7 +27,7 @@ reg_labels2 = [1.0, -4.5, 8.7, 3.2, 4.1, 6.2]
 # root = Node(dataset1, reg_labels1, false, max_depth=1)
 # root = Node(dataset2, cat_labels1, true, max_depth=1)
 # root = Node(dataset2, reg_labels1, false, max_depth=1)
-root = Node(dataset5, cat_labels2, true, max_depth=3, column_data=true)
+root = Node(dataset5, cat_labels2, true, entropy_metric=gini_impurity, max_depth=3, column_data=true)
 # root = Node(dataset6, cat_labels2, true, max_depth=1)
 tree = DecisionTree(root, 3)
 print_tree(tree)
