@@ -17,8 +17,9 @@ mutable struct Node{T<:Union{Number, String}}
     node_data::Vector{Int64}
     # TODO: Index list of constant columns or columns the label does not vary with
     # constant_columns::Vector{Int64}
-    # Own impurity
-    impurity::Union{Float64, Nothing}
+    # Own entropy
+    entropy_metric::Function
+    entropy::Union{Float64, Nothing}
     depth::Int64
 
     # TODO: should implement split_function; split function should only work if this node is a leaf
@@ -32,8 +33,9 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; entropy_metric::Function=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {S, T}
+    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; entropy_metric=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {S, T}
         N = new{T}(dataset, labels, node_data)
+        N.entropy_metric = entropy_metric
         N.depth = depth
         N.true_child = nothing
         N.false_child = nothing

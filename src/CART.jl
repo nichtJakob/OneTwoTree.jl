@@ -96,7 +96,7 @@ Determines whether to split the node N given.
 function should_split(N::Node, post_split_entropy::Float64, max_depth::Int64)
     # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should be impure i.e. impurity > 0 and the max_depth hasn't been reached.
-    if N.decision === nothing || post_split_impurity == -1.0
+    if N.decision === nothing || post_split_entropy == -1.0
         # @info "Could not find optimal split => No Split"
         return false
     end
