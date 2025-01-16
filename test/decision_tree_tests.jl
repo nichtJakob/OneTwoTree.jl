@@ -12,7 +12,7 @@ using Test
 
     dataset = [1.0 2.0; 3.0 4.0; 5.0 6.0]
     labels = ["yes", "no", "yes"]
-    n2 = Node(dataset, labels, true)
+    n2 = OneTwoTree.Node(dataset, labels, true)
 
     t2 = DecisionTreeClassifier(root=n2, max_depth=5)
     @test t2.root === n2

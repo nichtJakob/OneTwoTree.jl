@@ -1,5 +1,6 @@
 using Test
 using OneTwoTree
+using Suppressor # suppress prints in tests
 
 
 const RUN_MNIST = false
@@ -10,16 +11,16 @@ const USE_INT_FEATURES = false
 
 Checks if the properties of the node are consistent with the type of the node.
 """
-function test_node_consistency(node::Node)
-    if is_leaf(node)
+function test_node_consistency(node::OneTwoTree.Node)
+    if OneTwoTree.is_leaf(node)
         @test node.prediction isa Number || node.prediction isa String
         @test node.true_child === nothing
         @test node.false_child === nothing
         @test node.decision === nothing
     else
         @test node.prediction === nothing
-        @test node.true_child isa Node
-        @test node.false_child isa Node
+        @test node.true_child isa OneTwoTree.Node
+        @test node.false_child isa OneTwoTree.Node
         @test node.decision isa OneTwoTree.Decision
     end
 end
@@ -29,7 +30,7 @@ end
 
 Traverses the tree and checks all properties of the tree and its nodes for consistency.
 """
-function test_tree_consistency(; tree::AbstractDecisionTree, run_tests::Bool=true)
+function test_tree_consistency(; tree::OneTwoTree.AbstractDecisionTree, run_tests::Bool=true)
     if !run_tests
         @warn "Skipping tree consistency tests"
         return
@@ -60,7 +61,7 @@ function test_tree_consistency(; tree::AbstractDecisionTree, run_tests::Bool=tru
 
     # test depth consistency
     if tree.max_depth > 0
-        @test calc_depth(tree) <= tree.max_depth
+        @test OneTwoTree.calc_depth(tree) <= tree.max_depth
     end
 end
 
@@ -103,7 +104,7 @@ end
         t1 = DecisionTreeClassifier(max_depth=1)
         fit!(t1, dataset1, cat_labels1)
 
-        @test t1.root isa Node
+        @test t1.root isa OneTwoTree.Node
         @test t1.max_depth == 1
         test_tree_consistency(tree=t1, run_tests=t1.root !== nothing)
 
@@ -152,18 +153,18 @@ end
         fit!(t_int, dataset_int, aabcbb_labels)
         fit!(t_mixfs, dataset_mixfs, abcd_labels)
 
-        @test t_float.root isa Node
-        @test t_string.root isa Node
-        # @test t_int.root isa Node
-        @test t_mixfs.root isa Node
+        @test t_float.root isa OneTwoTree.Node
+        @test t_string.root isa OneTwoTree.Node
+        # @test t_int.root isa OneTwoTree.Node
+        @test t_mixfs.root isa OneTwoTree.Node
         test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
         test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
         # test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
         test_tree_consistency(tree=t_mixfs, run_tests=t_mixfs.root !== nothing)
-        @test calc_depth(t_float) == 2
-        @test calc_depth(t_string) == 2
+        @test OneTwoTree.calc_depth(t_float) == 2
+        @test OneTwoTree.calc_depth(t_string) == 2
         # @test calc_depth(t_int) == 2 # TODO: this probably isn't 2 as we have 6 data points
-        @test calc_depth(t_mixfs) == 3 # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution.
+        @test OneTwoTree.calc_depth(t_mixfs) == 3 # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution.
 
         pred_float = predict(t_float, dataset_float)
         pred_string = predict(t_string, dataset_string)
@@ -189,7 +190,7 @@ end
         # t_int_label = DecisionTreeClassifier(max_depth=3)
         # fit!(t_int_label, dataset_float, [1, 2, 3])
 
-        # @test t_int_label.root isa Node
+        # @test t_int_label.root isa OneTwoTree.Node
         # test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
         # @test calc_depth(t_int_label) == 3
 
@@ -202,7 +203,7 @@ end
         @testset "Zero Depth" begin
             t_zero_depth = DecisionTreeClassifier(max_depth=0)
             fit!(t_zero_depth, dataset_float, abc_labels)
-            @test calc_depth(t_zero_depth) == 0
+            @test OneTwoTree.calc_depth(t_zero_depth) == 0
         end
 
         # unlimited depth
@@ -210,9 +211,9 @@ end
             t_unlimited = DecisionTreeClassifier(max_depth=-1)
             fit!(t_unlimited, dataset_float, abc_labels)
 
-            @test t_unlimited.root isa Node
+            @test t_unlimited.root isa OneTwoTree.Node
             test_tree_consistency(tree=t_unlimited, run_tests=t_unlimited.root !== nothing)
-            @test calc_depth(t_unlimited) > 1
+            @test OneTwoTree.calc_depth(t_unlimited) > 1
 
             pred_unlimited = predict(t_unlimited, dataset_float)
             @test length(pred_unlimited) == length(abc_labels)
@@ -223,9 +224,9 @@ end
             t_bigger = DecisionTreeClassifier(max_depth=12)
             fit!(t_bigger, dataset_float, abc_labels)
 
-            @test t_bigger.root isa Node
+            @test t_bigger.root isa OneTwoTree.Node
             test_tree_consistency(tree=t_bigger, run_tests=t_bigger.root !== nothing)
-            @test calc_depth(t_bigger) <= 2
+            @test OneTwoTree.calc_depth(t_bigger) <= 2
 
             pred_bigger = predict(t_bigger, dataset_float)
             @test length(pred_bigger) == length(abc_labels)
@@ -236,9 +237,9 @@ end
             t_smaller = DecisionTreeClassifier(max_depth=1)
             fit!(t_smaller, dataset_float, abc_labels)
 
-            @test t_smaller.root isa Node
+            @test t_smaller.root isa OneTwoTree.Node
             test_tree_consistency(tree=t_smaller, run_tests=t_smaller.root !== nothing)
-            @test calc_depth(t_smaller) == 1
+            @test OneTwoTree.calc_depth(t_smaller) == 1
 
             pred_smaller = predict(t_smaller, dataset_float)
             @test length(pred_smaller) == length(abc_labels)
@@ -254,17 +255,17 @@ end
 
 @testset "FashionMNIST-1000" begin
     if !RUN_MNIST
-        @warn "Skipping FashionMNIST tests"
+        #@warn "Skipping FashionMNIST tests"
         return
     end
 
-    features, labels = load_data("fashion_mnist_1000")
+    features, labels = OneTwoTree.load_data("fashion_mnist_1000")
     tree = DecisionTreeClassifier(max_depth=10)
 
     @testset "Tree Construction" begin
         fit!(tree, features, labels)
 
-        @test tree.root isa Node
+        @test tree.root isa OneTwoTree.Node
         @test tree.max_depth == 10
         test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
     end
@@ -279,5 +280,47 @@ end
 
         @test length(pred) == length(labels)
         @test calc_accuracy(labels, pred) > 0.2
+    end
+end
+
+@testset "ReadMe Examples" begin
+    @testset "Classification" begin
+        dataset = [
+            3.5 9.1 2.9
+            1.0 1.2 0.4
+            5.6 3.3 4.3
+        ]
+        labels = ["A", "B", "C"]
+
+        tree = DecisionTreeClassifier(max_depth=2)
+        @capture_out print(tree)
+        @capture_out print(fit!(tree, dataset, labels))
+        @capture_out print(tree)
+        prediction = predict(tree, [
+            2.0 4.0 6.0
+        ])
+        @capture_out print("The tree predicted class $(prediction[1]).")
+        @test true # no errors thrown
+    end
+
+    @testset "Regression" begin
+        dataset = [
+            1.0 2.0
+            2.0 3.0
+            3.0 4.0
+            4.0 5.0
+        ]
+        labels = [1.5, 2.5, 3.5, 4.5]
+
+        tree = DecisionTreeRegressor(max_depth=3)
+        @capture_out print(tree)
+        @capture_out print(fit!(tree, dataset, labels))
+        @capture_out print(tree)
+
+        prediction = predict(tree, [
+            1.0 4.0
+        ])
+        @capture_out print("The tree predicted $(prediction[1]).")
+        @test true # no errors thrown
     end
 end

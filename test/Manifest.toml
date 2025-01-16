@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.6"
+julia_version = "1.10.7"
 manifest_format = "2.0"
-project_hash = "71d91126b5a1fb1020e1098d9d492de2a4438fd2"
+project_hash = "77372d185d3700678577210f4d760fcb318e10c5"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -28,6 +28,12 @@ version = "0.7.0"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+
+[[deps.Suppressor]]
+deps = ["Logging"]
+git-tree-sha1 = "6dbb5b635c5437c68c28c2ac9e39b87138f37c0a"
+uuid = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
+version = "0.2.8"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]

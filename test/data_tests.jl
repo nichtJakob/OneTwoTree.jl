@@ -3,7 +3,7 @@ using OneTwoTree
 # using MLDatasets    # for FashionMNIST
 
 @testset "Load Data" begin
-    features, labels = load_data("fashion_mnist_1000")
+    features, labels = OneTwoTree.load_data("fashion_mnist_1000")
     @test typeof(labels) == Array{Int64,1}
     @test typeof(features) == Array{Float64,2}
     @test size(features) == (784, 1000)
@@ -21,8 +21,8 @@ using OneTwoTree
     end
 end
 
-# Works locally but not on Github Runner
-# For that reason, I put the file containing the functions into test/utils
+# Downloading datasets works locally but not on Github Runner
+# File containing the functions is in test/utils
 
 # @testset "Download Data" begin
 #     dataset_train = FashionMNIST(; split=:train)
