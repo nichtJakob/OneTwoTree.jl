@@ -7,6 +7,7 @@ include("Tree.jl")
 include("CART.jl")
 include("CARTutils.jl")
 include("Gini.jl")
+include("infoGain.jl")
 
 
 # Public API
@@ -19,6 +20,7 @@ export fit!, predict, print_tree
 export lessThanOrEqual, equal
 export load_data
 export gini_impurity
+export information_gain
 
 # Testing
 export calc_depth, calc_accuracy, is_leaf

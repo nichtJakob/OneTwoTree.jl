@@ -16,7 +16,7 @@ This function calculates the entropy of set of lables
 """
 function entropy(labels)
     num_occurences = countmap(labels)
-    wkeiten = [occurence / length(labels) for occurence in num_occurences.values]
+    wkeiten = [occurence / length(labels) for occurence in values(num_occurences)]
     return -sum(p * log2(p) for p in wkeiten if p > 0)
 end
 
@@ -36,7 +36,7 @@ This function calculates the information gain spliting criterion
 - calculated as follows:
     Information gain = entropy(parent) - [weightes] * entropy(children) 
 """
-function information_gain(parent_labels, child_1_labels, child_2_labels) :: Float64
+function information_gain(parent_labels::AbstractVector, child_1_labels::AbstractVector, child_2_labels::AbstractVector) :: Float64
     total = length(parent_labels) 
 
     child_1_weight = length(child_1_labels) / total
