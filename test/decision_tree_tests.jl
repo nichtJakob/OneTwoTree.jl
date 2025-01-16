@@ -1,63 +1,65 @@
 using OneTwoTree
 using Test
 
-@testset "DecisionTree struct" begin
-    t0 = DecisionTree()
+@testset "DecisionTree Struct" begin
+    t0 = DecisionTreeClassifier()
     @test t0.root === nothing
     @test t0.max_depth === -1
 
-    t1 = DecisionTree(max_depth=5)
+    t1 = DecisionTreeClassifier(max_depth=5)
     @test t1.root === nothing
     @test t1.max_depth === 5
 
-    n2 = Node(prediction=1.0)
-    t2 = DecisionTree(root=n2, max_depth=5)
+    dataset = [1.0 2.0; 3.0 4.0; 5.0 6.0]
+    labels = ["yes", "no", "yes"]
+    n2 = Node(dataset, labels, true)
+
+    t2 = DecisionTreeClassifier(root=n2, max_depth=5)
     @test t2.root === n2
     @test t2.max_depth === 5
 
-    t3 = DecisionTree(root=n2)
+    t3 = DecisionTreeClassifier(root=n2)
     @test t3.root === n2
     @test t3.max_depth === -1
 end
 
-# @testset "Print Tree" begin # Test: Tree with multiple decision nodes
-#     leaf1 = Node(prediction=842)
-#     leaf2 = Node(prediction=2493)
-#     leaf3 = Node(prediction=683)
+@testset "Print Tree" begin # Test: stringify tree with multiple decision nodes
+    dataset = reshape([
+        1.0;
+        9.0
+    ], 2, 1)
+    labels = ["A", "B"]
 
-#     decision_node1 = Node(
-#         decision = x -> x < 28,
-#         decision_string = "x < 28",
-#         true_child = leaf3,
-#         false_child = leaf1
-#     )
+    t = DecisionTreeClassifier(max_depth=1)
+    fit!(t, dataset, labels)
 
-#     decision_node2 = Node(
-#         decision = x -> x < 161,
-#         decision_string = "x < 161",
-#         true_child = leaf2,
-#         false_child = decision_node1
-#     )
+    returned_string = OneTwoTree._tree_to_string(t, false)
+    expected_string = "
+x[1] <= 5.0 ?
+├─ True: A
+└─ False: B
+"
 
-#     tree = DecisionTree(root=decision_node2, max_depth=3)
+    @test returned_string == expected_string
 
-#     #TODO:  Capture the printed output
-#     #TODO: this does not work
-#     #TODO: also if you use LLMs, you need to copy all your prompts into a txt file
-#     output = capture_stdout() do
-#         print_tree(tree)
-#         @test tree_prediction(root, [-1.0]) == 1.0
-#     end
+    dataset1 = reshape([
+        1.0;
+        3.0;
+        5.0
+    ], 3, 1)
+    labels1 = ["A", "B", "C"]
 
-#     # Expected output string with the exact structure
-#     expected_output = """
-# x < 161 ?
-# ├─ False: x < 28 ?
-# │   ├─ False: 842.0
-# │   └─ True: 683.0
-# └─ True: 2493.0
-# """
+    t = DecisionTreeClassifier(max_depth=2)
+    fit!(t, dataset1, labels1)
 
-#     # Check if the exact expected output matches the printed output
-#     @test output == expected_output
-# end
+    returned_string = OneTwoTree._tree_to_string(t, false)
+    expected_string = "
+x[1] <= 2.0 ?
+├─ True: A
+└─ False: x[1] <= 4.0 ?
+│  ├─ True: B
+│  └─ False: C
+"
+
+    @test returned_string == expected_string
+end

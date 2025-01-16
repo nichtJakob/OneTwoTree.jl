@@ -4,51 +4,23 @@
 # MARK: Structs & Constructors
 # ----------------------------------------------------------------
 
-"""
-    Node
-
-A Node represents a decision in the Tree.
-It is a leaf with a prediction or has exactly one true and one false child and a decision
-function.
-"""
-struct Node
-    decision::Union{Function, Nothing} # returns True -> go to left child, else right
-    decision_string::Union{String, Nothing} # *Optional* string for printing
-    true_child::Union{Node, Nothing} #decision is True
-    false_child::Union{Node, Nothing} #decision is NOT true
-    prediction::Union{Float64, Nothing} # for leaves
-end
-
-# Custom constructor for keyword arguments
-function Node(; decision=nothing, decision_string=nothing, true_child=nothing, false_child=nothing, prediction=nothing)
-    Node(decision, decision_string, true_child, false_child, prediction)
-end
-
+#MARK: DecisionTree
+abstract type AbstractDecisionTree end
 
 """
-    DecisionTree
+    DecisionTreeClassifier
 
-A DecisionTree is a tree of Nodes.
+A DecisionTreeClassifier is a tree of decision nodes. It can predict classes based on the input data.
 In addition to a root node it holds meta informations such as max_depth etc.
 Use `fit(tree, features, labels)` to create a tree from data
 
-# Parameters
+# Arguments
 - root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-struct DecisionTree
+mutable struct DecisionTreeClassifier <: AbstractDecisionTree
     root::Union{Node, Nothing}
     max_depth::Int
-
-    # TODO: add additional needed properties here
-    # min_samples_split::Int
-    # pruning::Bool
-    # rng=Random.GLOBAL_RNG
-
-    # default constructor
-    function DecisionTree(root::Union{Node, Nothing}, max_depth::Int)
-        new(root, max_depth)
-    end
 end
 
 """
@@ -59,15 +31,99 @@ end
 - `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-
-
-function DecisionTree(; root=nothing, max_depth=-1)
-    DecisionTree(root, max_depth)
+function DecisionTreeClassifier(; root=nothing, max_depth=-1)
+    if max_depth < -1
+        error("DecisionTreeClassifier: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)")
+    end
+    DecisionTreeClassifier(root, max_depth)
 end
+
+"""
+    DecisionTreeRegressor
+
+A DecisionTreeRegressor is a tree of decision nodes. It can predict function values based on the input data.
+In addition to a root node it holds meta informations such as max_depth etc.
+Use `fit(tree, features, labels)` to create a tree from data
+
+# Arguments
+- root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
+- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
+"""
+mutable struct DecisionTreeRegressor <: AbstractDecisionTree
+    root::Union{Node, Nothing}
+    max_depth::Int
+end
+
+"""
+    Initialises a decision tree model.
+
+# Arguments
+
+- `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
+- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
+"""
+function DecisionTreeRegressor(; root=nothing, max_depth=-1)
+    if max_depth < -1
+        error("DecisionTreeRegressor: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)")
+    end
+    DecisionTreeRegressor(root, max_depth)
+end
+
+
 
 # ----------------------------------------------------------------
 # MARK: Functions
 # ----------------------------------------------------------------
+
+"""
+Some guards to ensure the input data is valid for training a tree.
+"""
+function _verify_fit!_args(tree, dataset, labels, column_data)
+    if isempty(labels)
+        error("fit!: Cannot build tree from empty label set.")
+    end
+    if isempty(dataset)
+        error("fit!: Cannot build tree from empty dataset.")
+    end
+    if tree.max_depth < -1
+        error("fit!: Cannot build tree with negative depth, but got max_depth=$(max_depth).")
+    end
+    if (!column_data && size(dataset, 1) != length(labels))
+        error("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?")
+    end
+    if (column_data && size(dataset, 2) != length(labels))
+        error("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 2)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=false helps?")
+    end
+    for label in labels
+        if typeof(label) != typeof(labels[1])
+            error("fit!: Encountered heterogeneous label types. Please make sure all labels are of the same type.")
+        end
+    end
+    if tree isa DecisionTreeRegressor && (labels[1] isa String) # vorher: !(labels[1] isa String)
+        error("Cannot train a DecisionTreeRegressor on a dataset with categorical labels.")
+    end
+
+    # TODO: check if columns of dataset have consistent type either Real or String
+    # if !column_data
+    #     for i in range(1, size(dataset, 2))
+    #         for j in range(1, size(dataset, 1))
+    #             if typeof(dataset[j, i]) != typeof(dataset[1, i])
+    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
+    #             end
+    #         end
+    #     end
+    # end
+
+    # if column_data
+    #     for i in range(1, size(dataset, 1))
+    #         for j in range(1, size(dataset, 2))
+    #             if typeof(dataset[i, j]) != typeof(dataset[i, 1])
+    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
+    #             end
+    #         end
+    #     end
+    # end
+end
 
 """
     fit!(tree, features, labels)
@@ -76,126 +132,176 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 
 # Arguments
 
-- `tree::DecisionTree`: the tree to be trained
-- `X::Array{Float64,2}`: the training data
-- `y::Array{Float64,1}`: the target labels
+- `tree::AbstractDecisionTree`: the tree to be trained
+- `dataset::AbstractMatrix`: the training data
+- `labels::Vector{Union{Real, String}}`: the target labels
+- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 """
-function fit!(tree::DecisionTree, features::Array{Float64,2}, labels::Array{Float64,1})
-    #TODO: Implement CART
-    error("Not implemented.")
+function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}, column_data=false) where {T<:Union{Number, String}}
+    _verify_fit!_args(tree, features, labels, column_data)
+
+    classify = (tree isa DecisionTreeClassifier)
+    tree.root = Node(features, labels, classify, max_depth=tree.max_depth, column_data=column_data)
 end
 
-
 """
-    build_tree(features, labels, max_depth, ...)
-
-Builds a decision tree from the given data using some algorithm (e.g. CART)
-
-# Arguments
-
-- `tree::DecisionTree`: the tree to be trained
-- `X::Array{Float64,2}`: the training data
-- `y::Array{Float64,1}`: the target labels
-"""
-function build_tree(features::Array{Float64,2}, labels::Array{Float64,1},
-                    max_depth::Int
-                    #, min_samples_split::Int, pruning::Bool, rng=Random.GLOBAL_RNG
-                    )::DecisionTree
-    #TODO: Implement CART
-    error("Not implemented.")
-end
-
-
-"""
-    tree_prediction
+    predict
 
 Traverses the tree for a given datapoint x and returns that trees prediction.
-"""
-function tree_prediction(tree::Node, x)
-    #Check if leaf
-    if tree.prediction !== nothing
-        return tree.prediction
-    end
-
-    #else check if decision(x) leads to right or left child
-    if tree.decision(x)
-        return tree_prediction(tree.true_child, x)
-    else
-        return tree_prediction(tree.false_child, x)
-    end
-end
-
-
-"""
-    lessThan
-
-A basic decision function for testing and playing around.
-"""
-function lessThan(x, threshold::Float64, featureindex::Int =1)::Bool
-    return x[featureindex] < threshold
-end
-
-
-"""
-    print_tree(tree::DecisionTree)
-
-Prints a textual visualization of the decision tree.
-For each decision node, it displays the condition, and for each leaf, it displays the prediction.
 
 # Arguments
 
-- `tree`: The `DecisionTree` instance to print.
+- `tree::AbstractDecisionTree`: the tree to predict with
+- `X::Union{AbstractMatrix, AbstractVector`: the data to predict on
+"""
+function predict(tree::AbstractDecisionTree, X::Union{AbstractMatrix, AbstractVector})
+    if tree.root === nothing
+        error("Cannot predict from an empty tree.")
+    end
+
+    return predict(tree.root, X)
+end
+
+function predict(node::Node, datapoint::AbstractVector)
+    if is_leaf(node)
+        return node.prediction
+    end
+
+    if call(node.decision, datapoint)
+        return predict(node.true_child, datapoint)
+    else
+        return predict(node.false_child, datapoint)
+    end
+end
+
+function predict(node::Node, dataset::AbstractMatrix)
+    if is_leaf(node)
+        return node.prediction * ones(size(dataset, 1))
+    end
+
+    result = []
+
+    for i in range(1, size(dataset, 1))
+        datapoint = dataset[i, :]
+        if call(node.decision, datapoint)
+            push!(result, predict(node.true_child, datapoint))
+        else
+            push!(result, predict(node.false_child, datapoint))
+        end
+    end
+    return result
+end
+
+"""
+    calc_accuracy(labels, predictions)
+
+Calculates the accuracy of the predictions compared to the labels.
+"""
+function calc_accuracy(labels, predictions)
+    if length(labels) != length(predictions)
+        error("Length of labels and predictions must be equal.")
+    end
+
+    if length(labels) == 0
+        return 0.0
+    end
+
+    correct = 0.0
+    for i in 1:lastindex(labels)
+        if labels[i] == predictions[i]
+            correct += 1.0
+        end
+    end
+
+    return correct / length(labels)
+end
+
+"""
+    depth(tree)
+
+Traverses the tree and returns the maximum depth.
+"""
+function calc_depth(tree::AbstractDecisionTree)
+
+    max_depth = 0
+    if tree.root === nothing
+        return max_depth
+    end
+
+    to_visit = [(tree.root, 0)]
+    while !isempty(to_visit)
+        node, cur_depth = popfirst!(to_visit)
+
+        if cur_depth > max_depth
+            max_depth = cur_depth
+        end
+
+        if node.true_child !== nothing
+            push!(to_visit, (node.true_child, cur_depth + 1))
+        end
+
+        if node.false_child !== nothing
+            push!(to_visit, (node.false_child, cur_depth + 1))
+        end
+    end
+    return max_depth
+end
+
+#----------------------------------------
+# MARK: Printing
+#----------------------------------------
+
+"""
+    tree_to_string(tree::AbstractDecisionTree)
+
+Returns a textual visualization of the decision tree.
+
+# Arguments
+
+- `tree::AbstractDecisionTree` The `DecisionTree` instance to print.
 
 # Example output:
 
-x < 28 ?
-├─ False: y < 161 ?
-   ├─ False: 842
-   └─ True: 2493
+x < 28.0 ?
+├─ False: x == 161.0 ?
+│  ├─ False: 842
+│  └─ True: 2493
 └─ True: 683
-
 """
-
-function print_tree(tree::DecisionTree)
+function _tree_to_string(tree::AbstractDecisionTree, print_parameters=true)
     if tree.root === nothing
-        println("The tree is empty.")
-    else
-        # If leaf
-        if tree.root.prediction !== nothing
-            println("The tree is only a leaf with prediction = ", tree.root.prediction, ".")
-        else
-            println(string(tree.root.decision_string), " ?")
-            _print_node(tree.root.true_child, "", false, "")
-            _print_node(tree.root.false_child, "", true, "")
-        end
+        return "\nTree(max_depth=$(tree.max_depth), root=nothing)\n"
     end
+
+    result = ""
+    if print_parameters
+        result *= "Tree(max_depth=$(tree.max_depth))"
+    end
+    result *= _node_to_string_as_root(tree.root)
+    return result
+end
+
+function Base.show(io::IO, tree::AbstractDecisionTree)
+    print(io, _tree_to_string(tree))
 end
 
 """
-    _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
+    print_tree(tree::AbstractDecisionTree)
 
-Recursive helper function to print the decision tree structure.
+Returns a textual visualization of the decision tree.
 
 # Arguments
 
-- `node`: The current node to print.
-- `prefix`: A string used for formatting the tree structure.
-- `is_left`: Boolean indicating if the node is a left (true branch) child.
-- `indentation`: The current indentation.
-"""
+- `tree::AbstractDecisionTree` The `DecisionTree` instance to print.
 
-function _print_node(node::Node, prefix::String, is_left::Bool, indentation::String)
-    if is_left
-        prefix = indentation * "└─ True"
-    else
-        prefix = indentation * "├─ False"
-    end
-    # If leaf
-    if node.prediction !== nothing
-        println(prefix, ": ", node.prediction)
-    else
-        println(prefix, ": ", string(tree.root.decision_string), " ?")
-        _print_node(node.true_child, prefix, false, indentation * "   ")
-        _print_node(node.false_child, prefix, true, indentation * "   ")
-    end
+# Example output:
+
+x < 28.0 ?
+├─ False: x == 161.0 ?
+│  ├─ False: 842
+│  └─ True: 2493
+└─ True: 683
+"""
+function print_tree(tree::AbstractDecisionTree)
+    print(_tree_to_string(tree, false))
 end
