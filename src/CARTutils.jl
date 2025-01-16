@@ -132,20 +132,6 @@ function collect_classes(dataset::AbstractMatrix, indices::Vector{Int64}, column
     return collect(keys(classes))
 end
 
-"""
-    label_mean(labels, indices)
-
-Calculate the mean of numeric labels.
-
-# Arguments
-
-- `labels::Vector{Real}`: the vector of numeric labels
-"""
-function label_mean(labels::Vector{T}) where T<:Real
-    sum = 0.0
-    foreach(label -> sum += label, labels)
-    return sum / size(labels)[1]
-end
 
 """
     label_mean(labels, indices)

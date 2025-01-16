@@ -7,7 +7,7 @@ using Test
         features1 = collect(transpose([1 2 3 4]))  # Integer features
         labels1 = [1, 0, 1, 0]    # Integer labels
         node_data1 = [1, 2, 3, 4]  # All elements included
-        gini1 = gini_impurity(features1, labels1, node_data1, lessThanOrEqual, 2.0, 1)
+        gini1 = gini_impurity(features1, labels1, node_data1, less_than_or_equal, 2.0, 1)
         @test isapprox(gini1, 0.5, atol=1e-2)  # Expected result
     end
 
@@ -34,7 +34,7 @@ using Test
         features5 = reshape([1, 2, 3, 4, 5], 5, 1)
         labels5 = [true, true, true, true, true]  # All labels are 'true'
         node_data5 = [1, 2, 3, 4, 5]  # All elements included
-        gini5 = gini_impurity(features5, labels5, node_data5, lessThanOrEqual, 3.0, 1)
+        gini5 = gini_impurity(features5, labels5, node_data5, less_than_or_equal, 3.0, 1)
         @test gini5 == 0.0  # Expect 0 because all labels are the same
     end
 
@@ -43,7 +43,7 @@ using Test
         features6 = reshape([1, 2, 3, 4, 5, 6], 6, 1)
         labels6 = [true, true, true, false, false, false]  # Labels perfectly split
         node_data6 = [1, 2, 3, 4, 5, 6]  # All elements included
-        gini6 = gini_impurity(features6, labels6, node_data6, lessThanOrEqual, 3.0, 1)
+        gini6 = gini_impurity(features6, labels6, node_data6, less_than_or_equal, 3.0, 1)
         @test gini6 == 0.0  # Expect 0 because it's a perfect split
     end
 
@@ -52,7 +52,7 @@ using Test
         features7 = reshape([10, 20, 30, 40, 50], 5, 1)
         labels7 = [true, true, false, false, false]  # Uneven split
         node_data7 = [1, 2, 3, 4, 5]  # All elements included
-        gini7 = gini_impurity(features7, labels7, node_data7, lessThanOrEqual, 35.0, 1)
+        gini7 = gini_impurity(features7, labels7, node_data7, less_than_or_equal, 35.0, 1)
         @test isapprox(gini7, 0.266, atol=1e-2)  # Expected gini value with this split
     end
 

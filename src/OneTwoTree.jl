@@ -15,6 +15,6 @@ export fit!, predict
 export calc_accuracy, print_tree
 
 export gini_impurity
-export lessThanOrEqual, equal
+export less_than_or_equal, equal
 
 end # end the module
