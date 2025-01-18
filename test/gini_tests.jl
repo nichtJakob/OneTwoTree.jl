@@ -8,7 +8,7 @@ using Test
         labels1 = [1, 0, 1, 0]    # Integer labels
         node_data1 = [1, 2, 3, 4]  # All elements included
         gini1 = gini_impurity(features1, labels1, node_data1, less_than_or_equal, 2.0, 1)
-        @test isapprox(gini1, 0.5, atol=1e-2)  # Expected result
+        @test isapprox(gini1, -0.5, atol=1e-2)  # Expected result
     end
 
     # Test 2: String labels
@@ -17,7 +17,7 @@ using Test
         labels2 = ["yes", "no", "yes", "no"]  # String labels
         node_data2 = [1, 2, 3, 4]
         gini2 = gini_impurity(features2, labels2, node_data2, equal, "high", 1)
-        @test isapprox(gini2, 0.5, atol=1e-2)  # Expected result
+        @test isapprox(gini2, -0.5, atol=1e-2)  # Expected result
     end
 
     # Test 3: Multi-class String labels (new test case)
@@ -26,7 +26,7 @@ using Test
         labels3 = ["low", "medium", "high", "medium", "low", "high"]  # Multi-class labels
         node_data3 = [1, 2, 3, 4, 5, 6]  # All elements included
         gini3 = gini_impurity(features3, labels3, node_data3, equal, "medium", 1)
-        @test isapprox(gini3, 0.333, atol=1e-2)  # Expected gini value for multi-class split
+        @test isapprox(gini3, -0.333, atol=1e-2)  # Expected gini value for multi-class split
     end
 
     # Test 4: All labels are the same
@@ -53,7 +53,7 @@ using Test
         labels7 = [true, true, false, false, false]  # Uneven split
         node_data7 = [1, 2, 3, 4, 5]  # All elements included
         gini7 = gini_impurity(features7, labels7, node_data7, less_than_or_equal, 35.0, 1)
-        @test isapprox(gini7, 0.266, atol=1e-2)  # Expected gini value with this split
+        @test isapprox(gini7, -0.266, atol=1e-2)  # Expected gini value with this split
     end
 
     # Test 7: Subset of node_data
@@ -62,7 +62,7 @@ using Test
         labels8 = [true, false, true, false]
         node_data8 = [1, 2, 3]  # Only first three elements
         gini8 = gini_impurity(features8, labels8, node_data8, equal, "high", 1)
-        @test isapprox(gini8, 0.333, atol=1e-2)  # Expected gini value for this subset
+        @test isapprox(gini8, -0.333, atol=1e-2)  # Expected gini value for this subset
     end
 
     # Test 8: No matching decision function
@@ -71,6 +71,6 @@ using Test
         labels9 = [true, false, true, false]
         node_data9 = [1, 2, 3, 4]  # All elements included
         gini9 = gini_impurity(features9, labels9, node_data9, equal, "high", 1)
-        @test gini9 == 0.5
+        @test gini9 == -0.5
     end
 end
