@@ -1,7 +1,7 @@
 """
     split(N)
 
-Determine the optimal split of a node by chosing the feature with the smallest entropy. Handles numerical and categorical data and labels.
+Determine the optimal split of a node by chosing the feature with the greatest gain. Handles numerical and categorical data and labels.
 
 # Arguments
 
@@ -14,14 +14,14 @@ function split(N::Node)
     num_features = size(N.dataset)[2]
     best_feature = -1
     best_decision::Union{Decision, Nothing} = nothing
-    best_entropy = -1.0
+    best_gain = -1.0
 
     data = N.dataset[N.node_data, :]
     for i in range(1, num_features)
         # NOTE: This determination of whether a column is categorical or numerical assumes, that the types do not vary among a column
         is_categorical = (typeof(N.dataset[1, i]) == String)
         # @info "\n\n\nChecking decisions for feature $(i) where is_categorical=$(is_categorical): "
-        # for categorical features, we calculate the entropy for each split (e.g. feature == class1, feature == class2, ...)
+        # for categorical features, we calculate the gain for each split (e.g. feature == class1, feature == class2, ...)
         if is_categorical
             # TODO: Test & Debug Categorical case
             classes = collect_classes(N.dataset, N.node_data, i)
@@ -29,16 +29,16 @@ function split(N::Node)
                 for class in classes
 
                     decision = Decision(equal, i, class)
-                    entropy = N.entropy_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    gain = N.gain_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
 
-                    if best_feature == -1 || (entropy < best_entropy)
+                    if best_feature == -1 || (gain > best_gain)
                         best_feature = i
-                        best_entropy = entropy
+                        best_gain = gain
                         best_decision = decision
                     end
                 end
             end
-        # for numerical features, we sort them and calculate the entropy for each split (splitting at the mean between each two list neighbors)
+        # for numerical features, we sort them and calculate the gain for each split (splitting at the mean between each two list neighbors)
         else
             # sort dataset matrix by column
             feature_value_sorting = sortperm(data[:, i])
@@ -63,14 +63,14 @@ function split(N::Node)
                 # calculate threshold used to discriminate between two values
                 midpoint = (value + next_value)/2.0
 
-                # calculate splitting entropy
+                # calculate splitting gain
                 decision = Decision(less_than_or_equal, i, midpoint)
-                entropy = N.entropy_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                gain = N.gain_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
 
                 # check if we found an improving decision
-                if best_feature == -1 || (entropy < best_entropy)
+                if best_feature == -1 || (gain > best_gain)
                     best_feature = i
-                    best_entropy = entropy
+                    best_gain = gain
                     best_decision = decision
                 end
                 j += 1
@@ -79,36 +79,36 @@ function split(N::Node)
     end
 
     # if best_decision == nothing, this means that no split could be found.
-    return best_decision, best_entropy
+    return best_decision, best_gain
 end
 
 """
-    should_split(N, post_split_entropy, max_depth)
+    should_split(N, post_split_gain, max_depth)
 
 Determines whether to split the node N given.
 
 # Arguments
 
 - `N::Node`: Node that may be split. N contains further fields relevant to the decision like the best splitting decision function, it's leaf impurity and depth.
-- `post_split_entropy::Float64`: The entropy of N after it's optimal split.
+- `post_split_gain::Float64`: The gain of N after it's optimal split.
 - `max_depth::Int64`: The maximum depth of the tree N is part of.
 """
-function should_split(N::Node, post_split_entropy::Float64, max_depth::Int64)
+function should_split(N::Node, post_split_gain::Float64, max_depth::Int64)
     # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should be impure i.e. impurity > 0 and the max_depth hasn't been reached.
-    if N.decision === nothing || post_split_entropy == -1.0
+    if N.decision === nothing || post_split_gain == -1.0
         # @info "Could not find optimal split => No Split"
         return false
     end
-    if N.entropy == 0.0
-        # @info "Node entropy == 0.0 => No Split"
+    if N.gain == 0.0
+        # @info "Node gain == 0.0 => No Split"
         return false
     end
     if N.depth == max_depth
         # @info "max_depth has been reached => No Split"
       return false
     end
-    # if entropy - post_split_entropy < min_purity_gain
+    # if gain - post_split_gain < min_purity_gain
     #   return false
     # end
     return true

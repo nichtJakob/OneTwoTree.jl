@@ -17,9 +17,9 @@ mutable struct Node{T<:Union{Number, String}}
     node_data::Vector{Int64}
     # TODO: Index list of constant columns or columns the label does not vary with
     # constant_columns::Vector{Int64}
-    # Own entropy
-    entropy_metric::Function
-    entropy::Union{Float64, Nothing}
+    # Own gain
+    gain_metric::Function
+    gain::Union{Float64, Nothing}
     depth::Int64
 
     # TODO: should implement split_function; split function should only work if this node is a leaf
@@ -33,9 +33,9 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; entropy_metric::Function=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; gain_metric::Function=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
-        N.entropy_metric = entropy_metric
+        N.gain_metric = gain_metric
         N.depth = depth
         N.true_child = nothing
         N.false_child = nothing
@@ -45,16 +45,16 @@ mutable struct Node{T<:Union{Number, String}}
         if classify
             # in classification, we simply choose the most frequent label as our prediction
             N.prediction = most_frequent_class(labels, node_data)
-            # calculate entropy if this was a leaf node
-            N.entropy = entropy_metric(dataset, labels, node_data)
+            # calculate gain if this was a leaf node
+            N.gain = gain_metric(dataset, labels, node_data)
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
-            N.entropy = 0.65 # TODO: in regression Sum-of-squares error is used as measure of entropy
+            N.gain = 0.65 # TODO: in regression Sum-of-squares error is used as measure of gain
         end
 
-        N.decision, post_split_entropy = split(N)
-        if should_split(N, post_split_entropy, max_depth)
+        N.decision, post_split_gain = split(N)
+        if should_split(N, post_split_gain, max_depth)
             # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)

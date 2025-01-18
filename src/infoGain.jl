@@ -46,5 +46,6 @@ function information_gain(parent_labels::AbstractVector, child_1_labels::Abstrac
     weighted_entropy_2 = child_2_weight * entropy(child_2_labels) 
     weighted_entropy = weighted_entropy_1 + weighted_entropy_2
 
-    return entropy(parent_labels) - weighted_entropy
+    gain = entropy(parent_labels) - weighted_entropy
+    return gain
 end

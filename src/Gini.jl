@@ -58,8 +58,9 @@ function gini_impurity(features::AbstractMatrix, labels::AbstractVector, node_da
     # Weighted Gini impurity
     total_length_data = length(node_data)
     gini_total = (total_true / total_length_data) * gini_true + (total_false / total_length_data) * gini_false
+    gain = -gini_total
 
-    return gini_total
+    return gain
 end
 
 function gini_impurity(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64})::Float64
@@ -82,6 +83,7 @@ function gini_impurity(features::AbstractMatrix, labels::AbstractVector, node_da
 
     # Gini impurity for the dataset
     gini = 1.0 - sum((count / total_labels)^2 for count in values(label_counts))
+    gain = -gini
 
-    return gini
+    return gain
 end
