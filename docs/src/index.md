@@ -43,3 +43,16 @@ OneTwoTree._node_to_string
 OneTwoTree._tree_to_string
 OneTwoTree._verify_fit!_args
 ```
+
+## Rest
+```@docs
+OneTwoTree.entropy
+OneTwoTree.information_gain
+OneTwoTree.label_mean
+OneTwoTree.equal
+OneTwoTree.split_indices
+OneTwoTree.less_than_or_equal
+OneTwoTree.load_data
+OneTwoTree.is_leaf
+OneTwoTree.printM
+```
