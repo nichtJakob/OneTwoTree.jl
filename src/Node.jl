@@ -53,22 +53,11 @@ mutable struct Node{T<:Union{Number, String}}
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
-<<<<<<< HEAD
             N.gain = 0.65 # TODO: in regression Sum-of-squares error is used as measure of gain
         end
 
         N.decision, post_split_gain = split(N)
         if should_split(N, post_split_gain, max_depth)
-=======
-            N.impurity = variance(labels[node_data])
-        end
-
-        # TODO: only temporary
-        N.classify = classify
-
-        N.decision, post_split_impurity = split(N)
-        if should_split(N, post_split_impurity, max_depth)
->>>>>>> master
             # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)
