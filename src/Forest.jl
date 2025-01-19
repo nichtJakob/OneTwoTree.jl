@@ -57,7 +57,6 @@ function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, co
     is_classifier = (forest isa ForestClassifier)
 
     for i in 1:forest.n_trees
-        println("Fitting tree $i...")
         # get random dataset of size forest.n_features_per_tree
         current_tree_features, current_tree_labels = get_random_features(features, labels, forest.n_features_per_tree)
 
