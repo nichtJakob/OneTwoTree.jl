@@ -12,13 +12,16 @@ include("InfoGain.jl")
 include("VarGain.jl")
 include("vectorutils.jl")
 
+# Decision Tree and Random Forest API
 export DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
-export fit!, predict, print_tree, get_random_features
+export ForestClassifier, ForestRegressor, AbstractForest
+export fit!, predict
 export calc_accuracy, print_tree
-export ForestClassifier, fit2!, predict2
+
+# Splitting Criteria
 export gini_impurity
 export information_gain
-export less_than_or_equal, equal
 export var_gain
+export less_than_or_equal, equal
 
 end # end the module
