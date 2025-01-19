@@ -54,3 +54,32 @@ test_predictions = predict(tree, test_data)
 accuracy = sum(test_predictions .== test_labels) / length(test_labels)
 
 println("\n\nFor the Iris dataset we have achieved a test-accuracy of $(round(accuracy * 100, digits=2))%")
+
+
+# Now lets try using Random Forests
+println("\n\n Now we will grow our Random Forest")
+
+# You can play around with those valuse:
+n_trees = 20 # number of trees in our forest
+n_features_per_tree = 10 # number of features per tree
+max_forest_depth = 100 # our max depth for the trees
+
+forest = ForestClassifier(n_trees, n_features_per_tree, max_forest_depth)
+println("forest wurde initialisiert")
+
+fit2!(forest, train_data, train_labels)
+println("forest wurde gefitted")
+
+# lets have a look at our trees
+for (i, tree) in enumerate(forest.trees)
+    println("Tree $i:")
+    print_tree(tree)
+    println()
+end
+
+#Lets see how good our tree is at predicting lables of datapoints in the test_data
+forest_test_predictions = predict2(forest, test_data)
+forest_accuracy = sum(forest_test_predictions .== test_labels) / length(test_labels)
+
+println("\n\nFor the Iris dataset the forest has achieved a test-accuracy of $(round(forest_accuracy * 100, digits=2))%")
+

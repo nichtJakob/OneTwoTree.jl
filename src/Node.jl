@@ -31,6 +31,9 @@ mutable struct Node{T<:Union{Number, String}}
     false_child::Union{Node, Nothing} #decision is NOT true
     prediction::Union{T, Nothing} # for leaves
 
+    # TODO: only temporary
+    classify::Bool
+
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
     function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; gain_metric::Function=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {T}
@@ -50,11 +53,22 @@ mutable struct Node{T<:Union{Number, String}}
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
+<<<<<<< HEAD
             N.gain = 0.65 # TODO: in regression Sum-of-squares error is used as measure of gain
         end
 
         N.decision, post_split_gain = split(N)
         if should_split(N, post_split_gain, max_depth)
+=======
+            N.impurity = variance(labels[node_data])
+        end
+
+        # TODO: only temporary
+        N.classify = classify
+
+        N.decision, post_split_impurity = split(N)
+        if should_split(N, post_split_impurity, max_depth)
+>>>>>>> master
             # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)
@@ -112,23 +126,23 @@ Recursive helper function to stringify the decision tree structure.
 """
 function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
     if is_true_child
-        prefix = indentation * "├─ True"
+        prefix = indentation * "├─ True: "
     else
-        prefix = indentation * "└─ False"
+        prefix = indentation * "└─ False:"
     end
 
     if node === nothing
-        return "$(prefix): <Nothing>\n"
+        return "$(prefix) <Nothing>\n"
     end
     if is_leaf(node)
-        return "$(prefix): $(node.prediction)\n"
+        return "$(prefix) $(node.prediction)\n"
     end
 
-    result = "$(prefix): $(node.decision) ?\n"
+    result = "$(prefix) $(node.decision) ?\n"
     if is_true_child
-        indentation = indentation * "   "
-    else
         indentation = indentation * "│  "
+    else
+        indentation = indentation * "   "
     end
     result *= _node_to_string(node.true_child, true, indentation)
     result *= _node_to_string(node.false_child, false, indentation)

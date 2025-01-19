@@ -1,5 +1,4 @@
 # Spliting criterion Information Gain using entropy
-using StatsBase
 """
     entropy(features::AbstractVector) -> Float64
 
@@ -14,10 +13,11 @@ This function calculates the entropy of set of lables
     and n the number of elements in X
     and P() beeing the Probability 
 """
+
 function entropy(labels)
     num_occurences = countmap(labels)
-    wkeiten = [occurence / length(labels) for occurence in values(num_occurences)]
-    return -sum(p * log2(p) for p in wkeiten if p > 0)
+    probabilities = [occurence / length(labels) for occurence in values(num_occurences)]
+    return -sum(p * log2(p) for p in probabilities if p > 0)
 end
 
 
@@ -46,6 +46,11 @@ function information_gain(parent_labels::AbstractVector, child_1_labels::Abstrac
     weighted_entropy_2 = child_2_weight * entropy(child_2_labels) 
     weighted_entropy = weighted_entropy_1 + weighted_entropy_2
 
+<<<<<<< HEAD:src/infoGain.jl
     gain = entropy(parent_labels) - weighted_entropy
     return gain
 end
+=======
+    return entropy(parent_labels) - weighted_entropy
+end
+>>>>>>> master:src/InfoGain.jl

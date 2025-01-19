@@ -17,6 +17,7 @@ function split(N::Node)
     best_gain = -1.0
 
     data = N.dataset[N.node_data, :]
+    # @info "\n\nUsing data" data
     for i in range(1, num_features)
         # NOTE: This determination of whether a column is categorical or numerical assumes, that the types do not vary among a column
         is_categorical = (typeof(N.dataset[1, i]) == String)
@@ -29,7 +30,15 @@ function split(N::Node)
                 for class in classes
 
                     decision = Decision(equal, i, class)
+<<<<<<< HEAD
                     gain = N.gain_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+=======
+                    if N.classify
+                        impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    else
+                        impurity = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    end
+>>>>>>> master
 
                     if best_feature == -1 || (gain > best_gain)
                         best_feature = i
@@ -65,7 +74,15 @@ function split(N::Node)
 
                 # calculate splitting gain
                 decision = Decision(less_than_or_equal, i, midpoint)
+<<<<<<< HEAD
                 gain = N.gain_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+=======
+                if N.classify
+                    impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                else
+                    impurity = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                end
+>>>>>>> master
 
                 # check if we found an improving decision
                 if best_feature == -1 || (gain > best_gain)
@@ -78,6 +95,7 @@ function split(N::Node)
         end
     end
 
+    # @info "determined best decision as " best_decision best_impurity
     # if best_decision == nothing, this means that no split could be found.
     return best_decision, best_gain
 end
@@ -108,7 +126,11 @@ function should_split(N::Node, post_split_gain::Float64, max_depth::Int64)
         # @info "max_depth has been reached => No Split"
       return false
     end
+<<<<<<< HEAD
     # if gain - post_split_gain < min_purity_gain
+=======
+    # if N.impurity - post_split_impurity < min_purity_gain
+>>>>>>> master
     #   return false
     # end
     return true
