@@ -30,6 +30,21 @@ function test_node_consistency(node::OneTwoTree.Node)
 end
 
 """
+    test_no_duplicates(node::OneTwoTree.Node)
+Tests that no two node children classify the same (makes no sense)
+"""
+function test_no_duplicates(node::OneTwoTree.Node)
+    if OneTwoTree.is_leaf(node)
+        return
+    end
+
+    if OneTwoTree.is_leaf(node.true_child) && OneTwoTree.is_leaf(node.false_child)
+        @test node.true_child.prediction != node.false_child.prediction
+    end
+end
+
+
+"""
     test_tree_consistency(tree, run_tests::Bool=true)
 
 Traverses the tree and checks all properties of the tree and its nodes for consistency.
@@ -53,6 +68,7 @@ function test_tree_consistency(; tree::OneTwoTree.AbstractDecisionTree, run_test
         node = popfirst!(to_visit)
 
         test_node_consistency(node)
+        test_no_duplicates(node)
 
         if node.true_child !== nothing
             push!(to_visit, node.true_child)
