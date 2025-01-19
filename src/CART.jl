@@ -31,14 +31,14 @@ function split(N::Node)
 
                     decision = Decision(equal, i, class)
                     if N.classify
-                        gain = N.gain_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                        splitting_gain = N.splitting_criteria(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
                     else
-                        gain = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                        splitting_gain = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
                     end
 
-                    if best_feature == -1 || (gain > best_gain)
+                    if best_feature == -1 || (splitting_gain > best_gain)
                         best_feature = i
-                        best_gain = gain
+                        best_gain = splitting_gain
                         best_decision = decision
                     end
                 end
@@ -72,15 +72,15 @@ function split(N::Node)
                 decision = Decision(less_than_or_equal, i, midpoint)
                 
                 if N.classify
-                    gain = N.gain_metric(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    splitting_gain = N.splitting_criteria(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
                 else
-                    gain = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    splitting_gain = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
                 end
 
                 # check if we found an improving decision
-                if best_feature == -1 || (gain > best_gain)
+                if best_feature == -1 || (splitting_gain > best_gain)
                     best_feature = i
-                    best_gain = gain
+                    best_gain = splitting_gain
                     best_decision = decision
                 end
                 j += 1
@@ -111,7 +111,7 @@ function should_split(N::Node, post_split_gain::Float64, max_depth::Int64)
         # @info "Could not find optimal split => No Split"
         return false
     end
-    if N.gain == 0.0
+    if N.splitting_gain == 0.0
         # @info "Node gain == 0.0 => No Split"
         return false
     end
@@ -119,7 +119,7 @@ function should_split(N::Node, post_split_gain::Float64, max_depth::Int64)
         # @info "max_depth has been reached => No Split"
       return false
     end
-    # if gain - post_split_gain < min_purity_gain
+    # if splitting_gain - post_split_gain < min_purity_gain
     #   return false
     # end
     return true

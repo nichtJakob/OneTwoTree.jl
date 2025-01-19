@@ -18,8 +18,8 @@ mutable struct Node{T<:Union{Number, String}}
     # TODO: Index list of constant columns or columns the label does not vary with
     # constant_columns::Vector{Int64}
     # Own gain
-    gain_metric::Function
-    gain::Union{Float64, Nothing}
+    splitting_criteria::Function
+    splitting_gain::Union{Float64, Nothing}
     depth::Int64
 
     # TODO: should implement split_function; split function should only work if this node is a leaf
@@ -36,9 +36,9 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; gain_metric::Function=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; splitting_criteria::Function=gini_impurity, depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
-        N.gain_metric = gain_metric
+        N.splitting_criteria = splitting_criteria
         N.depth = depth
         N.true_child = nothing
         N.false_child = nothing
@@ -49,11 +49,11 @@ mutable struct Node{T<:Union{Number, String}}
             # in classification, we simply choose the most frequent label as our prediction
             N.prediction = most_frequent_class(labels, node_data)
             # calculate gain if this was a leaf node
-            N.gain = gain_metric(dataset, labels, node_data)
+            N.splitting_gain = splitting_criteria(dataset, labels, node_data)
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
-            N.gain = 0.65 # TODO: in regression Sum-of-squares error is used as measure of gain
+            N.splitting_gain = 0.65 # TODO: in regression Sum-of-squares error is used as measure of gain
         end
 
         N.decision, post_split_gain = split(N)
