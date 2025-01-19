@@ -40,5 +40,24 @@ OneTwoTree._node_to_string
 OneTwoTree._tree_to_string
 OneTwoTree._verify_fit!_args
 
-
+## Rest
+```@docs
+OneTwoTree.entropy
+OneTwoTree.information_gain
+OneTwoTree.split
+OneTwoTree.label_mean
+OneTwoTree.equal
+OneTwoTree._verify_fit!_args
+OneTwoTree.split_indices
+OneTwoTree.split_indices
+OneTwoTree._tree_to_string
+OneTwoTree._decision_to_string
+OneTwoTree.less_than_or_equal
+OneTwoTree.load_data
+OneTwoTree.is_leaf
+OneTwoTree._node_to_string
+OneTwoTree.predict
+OneTwoTree.fit!
+OneTwoTree.printM
+OneTwoTree.should_split
 
