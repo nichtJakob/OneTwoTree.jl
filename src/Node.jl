@@ -30,6 +30,9 @@ mutable struct Node{T<:Union{Number, String}}
     false_child::Union{Node, Nothing} #decision is NOT true
     prediction::Union{T, Nothing} # for leaves
 
+    # TODO: only temporary
+    classify::Bool
+
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
     function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
@@ -48,8 +51,11 @@ mutable struct Node{T<:Union{Number, String}}
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
-            N.impurity = 0.65 # TODO: in regression Sum-of-squares error is used as measure of impurity
+            N.impurity = variance(labels[node_data])
         end
+
+        # TODO: only temporary
+        N.classify = classify
 
         N.decision, post_split_impurity = split(N)
         if should_split(N, post_split_impurity, max_depth)

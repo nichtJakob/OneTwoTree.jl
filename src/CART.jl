@@ -30,7 +30,11 @@ function split(N::Node)
                 for class in classes
 
                     decision = Decision(equal, i, class)
-                    impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    if N.classify
+                        impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    else
+                        impurity = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    end
 
                     if best_feature == -1 || (impurity < best_impurity)
                         best_feature = i
@@ -66,7 +70,11 @@ function split(N::Node)
 
                 # calculate splitting impurity
                 decision = Decision(less_than_or_equal, i, midpoint)
-                impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                if N.classify
+                    impurity = gini_impurity(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                else
+                    impurity = variance(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                end
 
                 # check if we found an improving decision
                 if best_feature == -1 || (impurity < best_impurity)
