@@ -42,7 +42,6 @@ using OneTwoTree
     @testset "Regression depth 1" begin
 
         #Tree generation
-        @info r1_features r1_labels
         r3_tree = DecisionTreeRegressor(max_depth=1)
         fit!(r3_tree, r1_features, r1_labels)
 
