@@ -18,8 +18,7 @@ This documentation provides an overview of the `OneTwoTree.jl` package.
 
 ## API Documentation
 
-```@tabset FunctionGroups
-
+@tabset
 ```@tab Core Types and Structures
 ### Core Types
 - `Decision`: Represents a decision with a function and parameter.
@@ -53,4 +52,3 @@ This documentation provides an overview of the `OneTwoTree.jl` package.
 ### Decision Functions
 - `equal`: A categorical decision function.
 - `lessThanOrEqual`: A numerical decision function.
-
