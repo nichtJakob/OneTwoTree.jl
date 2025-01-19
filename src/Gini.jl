@@ -66,7 +66,7 @@ function gini_impurity(features::AbstractMatrix, labels::AbstractVector, node_da
 
     # Filter features and labels using node_data
     gini_labels = labels[node_data]
-    total_labels = length(labels)
+    total_labels = length(gini_labels)
 
     # Handle empty labels edge case
     if isempty(gini_labels)
