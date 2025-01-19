@@ -16,7 +16,7 @@ OneTwoTree.DecisionTreeRegressor
 OneTwoTree.Node
 
 ## Training and Prediction
-'''@docs
+```@docs
 
 OneTwoTree.fit!
 OneTwoTree.predict
@@ -24,7 +24,7 @@ OneTwoTree.should_split
 OneTwoTree.split
 
 ## Utility Functions
-'''@docs
+```@docs
 
 OneTwoTree.calc_accuracy
 OneTwoTree.calc_depth
@@ -33,7 +33,7 @@ OneTwoTree.most_frequent_class
 OneTwoTree.print_tree
 
 ## Internal Methods
-'''@docs
+```@docs
 
 OneTwoTree._decision_to_string
 OneTwoTree._node_to_string
