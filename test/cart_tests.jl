@@ -167,29 +167,29 @@ Tests whether constructed trees predict expected values and conform to given con
 
         @test t_float.root isa OneTwoTree.Node
         @test t_string.root isa OneTwoTree.Node
-        # @test t_int.root isa OneTwoTree.Node
+        @test t_int.root isa OneTwoTree.Node
         @test t_mixfs.root isa OneTwoTree.Node
         test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
         test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
-        # test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
+        test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
         test_tree_consistency(tree=t_mixfs, run_tests=t_mixfs.root !== nothing)
         @test OneTwoTree.calc_depth(t_float) == 2
         @test OneTwoTree.calc_depth(t_string) == 2
-        # @test calc_depth(t_int) == 2 # TODO: this probably isn't 2 as we have 6 data points
+        @test OneTwoTree.calc_depth(t_int) == 2
         @test OneTwoTree.calc_depth(t_mixfs) == 3 # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution.
 
         pred_float = predict(t_float, dataset_float)
         pred_string = predict(t_string, dataset_string)
-        # pred_int = predict(t_int, dataset_int)
+        pred_int = predict(t_int, dataset_int)
         pred_mixfs = predict(t_mixfs, dataset_mixfs)
 
         @test length(pred_float) == 3
         @test length(pred_string) == 3
-        # @test length(pred_int) == 6
+        @test length(pred_int) == 6
         @test length(pred_mixfs) == 4
         @test calc_accuracy(abc_labels, pred_float) == 1.0
         @test calc_accuracy(abc_labels, pred_string) == 1.0
-        # @test calc_accuracy(aabcbb_labels, pred_int) == 1.0
+        @test calc_accuracy(aabcbb_labels, pred_int) == 1.0
         @test calc_accuracy(abcd_labels, pred_mixfs) == 1.0
 
         #TODO: test mixed type and int features
@@ -198,17 +198,17 @@ Tests whether constructed trees predict expected values and conform to given con
 
     # TODO: readd integer label type tests as soon as it is fixed!
     @testset "Int Label" begin
-        # @warn "Int Labels are allowed in the tree code but not sure if this will work."
-        # t_int_label = DecisionTreeClassifier(max_depth=3)
-        # fit!(t_int_label, dataset_float, [1, 2, 3])
+        @warn "Int Labels are allowed in the tree code but not sure if this will work."
+        t_int_label = DecisionTreeClassifier(max_depth=3)
+        fit!(t_int_label, dataset_float, [1, 2, 3])
 
-        # @test t_int_label.root isa OneTwoTree.Node
-        # test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
-        # @test calc_depth(t_int_label) == 3
+        @test t_int_label.root isa OneTwoTree.Node
+        test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
+        @test OneTwoTree.calc_depth(t_int_label) == 2
 
-        # pred_int_label = predict(t_int_label, dataset_float)
-        # @test length(pred_int_label) == 3
-        # @test calc_accuracy([1, 2, 3], pred_int_label) == 1.0
+        pred_int_label = predict(t_int_label, dataset_float)
+        @test length(pred_int_label) == 3
+        @test calc_accuracy([1, 2, 3], pred_int_label) == 1.0
     end
 
     @testset "Max Depth" begin

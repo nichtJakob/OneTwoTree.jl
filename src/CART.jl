@@ -17,6 +17,7 @@ function split(N::Node)
     best_impurity = -1.0
 
     data = N.dataset[N.node_data, :]
+    # @info "\n\nUsing data" data
     for i in range(1, num_features)
         # NOTE: This determination of whether a column is categorical or numerical assumes, that the types do not vary among a column
         is_categorical = (typeof(N.dataset[1, i]) == String)
@@ -78,6 +79,7 @@ function split(N::Node)
         end
     end
 
+    # @info "determined best decision as " best_decision best_impurity
     # if best_decision == nothing, this means that no split could be found.
     return best_decision, best_impurity
 end
@@ -108,7 +110,7 @@ function should_split(N::Node, post_split_impurity::Float64, max_depth::Int64)
         # @info "max_depth has been reached => No Split"
       return false
     end
-    # if impurity - post_split_impurity < min_purity_gain
+    # if N.impurity - post_split_impurity < min_purity_gain
     #   return false
     # end
     return true
