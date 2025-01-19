@@ -42,6 +42,3 @@ OneTwoTree._verify_fit!_args
 
 
 
-```@autodocs
-Modules = [OneTwoTree]
-```
