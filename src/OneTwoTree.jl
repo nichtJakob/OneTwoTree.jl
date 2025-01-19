@@ -10,6 +10,7 @@ include("Gini.jl")
 include("Forest.jl")
 include("InfoGain.jl")
 include("VarGain.jl")
+include("vectorutils.jl")
 
 export DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
 export fit!, predict, print_tree, get_random_features

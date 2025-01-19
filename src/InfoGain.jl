@@ -1,6 +1,4 @@
 # Spliting criterion Information Gain using entropy
-#using StatsBase
-include("vectorutils.jl")
 """
     entropy(features::AbstractVector) -> Float64
 
