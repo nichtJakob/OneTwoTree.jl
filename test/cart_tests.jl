@@ -8,7 +8,7 @@ using Suppressor # suppress prints in tests
 
 
 const RUN_MNIST = false
-const USE_INT_FEATURES = false
+const USE_INT_FEATURES = true
 
 """
     test_node_consistency(node::Node)
