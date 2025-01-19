@@ -26,42 +26,76 @@ using Test
 end
 
 @testset "Print Tree" begin # Test: stringify tree with multiple decision nodes
-    dataset = reshape([
-        1.0;
-        9.0
-    ], 2, 1)
-    labels = ["A", "B"]
 
-    t = DecisionTreeClassifier(max_depth=1)
-    fit!(t, dataset, labels)
+    @testset "Basic" begin
+        dataset = reshape([
+            1.0;
+            9.0
+        ], 2, 1)
+        labels = ["A", "B"]
 
-    returned_string = OneTwoTree._tree_to_string(t, false)
-    expected_string = "
+        t = DecisionTreeClassifier(max_depth=1)
+        fit!(t, dataset, labels)
+
+        returned_string = OneTwoTree._tree_to_string(t, false)
+        expected_string = "
 x[1] <= 5.0 ?
-├─ True: A
+├─ True:  A
 └─ False: B
 "
+        @test returned_string == expected_string
+    end
 
-    @test returned_string == expected_string
+    @testset "Depth 2" begin
+        dataset1 = reshape([
+            1.0;
+            3.0;
+            5.0
+        ], 3, 1)
+        labels1 = ["A", "B", "C"]
 
-    dataset1 = reshape([
-        1.0;
-        3.0;
-        5.0
-    ], 3, 1)
-    labels1 = ["A", "B", "C"]
+        t = DecisionTreeClassifier(max_depth=2)
+        fit!(t, dataset1, labels1)
 
-    t = DecisionTreeClassifier(max_depth=2)
-    fit!(t, dataset1, labels1)
-
-    returned_string = OneTwoTree._tree_to_string(t, false)
-    expected_string = "
+        returned_string = OneTwoTree._tree_to_string(t, false)
+        expected_string = "
 x[1] <= 2.0 ?
-├─ True: A
+├─ True:  A
 └─ False: x[1] <= 4.0 ?
-│  ├─ True: B
-│  └─ False: C
+   ├─ True:  B
+   └─ False: C
 "
 
-    @test returned_string == expected_string
+        @test returned_string == expected_string
+    end
+
+    @testset "Depth 3" begin
+        dataset2 = [
+            1.0 2.0 3.0
+            1.0 2.0 4.0
+            1.0 -2.0 3.0
+            1.0 -2.0 4.0
+            -1.0 2.0 3.0
+        ]
+        labels2 = ["A", "B", "C", "D", "E"]
+
+        t = DecisionTreeClassifier()
+        fit!(t, dataset2, labels2)
+
+        returned_string = OneTwoTree._tree_to_string(t, false)
+        expected_string = "
+x[1] <= 0.0 ?
+├─ True:  E
+└─ False: x[2] <= 0.0 ?
+   ├─ True:  x[3] <= 3.5 ?
+   │  ├─ True:  C
+   │  └─ False: D
+   └─ False: x[3] <= 3.5 ?
+      ├─ True:  A
+      └─ False: B
+"
+        # println(returned_string)
+        # println(cmp(expected_string, returned_string))
+        @test returned_string == expected_string
+    end
 end

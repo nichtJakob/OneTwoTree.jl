@@ -110,23 +110,23 @@ Recursive helper function to stringify the decision tree structure.
 """
 function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
     if is_true_child
-        prefix = indentation * "├─ True"
+        prefix = indentation * "├─ True: "
     else
-        prefix = indentation * "└─ False"
+        prefix = indentation * "└─ False:"
     end
 
     if node === nothing
-        return "$(prefix): <Nothing>\n"
+        return "$(prefix) <Nothing>\n"
     end
     if is_leaf(node)
-        return "$(prefix): $(node.prediction)\n"
+        return "$(prefix) $(node.prediction)\n"
     end
 
-    result = "$(prefix): $(node.decision) ?\n"
+    result = "$(prefix) $(node.decision) ?\n"
     if is_true_child
-        indentation = indentation * "   "
-    else
         indentation = indentation * "│  "
+    else
+        indentation = indentation * "   "
     end
     result *= _node_to_string(node.true_child, true, indentation)
     result *= _node_to_string(node.false_child, false, indentation)
