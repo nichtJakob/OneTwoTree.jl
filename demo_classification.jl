@@ -3,11 +3,11 @@
 using OneTwoTree
 
 # If you want to execute this example in your julia REPL you will first need to
-# 1) install a dependency for the dataset: 
-#   julia>  using Pkg 
+# 1) install a dependency for the dataset:
+#   julia>  using Pkg
 #   julia>  Pkg.add("MLDatasets")
 #
-# 2) execute the code in your REPL: 
+# 2) execute the code in your REPL:
 #   julia>  include("demo_iris.jl")
 
 # First we load the iris dataset. Targets are the 3 types of the flowers
@@ -20,10 +20,10 @@ targets = String.(Array(dataset.targets))
 
 #lets have a look at the types of the iris flower contained in targets
 println("The possible targets are: ", unique(targets), "\n")
-# and the features aka the given measurmentrs of flowers 
+# and the features aka the given measurmentrs of flowers
 println("The measured features are: ", names(dataset.features), "\n")
 
-# we have 150 data points as you can see in the size of the data 
+# we have 150 data points as you can see in the size of the data
 println("Size of data: ", size(data), "\n")
 
 #here we define how big training and test set should be

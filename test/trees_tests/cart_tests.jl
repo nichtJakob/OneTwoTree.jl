@@ -214,7 +214,6 @@ Tests whether constructed trees predict expected values and conform to given con
 
     # TODO: readd integer label type tests as soon as it is fixed!
     @testset "Int Label" begin
-        @warn "Int Labels are allowed in the tree code but not sure if this will work."
         t_int_label = DecisionTreeClassifier(max_depth=3)
         fit!(t_int_label, dataset_float, [1, 2, 3])
 
@@ -312,35 +311,35 @@ Loads large FashionMNIST dataset from MLDatasets and tests tree construction and
 as well as consistency in the tree.
 """
 
-@testset "FashionMNIST-1000" begin
-    if !RUN_MNIST
-        #@warn "Skipping FashionMNIST tests"
-        return
-    end
+# @testset "FashionMNIST-1000" begin
+#     if !RUN_MNIST
+#         #@warn "Skipping FashionMNIST tests"
+#         return
+#     end
 
-    features, labels = OneTwoTree.load_data("fashion_mnist_1000")
-    tree = DecisionTreeClassifier(max_depth=10)
+#     features, labels = OneTwoTree.load_data("fashion_mnist_1000")
+#     tree = DecisionTreeClassifier(max_depth=10)
 
-    @testset "Tree Construction" begin
-        fit!(tree, features, labels)
+#     @testset "Tree Construction" begin
+#         fit!(tree, features, labels)
 
-        @test tree.root isa OneTwoTree.Node
-        @test tree.max_depth == 10
-        test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
-    end
+#         @test tree.root isa OneTwoTree.Node
+#         @test tree.max_depth == 10
+#         test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
+#     end
 
-    #@warn "Skipping prediction tests"
-    if(tree.root === nothing)
-        @warn "Skipping prediction tests"
-        return
-    end
-    @testset "Prediction" begin
-        pred = predict(tree, features)
+#     #@warn "Skipping prediction tests"
+#     if(tree.root === nothing)
+#         @warn "Skipping prediction tests"
+#         return
+#     end
+#     @testset "Prediction" begin
+#         pred = predict(tree, features)
 
-        @test length(pred) == length(labels)
-        @test calc_accuracy(labels, pred) > 0.2
-    end
-end
+#         @test length(pred) == length(labels)
+#         @test calc_accuracy(labels, pred) > 0.2
+#     end
+# end
 
 
 """

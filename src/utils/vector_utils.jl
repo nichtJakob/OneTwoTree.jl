@@ -12,7 +12,7 @@ end
 function mode(collection)
     # Erstelle ein Countmap
     counts = countmap(collection)
-    
+
     # Finde das häufigste Element
     max_count = -1
     mode_element = nothing
@@ -22,7 +22,7 @@ function mode(collection)
             mode_element = key
         end
     end
-    
+
     return mode_element
 end
 

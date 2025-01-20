@@ -1,14 +1,14 @@
 # In this example project we want to compare the performance
-# of regression trees with regression random forests 
+# of regression trees with regression random forests
 # on the BostonHousing dataset by  using the OneTwoTree package
 using OneTwoTree
 
 # If you want to execute this example in your julia REPL you will first need to
-# 1) install a dependency for the dataset: 
-#   julia>  using Pkg 
+# 1) install a dependency for the dataset:
+#   julia>  using Pkg
 #   julia>  Pkg.add("MLDatasets")
 #
-# 2) execute the code in your REPL: 
+# 2) execute the code in your REPL:
 #   julia>  include("demo_regression.jl")
 
 
@@ -17,7 +17,7 @@ using MLDatasets: BostonHousing
 using Random
 using Statistics
 
-# First we load the data 
+# First we load the data
 dataset = MLDatasets.BostonHousing(as_df=false)
 X, y = dataset[:]
 n_samples = size(X, 1)
@@ -28,15 +28,15 @@ train_ratio = 0.8
 n_train = Int(round(train_ratio * n_samples))
 indices = randperm(n_samples)
 train_idx = indices[1:n_train]
-test_idx = indices[n_train+1:end] 
+test_idx = indices[n_train+1:end]
 X_train, y_train = X[train_idx, :], y[train_idx]
 X_test, y_test = X[test_idx, :], y[test_idx]
 
-# Now we use the OneTwoTree Package to plant a regression tree. 
+# Now we use the OneTwoTree Package to plant a regression tree.
 # You can play around with different tree max depths
 tree = DecisionTreeRegressor(max_depth=5)
 
-# we train it on the training data 
+# we train it on the training data
 fit!(tree, X_train, y_train)
 
 # lets have a look at our tree
@@ -45,7 +45,7 @@ print_tree(tree)
 
 #Now lets look at regression forests
 
-# We plant a forest. 
+# We plant a forest.
 # you can experiment with the parameters and see how the performance varies
 forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
 fit!(forest, X_train, y_train)

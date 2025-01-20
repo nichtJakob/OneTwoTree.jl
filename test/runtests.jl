@@ -6,12 +6,12 @@ using OneTwoTree
 using Test
 
 include("data_tests.jl")
-include("decision_tree_tests.jl")
-include("cart_tests.jl")
-include("regression_tests.jl")
-include("cart_utils_tests.jl")
-include("forest_tests.jl")
-include("gini_tests.jl")
-include("infoGain_tests.jl")
-include("varGain_tests.jl")
+include("trees_tests/decision_tree_tests.jl")
+include("trees_tests/cart_tests.jl")
+include("trees_tests/regression_tests.jl")
+include("trees_tests/cart_utils_tests.jl")
+include("trees_tests/forest_tests.jl")
+include("splitting_criteria_tests/gini_tests.jl")
+include("splitting_criteria_tests/info_gain_tests.jl")
+include("splitting_criteria_tests/var_gain_tests.jl")
 
