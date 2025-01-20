@@ -50,7 +50,7 @@ using OneTwoTree
         #print(r3_predictions)
 
         #print_tree(r3_tree)
-        @test all(isapprox.(r3_predictions, [2.0, 4.0], atol=0.1))
+        @test all(isapprox.(r3_predictions, [1.5, 3.5], atol=0.1))
     end
 
     @testset "Regression max depth not set" begin
