@@ -14,7 +14,7 @@ include("vectorutils.jl")
 
 # Decision Tree and Random Forest API
 export DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
-export ForestClassifier, ForestRegressor, AbstractForest
+export ForestClassifier, ForestRegressor, AbstractForest, print_forest
 export fit!, predict
 export calc_accuracy, print_tree
 

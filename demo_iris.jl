@@ -3,8 +3,12 @@
 using OneTwoTree
 
 # If you want to execute this example in your julia REPL you will first need to
-# 1) install a dependency for the dataset: Pkg.add("MLDatasets")
-# 2) execute the code in your REPL: include("demo_iris.jl")
+# 1) install a dependency for the dataset: 
+#   julia>  using Pkg 
+#   julia>  Pkg.add("MLDatasets")
+#
+# 2) execute the code in your REPL: 
+#   julia>  include("demo_iris.jl")
 
 # First we load the iris dataset. Targets are the 3 types of the flowers
 # and data contains measurements of flowers
@@ -59,26 +63,22 @@ println("\n\nFor the Iris dataset we have achieved a test-accuracy of $(round(ac
 # Now lets try using Random Forests
 println("\n\n Now we will grow our Random Forest")
 
-# You can play around with those valuse:
-n_trees = 20 # number of trees in our forest
-n_features_per_tree = 10 # number of features per tree
-max_forest_depth = 100 # our max depth for the trees
+# You can play around with those valuse of the parameters:
+#n_trees := number of trees in our forest
+#n_features_per_tree := number of features per tree
+#max_depth := our max depth for the trees
 
-forest = ForestClassifier(n_trees, n_features_per_tree, max_forest_depth)
-println("forest wurde initialisiert")
+forest = ForestClassifier(n_trees=5, n_features_per_tree=30, max_depth=5)
+println("forest was initialized")
 
-fit2!(forest, train_data, train_labels)
-println("forest wurde gefitted")
+fit!(forest, train_data, train_labels)
+println("forest was fitted")
 
-# lets have a look at our trees
-for (i, tree) in enumerate(forest.trees)
-    println("Tree $i:")
-    print_tree(tree)
-    println()
-end
+# lets have a look at our forest
+print_forest(forest)
 
 #Lets see how good our tree is at predicting lables of datapoints in the test_data
-forest_test_predictions = predict2(forest, test_data)
+forest_test_predictions = predict(forest, test_data)
 forest_accuracy = sum(forest_test_predictions .== test_labels) / length(test_labels)
 
 println("\n\nFor the Iris dataset the forest has achieved a test-accuracy of $(round(forest_accuracy * 100, digits=2))%")

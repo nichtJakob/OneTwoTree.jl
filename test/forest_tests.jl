@@ -66,7 +66,16 @@ using OneTwoTree
         #TODO: check n_features_per_tree out of bounds
         #TODO: check max_depth -1, -2, too large, too small etc.
         #TODO: check datatypes: Int, Float, String, Mixed
+        #println("f0 Print: ---------------------------------------------------")
+        #print_forest(f0)
     end
+
+    #@testset "Printing" begin
+    #    fprint = ForestClassifier(n_trees=5, n_features_per_tree=6, max_depth=5)
+    #    fit!(fprint, dataset1, cat_labels1)
+    #    print_forest(fprint)
+    #end
+
 
     @testset "Regressor" begin
         #TODO:

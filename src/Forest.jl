@@ -84,3 +84,17 @@ function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S
         return mean(predictions)
     end
 end
+
+function _forest_to_string(forest::AbstractForest)
+    result = ""
+    for (i, tree) in enumerate(forest.trees)
+        result *= "\nTree $i:\n"
+        result *= _tree_to_string(tree, false)
+        result *= "\n"
+    end
+    return result
+end
+
+function print_forest(forest::AbstractForest)
+    print(_forest_to_string(forest))
+end
