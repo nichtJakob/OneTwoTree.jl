@@ -56,6 +56,9 @@ mutable struct Node{T<:Union{Number, String}}
             N.splitting_gain = 0.65 # TODO: in regression Sum-of-squares error is used as measure of gain
         end
 
+        # TODO: only temporary
+        N.classify = classify
+        
         N.decision, post_split_gain = split(N)
         if should_split(N, post_split_gain, max_depth)
             # N.decision_column = split_info...
