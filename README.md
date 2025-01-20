@@ -42,7 +42,6 @@ using OneTwoTree
 
 ## ▶️ **Example: Running a Simple Example**
 
-- Note that the classifier currently only supports training datasets and labels of type `Real/String`.
 - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
 
 ### Classification
