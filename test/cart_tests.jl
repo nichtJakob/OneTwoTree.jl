@@ -214,7 +214,7 @@ Tests whether constructed trees predict expected values and conform to given con
 
     # TODO: readd integer label type tests as soon as it is fixed!
     @testset "Int Label" begin
-        @warn "Int Labels are allowed in the tree code but not sure if this will work."
+        #@warn "Int Labels are allowed in the tree code but not sure if this will work."
         t_int_label = DecisionTreeClassifier(max_depth=3)
         fit!(t_int_label, dataset_float, [1, 2, 3])
 

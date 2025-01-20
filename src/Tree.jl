@@ -176,7 +176,9 @@ end
 
 function predict(node::Node, dataset::AbstractMatrix)
     if is_leaf(node)
-        return node.prediction * ones(size(dataset, 1))
+        #println("Node prediction ist $(node.prediction)")
+        return fill(node.prediction, size(dataset, 1))
+        #return node.prediction * ones(size(dataset, 1))
     end
 
     result = []
