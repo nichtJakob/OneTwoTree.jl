@@ -1,6 +1,6 @@
 # In this example project we want to compare the performance
 # of regression trees with regression random forests 
-# on the BostonHousing dataset by  using the OneTwoTree
+# on the BostonHousing dataset by  using the OneTwoTree package
 using OneTwoTree
 
 # If you want to execute this example in your julia REPL you will first need to
