@@ -12,7 +12,7 @@ using OneTwoTree
 
 # First we load the iris dataset. Targets are the 3 types of the flowers
 # and data contains measurements of flowers
-using MLDatasets
+using MLDatasets: Iris
 
 dataset = MLDatasets.Iris()
 data = Array(dataset.features)
