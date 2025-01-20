@@ -17,8 +17,6 @@ mutable struct Node{T<:Union{Number, String}}
     node_data::Vector{Int64}
     # TODO: Index list of constant columns or columns the label does not vary with
     # constant_columns::Vector{Int64}
-    # Own impurity
-    impurity::Union{Float64, Nothing}
     depth::Int64
 
     # TODO: should implement split_function; split function should only work if this node is a leaf
@@ -35,7 +33,7 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
         N.depth = depth
         N.true_child = nothing
@@ -46,24 +44,21 @@ mutable struct Node{T<:Union{Number, String}}
         if classify
             # in classification, we simply choose the most frequent label as our prediction
             N.prediction = most_frequent_class(labels, node_data)
-            # calculate gini impurity if this was a leaf node
-            N.impurity = gini_impurity(dataset, labels, node_data)
         else
             # in regression, we choose the mean as our prediction as it minimizes the square loss
             N.prediction = label_mean(labels, node_data)
-            N.impurity = variance(labels[node_data])
         end
 
         # TODO: only temporary
         N.classify = classify
 
-        N.decision, post_split_impurity = split(N)
-        if should_split(N, post_split_impurity, max_depth)
+        N.decision, splitting_gain = split(N, splitting_criterion)
+        if should_split(N, splitting_gain, max_depth)
             # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)
-            N.true_child = Node(dataset, labels, true_data, classify, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
-            N.false_child = Node(dataset, labels, false_data, classify, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
+            N.true_child = Node(dataset, labels, true_data, classify, splitting_criterion, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
+            N.false_child = Node(dataset, labels, false_data, classify, splitting_criterion, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
             # TODO: Do we want to set prediction to nothing in non-leaf nodes? It could be neat to just have it, if we already had to calculate it anyways.
             # NOTE: The reason it is set to nothing here atm, is because N.prediction being nothing is later used to identify non-leaf nodes.
             N.prediction = nothing
@@ -76,7 +71,7 @@ mutable struct Node{T<:Union{Number, String}}
 end
 
 # Custom constructor for keyword arguments
-function Node(dataset, labels, classify; column_data=false, node_data=nothing, max_depth=0)
+function Node(dataset, labels, classify; splitting_criterion=nothing, column_data=false, node_data=nothing, max_depth=0)
 
     # This is meant for when initializing a matrix like [[] [] []]. Then the inner []'s are inserted into the matrix as column vectors.
     # But since we would like them to be interpreted as row-vectors, we provide the option to transpose in this case.
@@ -87,12 +82,15 @@ function Node(dataset, labels, classify; column_data=false, node_data=nothing, m
     if node_data === nothing
         node_data = collect(1:size(dataset, 1))
     end
-    return Node(dataset, labels, node_data, classify, max_depth=max_depth)
+    if isnothing(splitting_criterion)
+        if classify
+            splitting_criterion = gini_gain
+        else
+            splitting_criterion = variance_gain
+        end
+    end
+    return Node(dataset, labels, node_data, classify, splitting_criterion, max_depth=max_depth)
 end
-
-# function Node(dataset; node_data=nothing, decision=nothing, true_child=nothing, false_child=nothing, prediction=nothing)
-    # Node(dataset, decision, true_child, false_child, prediction)
-# end
 
 """
     is_leaf(node)

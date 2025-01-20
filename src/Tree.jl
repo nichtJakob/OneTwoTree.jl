@@ -135,13 +135,21 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 - `tree::AbstractDecisionTree`: the tree to be trained
 - `dataset::AbstractMatrix`: the training data
 - `labels::Vector{Union{Real, String}}`: the target labels
+- `splitting_criterion: a function indicating some notion of gain from splitting a node`
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 """
-function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}, column_data=false) where {T<:Union{Number, String}}
+function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
     _verify_fit!_args(tree, features, labels, column_data)
 
     classify = (tree isa DecisionTreeClassifier)
-    tree.root = Node(features, labels, classify, max_depth=tree.max_depth, column_data=column_data)
+    if isnothing(splitting_criterion)
+        if classify
+            splitting_criterion = gini_gain
+        else
+            splitting_criterion = variance_gain
+        end
+    end
+    tree.root = Node(features, labels, classify, splitting_criterion=splitting_criterion, max_depth=tree.max_depth, column_data=column_data)
 end
 
 """

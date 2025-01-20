@@ -10,6 +10,16 @@ function variance(data::AbstractVector) :: Float64
     return variance
 end
 
+function variance(labels::AbstractVector, node_data::Vector{Int64}) :: Float64
+    if isempty(labels)
+        return 0.0
+    end
+    # TODO: here we copy a lot, but I wasnt too confident to change it on release day
+    mean_value = mean(labels[node_data])
+    variance = mean((labels[node_data] .- mean_value) .^ 2)
+    return variance
+end
+
 # function variance(child_1_labels::AbstractVector, child_2_labels::AbstractVector) :: Float64
 function variance(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64)::Float64
 
@@ -35,7 +45,11 @@ function variance(features::AbstractMatrix, labels::AbstractVector, node_data::V
     return weighted_var
 end
 
-# Spliting criterion for regression based on the variance similar to infogain
+function variance_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64)::Float64
+    return variance(labels, node_data) - variance(features, labels, node_data, decision_fn, decision_param, decision_feature)
+end
+
+# # Spliting criterion for regression based on the variance similar to infogain
 function var_gain(parent_labels::AbstractVector, child_1_labels::AbstractVector, child_2_labels::AbstractVector) :: Float64
     max_gain = variance(parent_labels)
 

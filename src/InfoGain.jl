@@ -36,6 +36,45 @@ This function calculates the information gain spliting criterion
 - calculated as follows:
     Information gain = entropy(parent) - [weightes] * entropy(children) 
 """
+function information_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64)::Float64
+
+    # Split data in true and false
+    split_true, split_false = split_indices(features, node_data, decision_fn, decision_param, decision_feature)
+
+    # Labeling data
+    true_labels = labels[split_true]
+    false_labels = labels[split_false]
+    total_labels = length(labels[node_data])
+
+    if isempty(true_labels) || isempty(false_labels)
+        return 0.0
+    end
+
+    true_weight = length(true_labels) / total_labels
+    false_weight = length(false_labels) / total_labels
+
+    weighted_true_entropy = true_weight * entropy(true_labels)
+    weighted_false_entropy = false_weight * entropy(false_labels)
+    weighted_entropy = weighted_true_entropy + weighted_false_entropy
+
+    return entropy(labels[node_data]) - weighted_entropy
+end
+
+"""
+    information_gain(features::AbstractVector) -> Float64
+
+This function calculates the information gain spliting criterion
+
+# Arguments:
+- `parent_labels`: A vector of all considerd labels to be split
+- `child_1_labels`: A vector of labels of the first spliting part
+- `child_2_labels`: A vector of labels of the other spliting part
+
+# Returns:
+- The information gain for given split as Float64. 
+- calculated as follows:
+    Information gain = entropy(parent) - [weightes] * entropy(children) 
+"""
 function information_gain(parent_labels::AbstractVector, child_1_labels::AbstractVector, child_2_labels::AbstractVector) :: Float64
     total = length(parent_labels) 
 

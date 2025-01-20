@@ -85,3 +85,23 @@ function gini_impurity(features::AbstractMatrix, labels::AbstractVector, node_da
 
     return gini
 end
+
+"""
+    gini_gain(features::AbstractVector, labels::Vector{Bool}, decision_fn::Function) -> Float64
+
+This function calculates the gain in Gini impurity for a split in a decision tree.
+
+# Arguments:
+- `features`: A vector of features (e.g., true/false values or more complex data points).
+- `labels`: A vector of Boolean labels indicating the target values (true/false).
+- `decision_fn`: A function that takes a feature and returns `true` or `false` to define the split.
+- `decision_param`: The parameter of the decision. This could be a numeric threshold e.g. 5 in x <= 5 or a class name "Ship" in x == "Ship".
+- `decision_feature`: The index of the feature the decision function branches on. For datapoints with 5 features, this can be an index i in [1:5].
+
+# Returns:
+- The gain in Gini impurity of the split.
+"""
+
+function gini_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64)::Float64
+    return gini_impurity(features, labels, node_data) - gini_impurity(features, labels, node_data, decision_fn, decision_param, decision_feature)
+end

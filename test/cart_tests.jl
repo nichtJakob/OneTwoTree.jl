@@ -280,6 +280,33 @@ Tests whether constructed trees predict expected values and conform to given con
     end
 end
 
+@testset "Custom Splitting Criteria" begin
+    dataset_zork = [
+        500.0 57.3 399.0 -250.0
+        34.2 21.3 781.5 994.0
+        -402.0 63.0 333.3 443.1
+        141.0 687.1 231.0 55.0
+        125.0 462.2 425.6 154.0
+        -392.0 366.2 -30.0 -220.0
+        -94.0 72.0 482.0 6.0
+        322.0 33.2 -230.0 750.0
+    ]
+    zork_labels = ["BAYALA", "BLORB", "CLEESH", "BAYALA", "LESOCH", "MUSDEX", "ZIMBOR", "MUSDEX"]
+
+    @testset "Information Gain" begin
+        tz = DecisionTreeClassifier(max_depth=3)
+        fit!(tz, dataset_zork, zork_labels, splitting_criterion=information_gain)
+
+        @test tz.root isa OneTwoTree.Node
+        @test tz.max_depth == 3
+        test_tree_consistency(tree=tz, run_tests=tz.root !== nothing)
+
+        pred = predict(tz, dataset_zork)
+        @test length(pred) == length(zork_labels)
+        @test calc_accuracy(zork_labels, pred) == 1.0
+    end
+end
+
 """
 Loads large FashionMNIST dataset from MLDatasets and tests tree construction and prediction
 as well as consistency in the tree.
