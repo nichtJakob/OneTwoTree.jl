@@ -18,7 +18,7 @@ using Random
 using Statistics
 
 # First we load the data
-dataset = MLDatasets.BostonHousing(as_df=false)
+dataset = BostonHousing(as_df=false)
 X, y = dataset[:]
 n_samples = size(X, 1)
 
@@ -56,9 +56,8 @@ println("\n \n Our forest: \n")
 print_forest(forest)
 
 
-
 # Lets check the tree performance on testdata
-y_pred_forest = predict(forest, X_test)
+y_pred_tree = predict(tree, X_test)
 
 mse_tree = mean((y_pred_tree .- y_test).^2)  # Mean Squared Error
 rmse_tree = sqrt(mse_tree)                  # Root Mean Squared Error
@@ -66,7 +65,7 @@ mae_tree = mean(abs.(y_pred_tree .- y_test))  # Mean Absolute Error
 
 
 # And now the forest performance on testdata
-y_pred_tree = predict(tree, X_test)
+y_pred_forest = predict(forest, X_test)
 
 mse_forest = mean((y_pred_forest .- y_test).^2)  # Mean Squared Error
 rmse_forest = sqrt(mse_forest)                  # Root Mean Squared Error

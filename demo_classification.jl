@@ -14,7 +14,7 @@ using OneTwoTree
 # and data contains measurements of flowers
 using MLDatasets: Iris
 
-dataset = MLDatasets.Iris()
+dataset = Iris()
 data = Array(dataset.features)
 targets = String.(Array(dataset.targets))
 
@@ -29,7 +29,7 @@ println("Size of data: ", size(data), "\n")
 #here we define how big training and test set should be
 # you can modify the spliting point to be any value between 1 and 149
 spliting_point = 120
-println("It is $(spliting_point > 1 && spliting_point < 150) that you have chosen a qualifiing spliting point $(spliting_point)", "\n")
+println("It is $(spliting_point > 1 && spliting_point < 150) that you have chosen a qualifying spliting point $(spliting_point)", "\n")
 
 
 
