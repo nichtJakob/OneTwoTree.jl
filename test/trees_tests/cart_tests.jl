@@ -8,7 +8,7 @@ using Suppressor # suppress prints in tests
 
 
 const RUN_MNIST = false
-const USE_INT_FEATURES = false
+const USE_INT_FEATURES = true
 
 """
     test_node_consistency(node::Node)
@@ -28,6 +28,21 @@ function test_node_consistency(node::OneTwoTree.Node)
         @test node.decision isa OneTwoTree.Decision
     end
 end
+
+"""
+    test_no_duplicates(node::OneTwoTree.Node)
+Tests that no two node children classify the same (makes no sense)
+"""
+function test_no_duplicates(node::OneTwoTree.Node)
+    if OneTwoTree.is_leaf(node)
+        return
+    end
+
+    if OneTwoTree.is_leaf(node.true_child) && OneTwoTree.is_leaf(node.false_child)
+        @test node.true_child.prediction != node.false_child.prediction
+    end
+end
+
 
 """
     test_tree_consistency(tree, run_tests::Bool=true)
@@ -53,6 +68,7 @@ function test_tree_consistency(; tree::OneTwoTree.AbstractDecisionTree, run_test
         node = popfirst!(to_visit)
 
         test_node_consistency(node)
+        test_no_duplicates(node)
 
         if node.true_child !== nothing
             push!(to_visit, node.true_child)
@@ -167,29 +183,29 @@ Tests whether constructed trees predict expected values and conform to given con
 
         @test t_float.root isa OneTwoTree.Node
         @test t_string.root isa OneTwoTree.Node
-        # @test t_int.root isa OneTwoTree.Node
+        @test t_int.root isa OneTwoTree.Node
         @test t_mixfs.root isa OneTwoTree.Node
         test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
         test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
-        # test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
+        test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
         test_tree_consistency(tree=t_mixfs, run_tests=t_mixfs.root !== nothing)
         @test OneTwoTree.calc_depth(t_float) == 2
         @test OneTwoTree.calc_depth(t_string) == 2
-        # @test calc_depth(t_int) == 2 # TODO: this probably isn't 2 as we have 6 data points
+        @test OneTwoTree.calc_depth(t_int) == 2
         @test OneTwoTree.calc_depth(t_mixfs) == 3 # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution.
 
         pred_float = predict(t_float, dataset_float)
         pred_string = predict(t_string, dataset_string)
-        # pred_int = predict(t_int, dataset_int)
+        pred_int = predict(t_int, dataset_int)
         pred_mixfs = predict(t_mixfs, dataset_mixfs)
 
         @test length(pred_float) == 3
         @test length(pred_string) == 3
-        # @test length(pred_int) == 6
+        @test length(pred_int) == 6
         @test length(pred_mixfs) == 4
         @test calc_accuracy(abc_labels, pred_float) == 1.0
         @test calc_accuracy(abc_labels, pred_string) == 1.0
-        # @test calc_accuracy(aabcbb_labels, pred_int) == 1.0
+        @test calc_accuracy(aabcbb_labels, pred_int) == 1.0
         @test calc_accuracy(abcd_labels, pred_mixfs) == 1.0
 
         #TODO: test mixed type and int features
@@ -198,17 +214,16 @@ Tests whether constructed trees predict expected values and conform to given con
 
     # TODO: readd integer label type tests as soon as it is fixed!
     @testset "Int Label" begin
-        # @warn "Int Labels are allowed in the tree code but not sure if this will work."
-        # t_int_label = DecisionTreeClassifier(max_depth=3)
-        # fit!(t_int_label, dataset_float, [1, 2, 3])
+        t_int_label = DecisionTreeClassifier(max_depth=3)
+        fit!(t_int_label, dataset_float, [1, 2, 3])
 
-        # @test t_int_label.root isa OneTwoTree.Node
-        # test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
-        # @test calc_depth(t_int_label) == 3
+        @test t_int_label.root isa OneTwoTree.Node
+        test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
+        @test OneTwoTree.calc_depth(t_int_label) == 2
 
-        # pred_int_label = predict(t_int_label, dataset_float)
-        # @test length(pred_int_label) == 3
-        # @test calc_accuracy([1, 2, 3], pred_int_label) == 1.0
+        pred_int_label = predict(t_int_label, dataset_float)
+        @test length(pred_int_label) == 3
+        @test calc_accuracy([1, 2, 3], pred_int_label) == 1.0
     end
 
     @testset "Max Depth" begin
@@ -264,40 +279,67 @@ Tests whether constructed trees predict expected values and conform to given con
     end
 end
 
+@testset "Custom Splitting Criteria" begin
+    dataset_zork = [
+        500.0 57.3 399.0 -250.0
+        34.2 21.3 781.5 994.0
+        -402.0 63.0 333.3 443.1
+        141.0 687.1 231.0 55.0
+        125.0 462.2 425.6 154.0
+        -392.0 366.2 -30.0 -220.0
+        -94.0 72.0 482.0 6.0
+        322.0 33.2 -230.0 750.0
+    ]
+    zork_labels = ["BAYALA", "BLORB", "CLEESH", "BAYALA", "LESOCH", "MUSDEX", "ZIMBOR", "MUSDEX"]
+
+    @testset "Information Gain" begin
+        tz = DecisionTreeClassifier(max_depth=3)
+        fit!(tz, dataset_zork, zork_labels, splitting_criterion=information_gain)
+
+        @test tz.root isa OneTwoTree.Node
+        @test tz.max_depth == 3
+        test_tree_consistency(tree=tz, run_tests=tz.root !== nothing)
+
+        pred = predict(tz, dataset_zork)
+        @test length(pred) == length(zork_labels)
+        @test calc_accuracy(zork_labels, pred) == 1.0
+    end
+end
+
 """
 Loads large FashionMNIST dataset from MLDatasets and tests tree construction and prediction
 as well as consistency in the tree.
 """
 
-@testset "FashionMNIST-1000" begin
-    if !RUN_MNIST
-        #@warn "Skipping FashionMNIST tests"
-        return
-    end
+# @testset "FashionMNIST-1000" begin
+#     if !RUN_MNIST
+#         #@warn "Skipping FashionMNIST tests"
+#         return
+#     end
 
-    features, labels = OneTwoTree.load_data("fashion_mnist_1000")
-    tree = DecisionTreeClassifier(max_depth=10)
+#     features, labels = OneTwoTree.load_data("fashion_mnist_1000")
+#     tree = DecisionTreeClassifier(max_depth=10)
 
-    @testset "Tree Construction" begin
-        fit!(tree, features, labels)
+#     @testset "Tree Construction" begin
+#         fit!(tree, features, labels)
 
-        @test tree.root isa OneTwoTree.Node
-        @test tree.max_depth == 10
-        test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
-    end
+#         @test tree.root isa OneTwoTree.Node
+#         @test tree.max_depth == 10
+#         test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
+#     end
 
-    #@warn "Skipping prediction tests"
-    if(tree.root === nothing)
-        @warn "Skipping prediction tests"
-        return
-    end
-    @testset "Prediction" begin
-        pred = predict(tree, features)
+#     #@warn "Skipping prediction tests"
+#     if(tree.root === nothing)
+#         @warn "Skipping prediction tests"
+#         return
+#     end
+#     @testset "Prediction" begin
+#         pred = predict(tree, features)
 
-        @test length(pred) == length(labels)
-        @test calc_accuracy(labels, pred) > 0.2
-    end
-end
+#         @test length(pred) == length(labels)
+#         @test calc_accuracy(labels, pred) > 0.2
+#     end
+# end
 
 
 """

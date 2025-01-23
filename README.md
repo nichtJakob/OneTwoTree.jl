@@ -27,21 +27,21 @@
 - Via `Pkg>` mode (press `]` in Julia REPL):
 
 ```bash
-add https://github.com/nichtJakob/OneTwoTree.jl
+activate --temp
+add https://github.com/nichtJakob/OneTwoTree.jl.git
 ```
 
 - For Pluto notebooks: We can't use Pluto's environments but have to create our own:
 ```julia
 using Pkg
 Pkg.activate("MyEnvironment")
-Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl")
+Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl.git")
 using OneTwoTree
 ```
 
 
 ## ▶️ **Example: Running a Simple Example**
 
-- Note that the classifier currently only supports training datasets of type `Real` and labels of type `String`
 - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
 
 ### Classification
@@ -84,8 +84,10 @@ using OneTwoTree
   ])
   print("The tree predicted $(prediction[1]).")
   ```
-   ### Loading Other Datasets
-   You can find a more extensive example which utilises the `Iris` dataset from `MLDatasets` in [`demo_iris.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_iris.jl). :)
+
+### Forests and Loading Other Datasets
+
+You can find more extensive examples utilising the `Iris` and `BostonHousing` datasets from `MLDatasets` in [`demo_classification.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_classification.jl). and [`demo_regression.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_regression.jl). The latter further compares `DecisionTree` performance to that of a `Forest`.
 
 ## 📚 **Further Reading for Developers**
 
@@ -119,7 +121,7 @@ using OneTwoTree
      or in your julia REPL run:
      ```julia
      include("runtests.jl")         # run all tests
-     include("regression_tests.jl") # run specific test (example)
+     include("trees_tests/regression_tests.jl") # run specific test (example)
      ```
 
     For a quick guide on how to develop julia packages, write tests, ...,  read [this](https://adrianhill.de/julia-ml-course/write/).
