@@ -29,6 +29,14 @@ function convert_img_to_dataframe(images, labels)
     return df_final
 end
 
+function get_save_path(filename)
+    save_path = joinpath(@__DIR__, "..", "data")
+    if !isdir(save_path)
+        error("Directory \"$save_path$filename\" does not exist.")
+    end
+    save_path = joinpath(save_path, filename)
+end
+
 """
     save_img_dataset_as_csv(dataset, filename, num_samples)
 
@@ -40,14 +48,9 @@ Save a subset of an image dataset to a CSV file.
 - `num_samples::Int`: the maximum number of samples to save from the dataset
 """
 function save_img_dataset_as_csv(dataset, filename, num_samples)
+    save_path = get_save_path(filename)
 
-    save_path = joinpath(@__DIR__, "..", "data")
-    if !isdir(save_path)
-        error("Directory \"$save_path$filename\" does not exist.")
-    end
-    save_path = joinpath(save_path, filename)
-
-    if length(dataset) < num_samples
+    if length(dataset) < num_samples || num_samples == -1
         num_samples = length(dataset)
     end
 
@@ -58,5 +61,8 @@ function save_img_dataset_as_csv(dataset, filename, num_samples)
     println("Saved $(length(labels)) samples to \"$save_path\"")
 end
 
-#dataset_train = FashionMNIST(; split=:train)
-#save_img_dataset_as_csv(dataset_train, "fashion_mnist_1000.csv", 1000)
+
+# dataset_train = FashionMNIST(; split=:train)
+# save_img_dataset_as_csv(dataset_train, "fashion_mnist_1000.csv", 1000)
+
+
