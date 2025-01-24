@@ -1,7 +1,6 @@
 module OneTwoTree
 
 #Main Module file
-include("utils/load_data.jl")
 include("utils/vector_utils.jl")
 include("splitting_criteria/gini.jl")
 include("splitting_criteria/info_gain.jl")
@@ -17,8 +16,8 @@ include("trees/cart/cart_utils.jl")
 
 
 # Decision Tree and Random Forest API
-export DecisionTreeClassifier, DecisionTreeRegressor, AbstractDecisionTree
-export ForestClassifier, ForestRegressor, AbstractForest
+export DecisionTreeClassifier, DecisionTreeRegressor
+export ForestClassifier, ForestRegressor
 export fit!, predict
 export calc_accuracy, print_tree, print_forest
 
