@@ -1,8 +1,8 @@
-# in this example project we want to distinguish between 3 types of the iris flower
+# In this example we want to distinguish between 3 types of the iris flower
 # using the OneTwoTree package
 using OneTwoTree
 
-# if you want to execute this example in your julia REPL you will first need to
+# If you want to execute this example in your julia REPL you will first need to
 # 1) install dependencies for the dataset:
 #   julia>  using Pkg
 #   julia>  Pkg.add("MLDatasets")
@@ -11,7 +11,7 @@ using OneTwoTree
 # 2) execute the code in your REPL:
 #   julia>  include("demo_classification.jl")
 
-# first we load the iris dataset. Targets are the 3 types of the flowers
+# First we load the iris dataset. Targets are the 3 types of the flowers
 # and data contains measurements of flowers
 using DataFrames
 using MLDatasets: Iris
@@ -20,16 +20,16 @@ dataset = Iris()
 data = Array(dataset.features)
 targets = String.(Array(dataset.targets))
 
-# let's have a look at the types of the iris flower contained in targets
+# Let's have a look at the types of the iris flower contained in targets
 println("The possible targets are: ", unique(targets), "\n")
 # and the features, aka the given measurements of flowers
 println("The measured features are: ", names(dataset.features), "\n")
 
-# we have 150 data points as you can see in the size of the data
+# We have 150 data points as you can see in the size of the data
 println("Size of data: ", size(data), "\n")
 
-# here we define how big training and test set should be
-# you can modify the splitting point to be any value between 1 and 149
+# Here we define how big training and test set should be
+# You can modify the splitting point to be any value between 1 and 149
 splitting_point = 120
 
 if splitting_point < 1 || splitting_point > 150
@@ -45,27 +45,27 @@ test_labels = targets[splitting_point+1:150]
 println("Size of train data: ", size(train_data), "\n")
 println("Size of test data: ", size(test_data), "\n")
 
-# now we use the OneTwoTree package to build a decision tree, you can experiment with different tree-depths
+# Now we use the OneTwoTree package to build a decision tree, you can experiment with different tree-depths
 our_max_depth = 3
 tree = DecisionTreeClassifier(max_depth=our_max_depth)
 
-# now we train on the training data
+# Now we train on the training data
 fit!(tree, train_data, train_labels)
 
-# finally we can take a look at our trained tree
-println("\n \n Our Tree: \n")
+# Finally, we can take a look at our trained tree
+println("\n\nOur Tree:\n")
 print_tree(tree)
 
-# let's see how good our tree is at predicting labels of data points in the test_data
+# Let's see how good our tree is at predicting labels of data points in the test_data
 test_predictions = predict(tree, test_data)
 accuracy = sum(test_predictions .== test_labels) / length(test_labels)
 
 println("\n\nFor the Iris dataset we have achieved a test accuracy of $(round(accuracy * 100, digits=2))%")
 println("-----------------------------------------------------\n")
 
-# now let's try using random forests
+# Now let's try using random forests
 
-# you can play around with the following values of the parameters:
+# You can play around with the following values of the parameters:
 # n_trees := number of trees in our forest
 # n_features_per_tree := number of features per tree
 # max_depth := our max depth for the trees
@@ -76,10 +76,10 @@ println("\n\nNow we will grow our random forest containing 5 trees with $n_featu
 forest = ForestClassifier(n_trees=5, n_features_per_tree=n_features_per_tree, max_depth=our_max_depth)
 fit!(forest, train_data, train_labels)
 
-# let's have a look at our forest
+# Let's have a look at our forest
 print_forest(forest)
 
-# let's see how good our tree is at predicting lables of datapoints in the test_data
+# Let's see how good our tree is at predicting lables of datapoints in the test_data
 forest_test_predictions = predict(forest, test_data)
 forest_accuracy = sum(forest_test_predictions .== test_labels) / length(test_labels)
 

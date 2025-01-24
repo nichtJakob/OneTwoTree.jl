@@ -1,28 +1,28 @@
-# In this example project we want to compare the performance
+# In this example we want to compare the performance
 # of regression trees with regression random forests
-# on the BostonHousing dataset by  using the OneTwoTree package
+# on the BostonHousing dataset by using the OneTwoTree package
 using OneTwoTree
 
 # If you want to execute this example in your julia REPL you will first need to
 # 1) install a dependency for the dataset:
 #   julia>  using Pkg
 #   julia>  Pkg.add("MLDatasets")
+#   julia>  Pkg.add("DataFrames")
 #
 # 2) execute the code in your REPL:
 #   julia>  include("demo_regression.jl")
 
-
-
 using MLDatasets: BostonHousing
 using Random
 using Statistics
+using DataFrames
 
 # First we load the data
 dataset = BostonHousing(as_df=false)
 X, y = dataset[:]
 n_samples = size(X, 1)
 
-# we split randomly into training and test sets. X are the features und y are teh Targets
+# We split randomly into training and test sets. X are the features and y are the targets
 # You can experiment with different train ratios as long as it stays between 0.1 and 0.9
 train_ratio = 0.8
 n_train = Int(round(train_ratio * n_samples))
@@ -32,31 +32,29 @@ test_idx = indices[n_train+1:end]
 X_train, y_train = X[train_idx, :], y[train_idx]
 X_test, y_test = X[test_idx, :], y[test_idx]
 
-# Now we use the OneTwoTree Package to plant a regression tree.
-# You can play around with different tree max depths
+# Now we use the OneTwoTree package to plant a regression tree.
+# You can experiment with different maximum tree depths.
 tree = DecisionTreeRegressor(max_depth=5)
 
-# we train it on the training data
+# We train it on the training data
 fit!(tree, X_train, y_train)
 
-# lets have a look at our tree
-println("\n \n Our Tree: \n")
+# Let's have a look at our tree
+println("\n\nOur Tree:\n")
 print_tree(tree)
 
-#Now lets look at regression forests
-
-# We plant a forest.
-# you can experiment with the parameters and see how the performance varies
+# Now let's look at regression forests
+# You can experiment with the parameters and see how the performance varies
 forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
 fit!(forest, X_train, y_train)
 
-# lets look at our forest
-# if you have chosen a large number of trees you might want to comment the forest prining out
+# Let's admire our forest by printing it to the console
+# If you have chosen a large number of trees, you might want to comment out the forest printing
 println("\n \n Our forest: \n")
 print_forest(forest)
 
 
-# Lets check the tree performance on testdata
+# Let's check the tree performance on test data
 y_pred_tree = predict(tree, X_test)
 
 mse_tree = mean((y_pred_tree .- y_test).^2)  # Mean Squared Error
@@ -64,7 +62,7 @@ rmse_tree = sqrt(mse_tree)                  # Root Mean Squared Error
 mae_tree = mean(abs.(y_pred_tree .- y_test))  # Mean Absolute Error
 
 
-# And now the forest performance on testdata
+# And now the forest performance on test data
 y_pred_forest = predict(forest, X_test)
 
 mse_forest = mean((y_pred_forest .- y_test).^2)  # Mean Squared Error
@@ -73,8 +71,8 @@ mae_forest = mean(abs.(y_pred_forest .- y_test))  # Mean Absolute Error
 
 
 
-# Finaly we can compare our regression tree with the random forest regressor
-println("\nTest Performance comparisson:")
+# Finally, we can compare our regression tree with the random forest regressor
+println("\nTest Performance comparison:")
 println("-------------------------------\n")
 
 println("Mean Squared Error (MSE)")
