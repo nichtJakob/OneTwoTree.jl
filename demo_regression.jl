@@ -4,7 +4,7 @@
 using OneTwoTree
 
 # If you want to execute this example in your julia REPL you will first need to
-# 1) install a dependency for the dataset:
+# 1) install dependencies for the dataset:
 #   julia>  using Pkg
 #   julia>  Pkg.add("MLDatasets")
 #   julia>  Pkg.add("DataFrames")
