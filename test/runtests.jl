@@ -5,8 +5,6 @@
 using OneTwoTree
 using Test
 
-include("data_tests.jl")
-
 include("trees_tests/decision_tree_tests.jl")
 include("trees_tests/cart_tests.jl")
 include("trees_tests/regression_tests.jl")
