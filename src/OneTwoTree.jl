@@ -23,7 +23,7 @@ export calc_accuracy, print_tree, print_forest
 # Splitting Criteria
 export gini_impurity
 export information_gain
-export var_gain
+export variance_gain
 export less_than_or_equal, equal
 
 end # end the module
