@@ -29,7 +29,8 @@ function split(N::Node, splitting_criterion::Function)
                 for class in classes
 
                     decision = Decision(equal, i, class)
-                    gain = splitting_criterion(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                    split_true, split_false = split_indices(N.dataset, N.node_data, decision.fn, decision.param, decision.feature)
+                    gain = splitting_criterion(view(N.labels, N.node_data), view(N.labels, split_true), view(N.labels, split_false))
 
                     if best_feature == -1 || (gain > best_gain)
                         best_feature = i
@@ -65,7 +66,8 @@ function split(N::Node, splitting_criterion::Function)
 
                 # calculate splitting gain
                 decision = Decision(less_than_or_equal, i, midpoint)
-                gain = splitting_criterion(N.dataset, N.labels, N.node_data, decision.fn, decision.param, decision.feature)
+                split_true, split_false = split_indices(N.dataset, N.node_data, decision.fn, decision.param, decision.feature)
+                gain = splitting_criterion(view(N.labels, N.node_data), view(N.labels, split_true), view(N.labels, split_false))
 
                 # check if we found an improving decision
                 if best_feature == -1 || (gain > best_gain)
