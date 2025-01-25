@@ -53,7 +53,7 @@ function get_random_features(features::Matrix{S}, labels::Vector{T}, n_features:
 end
 
 
-function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
     is_classifier = (forest isa ForestClassifier)
 
     for i in 1:forest.n_trees
@@ -66,7 +66,7 @@ function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, co
             tree = DecisionTreeRegressor(max_depth=forest.max_depth)
         end
 
-        fit!(tree, current_tree_features, current_tree_labels)
+        fit!(tree, current_tree_features, current_tree_labels, splitting_criterion=splitting_criterion)
         push!(forest.trees, tree)
     end
 end

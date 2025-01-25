@@ -37,7 +37,7 @@ X_test, y_test = X[test_idx, :], y[test_idx]
 tree = DecisionTreeRegressor(max_depth=5)
 
 # We train it on the training data
-fit!(tree, X_train, y_train)
+fit!(tree, X_train, y_train, splitting_criterion=information_gain)
 
 # Let's have a look at our tree
 println("\n\nOur Tree:\n")
@@ -46,7 +46,7 @@ print_tree(tree)
 # Now let's look at regression forests
 # You can experiment with the parameters and see how the performance varies
 forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
-fit!(forest, X_train, y_train)
+fit!(forest, X_train, y_train, splitting_criterion=information_gain)
 
 # Let's admire our forest by printing it to the console
 # If you have chosen a large number of trees, you might want to comment out the forest printing
