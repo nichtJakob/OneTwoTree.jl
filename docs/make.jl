@@ -5,7 +5,6 @@ DocMeta.setdocmeta!(OneTwoTree, :DocTestSetup, :(using OneTwoTree); recursive=tr
 
 makedocs(;
     modules=[OneTwoTree],
-    authors="Jakob Balasus <balasus@campus.tu-berlin.de>, Eloi Sandt <eloi.sandt@campus.tu-berlin.de>, Andreas Paul Bruno Lönne <loenne@campus.tu-berlin.de>, Alexander Obradovic <obradovic@campus.tu-berlin.de>",
     sitename="OneTwoTree.jl",
     format=Documenter.HTML(;
         canonical="https://nichtJakob.github.io/OneTwoTree.jl",
@@ -16,6 +15,8 @@ makedocs(;
         "Home" => "index.md",
         "Getting Started" => "getting_started.md",
         "Functions" => "functions.md",
+        "Demo classifications" => "demo_classification.md",
+        "Demo regression" => "demo_regression.md",
     ],
 )
 
