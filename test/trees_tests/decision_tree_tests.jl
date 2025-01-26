@@ -5,11 +5,11 @@ using Test
 
 @testset "DecisionTree Struct" begin
     t0 = DecisionTreeClassifier()
-    @test t0.root === nothing
+    @test isnothing(t0.root)
     @test t0.max_depth === -1
 
     t1 = DecisionTreeClassifier(max_depth=5)
-    @test t1.root === nothing
+    @test isnothing(t1.root)
     @test t1.max_depth === 5
 
     dataset = [1.0 2.0; 3.0 4.0; 5.0 6.0]

@@ -78,7 +78,7 @@ function Node(dataset, labels, classify; splitting_criterion=nothing, column_dat
         dataset = copy(transpose(dataset))
     end
     # if no subset was passed
-    if node_data === nothing
+    if isnothing(node_data)
         node_data = collect(1:size(dataset, 1))
     end
     if isnothing(splitting_criterion)
@@ -97,7 +97,7 @@ end
 Do you seriously expect a description for this?
 """
 function is_leaf(node::Node)::Bool
-    return node.prediction !== nothing
+    return !isnothing(node.prediction)
 end
 
 """
@@ -118,7 +118,7 @@ function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
         prefix = indentation * "└─ False:"
     end
 
-    if node === nothing
+    if isnothing(node)
         return "$(prefix) <Nothing>\n"
     end
     if is_leaf(node)

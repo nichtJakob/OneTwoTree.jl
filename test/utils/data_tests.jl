@@ -35,7 +35,7 @@ end
 #         catch e
 #             err = e
 #         end
-#         @test err === nothing
+#         @test isnothing(err)
 #     end
 #     path = joinpath(@__DIR__, "data", "fashion_mnist_1000.csv")
 #     @test isfile(path)

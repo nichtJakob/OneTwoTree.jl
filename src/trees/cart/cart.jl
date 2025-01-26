@@ -79,7 +79,7 @@ function split(N::Node, splitting_criterion::Function)
     end
 
     # @info "determined best decision as " best_decision best_gain
-    # if best_decision == nothing, this means that no split could be found.
+    # if best_decision isnothing, this means that no split could be found.
     return best_decision, best_gain
 end
 
@@ -97,7 +97,7 @@ Determines whether to split the node N given.
 function should_split(N::Node, splitting_gain::Float64, max_depth::Int64)
     # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should have a splitting_gain > 0 and the max_depth hasn't been reached.
-    if N.decision === nothing || splitting_gain == -1.0
+    if isnothing(N.decision) || splitting_gain == -1.0
         # @info "Could not find optimal split => No Split"
         return false
     end
