@@ -18,11 +18,11 @@ Checks if the properties of the node are consistent with the type of the node.
 function test_node_consistency(node::OneTwoTree.Node)
     if OneTwoTree.is_leaf(node)
         @test node.prediction isa Number || node.prediction isa String
-        @test node.true_child === nothing
-        @test node.false_child === nothing
-        @test node.decision === nothing
+        @test isnothing(node.true_child)
+        @test isnothing(node.false_child)
+        @test isnothing(node.decision)
     else
-        @test node.prediction === nothing
+        @test isnothing(node.prediction)
         @test node.true_child isa OneTwoTree.Node
         @test node.false_child isa OneTwoTree.Node
         @test node.decision isa OneTwoTree.Decision
@@ -58,7 +58,7 @@ function test_tree_consistency(; tree::OneTwoTree.AbstractDecisionTree, run_test
     # test tree properties
     @test tree.max_depth > 0 || tree.max_depth == -1
 
-    if tree.root === nothing
+    if isnothing(tree.root)
         return
     end
 
@@ -70,11 +70,11 @@ function test_tree_consistency(; tree::OneTwoTree.AbstractDecisionTree, run_test
         test_node_consistency(node)
         test_no_duplicates(node)
 
-        if node.true_child !== nothing
+        if !isnothing(node.true_child)
             push!(to_visit, node.true_child)
         end
 
-        if node.false_child !== nothing
+        if !isnothing(node.false_child)
             push!(to_visit, node.false_child)
         end
     end
@@ -134,7 +134,7 @@ Tests whether constructed trees predict expected values and conform to given con
 
         @test t1.root isa OneTwoTree.Node
         @test t1.max_depth == 1
-        test_tree_consistency(tree=t1, run_tests=t1.root !== nothing)
+        test_tree_consistency(tree=t1, run_tests=!isnothing(t1.root))
 
         pred = predict(t1, dataset1)
         @test length(pred) == length(cat_labels1)
@@ -185,10 +185,10 @@ Tests whether constructed trees predict expected values and conform to given con
         @test t_string.root isa OneTwoTree.Node
         @test t_int.root isa OneTwoTree.Node
         @test t_mixfs.root isa OneTwoTree.Node
-        test_tree_consistency(tree=t_float, run_tests=t_float.root !== nothing)
-        test_tree_consistency(tree=t_string, run_tests=t_string.root !== nothing)
-        test_tree_consistency(tree=t_int, run_tests=t_int.root !== nothing)
-        test_tree_consistency(tree=t_mixfs, run_tests=t_mixfs.root !== nothing)
+        test_tree_consistency(tree=t_float, run_tests=!isnothing(t_float.root))
+        test_tree_consistency(tree=t_string, run_tests=!isnothing(t_string.root))
+        test_tree_consistency(tree=t_int, run_tests=!isnothing(t_int.root))
+        test_tree_consistency(tree=t_mixfs, run_tests=!isnothing(t_mixfs.root))
         @test OneTwoTree.calc_depth(t_float) == 2
         @test OneTwoTree.calc_depth(t_string) == 2
         @test OneTwoTree.calc_depth(t_int) == 2
@@ -218,7 +218,7 @@ Tests whether constructed trees predict expected values and conform to given con
         fit!(t_int_label, dataset_float, [1, 2, 3])
 
         @test t_int_label.root isa OneTwoTree.Node
-        test_tree_consistency(tree=t_int_label, run_tests=t_int_label.root !== nothing)
+        test_tree_consistency(tree=t_int_label, run_tests=!isnothing(t_int_label.root))
         @test OneTwoTree.calc_depth(t_int_label) == 2
 
         pred_int_label = predict(t_int_label, dataset_float)
@@ -239,7 +239,7 @@ Tests whether constructed trees predict expected values and conform to given con
             fit!(t_unlimited, dataset_float, abc_labels)
 
             @test t_unlimited.root isa OneTwoTree.Node
-            test_tree_consistency(tree=t_unlimited, run_tests=t_unlimited.root !== nothing)
+            test_tree_consistency(tree=t_unlimited, run_tests=!isnothing(t_unlimited.root))
             @test OneTwoTree.calc_depth(t_unlimited) > 1
 
             pred_unlimited = predict(t_unlimited, dataset_float)
@@ -252,7 +252,7 @@ Tests whether constructed trees predict expected values and conform to given con
             fit!(t_bigger, dataset_float, abc_labels)
 
             @test t_bigger.root isa OneTwoTree.Node
-            test_tree_consistency(tree=t_bigger, run_tests=t_bigger.root !== nothing)
+            test_tree_consistency(tree=t_bigger, run_tests=!isnothing(t_bigger.root))
             @test OneTwoTree.calc_depth(t_bigger) <= 2
 
             pred_bigger = predict(t_bigger, dataset_float)
@@ -265,7 +265,7 @@ Tests whether constructed trees predict expected values and conform to given con
             fit!(t_smaller, dataset_float, abc_labels)
 
             @test t_smaller.root isa OneTwoTree.Node
-            test_tree_consistency(tree=t_smaller, run_tests=t_smaller.root !== nothing)
+            test_tree_consistency(tree=t_smaller, run_tests=!isnothing(t_smaller.root))
             @test OneTwoTree.calc_depth(t_smaller) == 1
 
             pred_smaller = predict(t_smaller, dataset_float)
@@ -298,7 +298,7 @@ end
 
         @test tz.root isa OneTwoTree.Node
         @test tz.max_depth == 3
-        test_tree_consistency(tree=tz, run_tests=tz.root !== nothing)
+        test_tree_consistency(tree=tz, run_tests=!isnothing(tz.root))
 
         pred = predict(tz, dataset_zork)
         @test length(pred) == length(zork_labels)
@@ -325,11 +325,11 @@ as well as consistency in the tree.
 
 #         @test tree.root isa OneTwoTree.Node
 #         @test tree.max_depth == 10
-#         test_tree_consistency(tree=tree, run_tests=tree.root !== nothing)
+#         test_tree_consistency(tree=tree, run_tests=!isnothing(tree.root))
 #     end
 
 #     #@warn "Skipping prediction tests"
-#     if(tree.root === nothing)
+#     if(isnothing(tree.root))
 #         @warn "Skipping prediction tests"
 #         return
 #     end

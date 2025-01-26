@@ -75,7 +75,7 @@ function most_frequent_class(labels::Vector{T}, indices::Vector{Int64}) where T 
             end
         else
             class_frequencies[class] = 1
-            if most_frequent === nothing
+            if isnothing(most_frequent)
                 most_frequent = labels[index]
             end
         end

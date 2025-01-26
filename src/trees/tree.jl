@@ -168,7 +168,7 @@ Traverses the tree for a given datapoint x and returns that trees prediction.
 - `X::Union{AbstractMatrix, AbstractVector`: the data to predict on
 """
 function predict(tree::AbstractDecisionTree, X::Union{AbstractMatrix, AbstractVector})
-    if tree.root === nothing
+    if isnothing(tree.root)
         error("Cannot predict from an empty tree.")
     end
 
@@ -239,7 +239,7 @@ Traverses the tree and returns the maximum depth.
 function calc_depth(tree::AbstractDecisionTree)
 
     max_depth = 0
-    if tree.root === nothing
+    if isnothing(tree.root)
         return max_depth
     end
 
@@ -251,11 +251,11 @@ function calc_depth(tree::AbstractDecisionTree)
             max_depth = cur_depth
         end
 
-        if node.true_child !== nothing
+        if !isnothing(node.true_child)
             push!(to_visit, (node.true_child, cur_depth + 1))
         end
 
-        if node.false_child !== nothing
+        if !isnothing(node.false_child)
             push!(to_visit, (node.false_child, cur_depth + 1))
         end
     end
@@ -284,7 +284,7 @@ x < 28.0 ?
 └─ True: 683
 """
 function _tree_to_string(tree::AbstractDecisionTree, print_parameters=true)
-    if tree.root === nothing
+    if isnothing(tree.root)
         return "\nTree(max_depth=$(tree.max_depth), root=nothing)\n"
     end
 
