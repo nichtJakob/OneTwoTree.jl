@@ -212,7 +212,7 @@ end
 
 Calculates the accuracy of the predictions compared to the labels.
 """
-function calc_accuracy(labels, predictions)
+function calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T}) where {S , T}
     if length(labels) != length(predictions)
         error("Length of labels and predictions must be equal.")
     end
