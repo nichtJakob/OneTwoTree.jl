@@ -67,23 +67,23 @@ This function calculates the information gain spliting criterion
 
 # Arguments:
 - `parent_labels`: A vector of all considerd labels to be split
-- `child_1_labels`: A vector of labels of the first spliting part
-- `child_2_labels`: A vector of labels of the other spliting part
+- `true_child_labels`: A vector of labels of the first splitting part
+- `false_child_labels`: A vector of labels of the other splitting part
 
 # Returns:
-- The information gain for given split as Float64. 
+- The information gain for given split as Float64.
 - calculated as follows:
-    Information gain = entropy(parent) - [weightes] * entropy(children) 
+    Information gain = entropy(parent) - [weights] * entropy(children)
 """
-function information_gain(parent_labels::AbstractVector, child_1_labels::AbstractVector, child_2_labels::AbstractVector) :: Float64
-    total = length(parent_labels) 
+function information_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector) :: Float64
+    total = length(parent_labels)
 
-    child_1_weight = length(child_1_labels) / total
-    child_2_weight = length(child_2_labels) / total
+    true_child_weight = length(true_child_labels) / total
+    false_child_weight = length(false_child_labels) / total
 
-    weighted_entropy_1 = child_1_weight * entropy(child_1_labels) 
-    weighted_entropy_2 = child_2_weight * entropy(child_2_labels) 
-    weighted_entropy = weighted_entropy_1 + weighted_entropy_2
+    true_weighted_entropy = true_child_weight * entropy(true_child_labels)
+    false_weighted_entropy = false_child_weight * entropy(false_child_labels)
+    weighted_entropy = true_weighted_entropy + false_weighted_entropy
 
     return entropy(parent_labels) - weighted_entropy
 end
