@@ -77,7 +77,19 @@ using OneTwoTree
     #end
 
 
-    @testset "Regressor" begin
-        #TODO:
+    @testset "Regression forest test" begin
+        X_train = [1 2 3; 9 12 99; 400 20 -19]
+        y_train = [-5.0, 20.5, 999.001]
+
+        forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
+        fit!(forest, X_train, y_train)
+
+        X_test = [2.4; 3.0; -9.2]
+        y_pred = predict(forest, X_test)
+
+        #println(y_pred)
+        @test isa(y_pred, Float64)
+        @test y_pred <= 9999.001
+        @test y_pred >= -5.0
     end
 end
