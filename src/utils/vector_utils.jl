@@ -1,7 +1,7 @@
 #Chat gpt replacement for StatsBase
 
-function countmap(collection)
-    counts = Dict{eltype(collection), Int}()
+function countmap(collection::AbstractVector{T}) where T
+    counts = Dict{T, Int}()
     for item in collection
         counts[item] = get(counts, item, 0) + 1
     end
