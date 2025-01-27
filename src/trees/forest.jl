@@ -213,6 +213,6 @@ Displays a string representation of the forest when shown in the REPL or other I
 - `io::IO`: The I/O stream.
 - `forest::AbstractForest`: The forest to be displayed.
 """
-function Base.show(io::IO, tree::AbstractForest)
+function Base.show(io::IO, forest::AbstractForest)
     print(io, _forest_to_string(forest))
 end
