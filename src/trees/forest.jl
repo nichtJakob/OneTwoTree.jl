@@ -98,3 +98,7 @@ end
 function print_forest(forest::AbstractForest)
     print(_forest_to_string(forest))
 end
+
+function Base.show(io::IO, tree::AbstractForest)
+    print(io, _forest_to_string(forest))
+end
