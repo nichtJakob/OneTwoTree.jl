@@ -20,19 +20,17 @@ function entropy(labels)
 end
 
 """
-    information_gain(features::AbstractVector) -> Float64
+    information_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels) -> Float64
 
-This function calculates the information gain splitting criterion
+This function calculates the information gain for a split in a decision tree. The split is characterized by the partition of the parent_labels into true_child_labels and false_child_labels according to some discriminant function.
 
 # Arguments:
-- `parent_labels`: A vector of all considered labels to be split
-- `true_child_labels`: A vector of labels of the first splitting part
-- `false_child_labels`: A vector of labels of the other splitting part
+- `parent_labels`: A vector of data labels (e.g., classes or numerical values in the case of regression).
+- `true_child_labels`: A vector of a subset of data labels contained in parent_labels.
+- `false_child_labels`: A vector of a subset of data labels contained in parent_labels.
 
 # Returns:
-- The information gain for given split as Float64.
-- calculated as follows:
-    Information gain = entropy(parent) - [weights] * entropy(children)
+- The information gain of the split.
 """
 function information_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector) :: Float64
     total = length(parent_labels)

@@ -9,7 +9,19 @@ function variance(data::AbstractVector) :: Float64
     return variance
 end
 
-# Splitting criterion for regression based on the variance similar to infogain
+"""
+    variance_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels) -> Float64
+
+This function calculates the variance gain for a split in a decision tree. The split is characterized by the partition of the parent_labels into true_child_labels and false_child_labels according to some discriminant function.
+
+# Arguments:
+- `parent_labels`: A vector of data labels (e.g., classes or numerical values in the case of regression).
+- `true_child_labels`: A vector of a subset of data labels contained in parent_labels.
+- `false_child_labels`: A vector of a subset of data labels contained in parent_labels.
+
+# Returns:
+- The variance gain of the split.
+"""
 function variance_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector) :: Float64
     max_gain = variance(parent_labels)
 
