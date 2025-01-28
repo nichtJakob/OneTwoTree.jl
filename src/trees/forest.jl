@@ -53,12 +53,29 @@ function get_random_features(features::Matrix{S}, labels::Vector{T}, n_features:
 end
 
 
-function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+"""
+    fit!(forest, dataset, labels; splitting_criterion, columns_data)
+
+Train a decision forest on the given data.
+
+# Arguments
+
+- `forest::AbstractForest`: the forest to be trained
+- `dataset::AbstractMatrix`: the training data
+- `labels::Vector{Union{Number, String}}`: the target labels
+- `splitting_criterion: a function indicating some notion of gain from splitting a node.
+- `column_data::Bool`: whether the datapoints are contained in dataset columnwise
+(OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
+
+1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
+2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
+"""
+function fit!(forest::AbstractForest, dataset::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
     is_classifier = (forest isa ForestClassifier)
 
     for i in 1:forest.n_trees
         # get random dataset of size forest.n_features_per_tree
-        current_tree_features, current_tree_labels = get_random_features(features, labels, forest.n_features_per_tree)
+        current_tree_dataset, current_tree_labels = get_random_features(dataset, labels, forest.n_features_per_tree)
 
         if is_classifier
             tree = DecisionTreeClassifier(max_depth=forest.max_depth)
@@ -66,7 +83,7 @@ function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}; sp
             tree = DecisionTreeRegressor(max_depth=forest.max_depth)
         end
 
-        fit!(tree, current_tree_features, current_tree_labels, splitting_criterion=splitting_criterion)
+        fit!(tree, current_tree_dataset, current_tree_labels, splitting_criterion=splitting_criterion)
         push!(forest.trees, tree)
     end
 end
