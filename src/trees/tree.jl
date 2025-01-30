@@ -102,31 +102,10 @@ function _verify_fit!_args(tree, dataset, labels, column_data)
     if tree isa DecisionTreeRegressor && (labels[1] isa String) # vorher: !(labels[1] isa String)
         throw(ArgumentError("Cannot train a DecisionTreeRegressor on a dataset with categorical labels."))
     end
-
-    # TODO: check if columns of dataset have consistent type either Real or String
-    # if !column_data
-    #     for i in range(1, size(dataset, 2))
-    #         for j in range(1, size(dataset, 1))
-    #             if typeof(dataset[j, i]) != typeof(dataset[1, i])
-    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
-    #             end
-    #         end
-    #     end
-    # end
-
-    # if column_data
-    #     for i in range(1, size(dataset, 1))
-    #         for j in range(1, size(dataset, 2))
-    #             if typeof(dataset[i, j]) != typeof(dataset[i, 1])
-    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
-    #             end
-    #         end
-    #     end
-    # end
 end
 
 """
-    fit!(tree, features, labels)
+    fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
 
 Train a decision tree on the given data using some algorithm (e.g. CART).
 
@@ -134,8 +113,8 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 
 - `tree::AbstractDecisionTree`: the tree to be trained
 - `dataset::AbstractMatrix`: the training data
-- `labels::Vector{Union{Real, String}}`: the target labels
-- `splitting_criterion: a function indicating some notion of gain from splitting a node.
+- `labels::Vector{Union{Number, String}}`: the target labels
+- `splitting_criterion`: a function indicating some notion of gain from splitting a node. If not provided, default criteria for classification and regression are used.
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 (OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
 
