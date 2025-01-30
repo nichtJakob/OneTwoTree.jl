@@ -45,6 +45,30 @@ function variance(features::AbstractMatrix, labels::AbstractVector, node_data::V
     return weighted_var
 end
 
+"""
+    variance_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, 
+                  decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64) -> Float64
+
+Computes the variance gain of a potential split in a decision tree for regression.
+
+## Parameters
+- `features::AbstractMatrix`: A matrix where each row represents a data sample and each column represents a feature.
+- `labels::AbstractVector`: A vector of continuous target values corresponding to the rows in `features`.
+- `node_data::Vector{Int64}`: A vector of indices representing the data points at the current node.
+- `decision_fn::Function`: A function that determines the split criterion.
+- `decision_param::Union{Real, String}`: A parameter for the `decision_fn`, such as a threshold value or category.
+- `decision_feature::Int64`: The index of the feature to be used for the split.
+
+## Returns
+- `Float64`: The variance gain, which quantifies the reduction in variance when the node is split using the given decision criterion.
+
+## Description
+The variance gain is computed as the difference between the variance of the target values at the current node and the weighted variance of the child nodes after applying the split. It is used in regression trees to evaluate the quality of a split.
+
+## Example
+```julia
+gain = variance_gain(features, labels, node_data, (x, t) -> x < t, 0.5, 2)
+"""
 function variance_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64)::Float64
     return variance(labels, node_data) - variance(features, labels, node_data, decision_fn, decision_param, decision_feature)
 end

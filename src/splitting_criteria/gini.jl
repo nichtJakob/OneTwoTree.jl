@@ -87,19 +87,29 @@ function gini_impurity(features::AbstractMatrix, labels::AbstractVector, node_da
 end
 
 """
-    gini_gain(features::AbstractVector, labels::Vector{Bool}, decision_fn::Function) -> Float64
+    gini_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, 
+              decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64) -> Float64
 
-This function calculates the gain in Gini impurity for a split in a decision tree.
+Computes the Gini gain of a potential split in a decision tree.
 
-# Arguments:
-- `features`: A vector of features (e.g., true/false values or more complex data points).
-- `labels`: A vector of Boolean labels indicating the target values (true/false).
-- `decision_fn`: A function that takes a feature and returns `true` or `false` to define the split.
-- `decision_param`: The parameter of the decision. This could be a numeric threshold e.g. 5 in x <= 5 or a class name "Ship" in x == "Ship".
-- `decision_feature`: The index of the feature the decision function branches on. For datapoints with 5 features, this can be an index i in [1:5].
+## Parameters
+- `features::AbstractMatrix`: A matrix where each row represents a data sample and each column represents a feature.
+- `labels::AbstractVector`: A vector of class labels corresponding to the rows in `features`.
+- `node_data::Vector{Int64}`: A vector of indices representing the data points at the current node.
+- `decision_fn::Function`: A function that determines the split criterion.
+- `decision_param::Union{Real, String}`: A parameter for the `decision_fn`, such as a threshold value or category.
+- `decision_feature::Int64`: The index of the feature to be used for the split.
 
-# Returns:
-- The gain in Gini impurity of the split.
+## Returns
+- `Float64`: The Gini gain, which quantifies the reduction in impurity when the node is split using the given decision criterion.
+
+## Description
+The Gini gain is calculated as the difference between the Gini impurity of the current node and the weighted Gini impurity of the child nodes after applying the split.
+
+## Example
+```julia
+gain = gini_gain(features, labels, node_data, (x, t) -> x < t, 0.5, 2)
+
 """
 
 function gini_gain(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64)::Float64

@@ -32,12 +32,47 @@ function verify_forest_args(n_trees::Int, n_features_per_tree::Int, max_depth::I
 end
 
 #TODO: n_features_per_tree could be defaulted to a percentage of the incoming data in fit!()
+
+"""
+    ForestClassifier(; n_trees::Int, n_features_per_tree::Int, max_depth::Int) -> ForestClassifier
+
+Creates a `ForestClassifier` object, which is an ensemble of decision tree classifiers used for classification tasks.
+
+## Parameters
+- `n_trees::Int`: The number of decision trees in the forest.
+- `n_features_per_tree::Int`: The number of features to consider when splitting at each node in a tree.
+- `max_depth::Int`: The maximum depth each decision tree can grow to.
+
+## Returns
+- A `ForestClassifier` instance initialized with the specified parameters.
+
+## Example
+```julia
+fc = ForestClassifier(n_trees=100, n_features_per_tree=5, max_depth=10)
+"""
 function ForestClassifier(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
     verify_forest_args(n_trees, n_features_per_tree, max_depth)
 
     ForestClassifier(Vector{DecisionTreeClassifier}(), n_trees, n_features_per_tree, max_depth)
 end
 
+"""
+    ForestRegressor(; n_trees::Int, n_features_per_tree::Int, max_depth::Int) -> ForestRegressor
+
+Creates a `ForestRegressor` object, which is an ensemble of decision tree regressors used for regression tasks.
+
+## Parameters
+- `n_trees::Int`: The number of decision trees in the forest.
+- `n_features_per_tree::Int`: The number of features to consider when splitting at each node in a tree.
+- `max_depth::Int`: The maximum depth each decision tree can grow to.
+
+## Returns
+- A `ForestRegressor` instance initialized with the specified parameters.
+
+## Example
+```julia
+fr = ForestRegressor(n_trees=100, n_features_per_tree=5, max_depth=10)
+"""
 function ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
     verify_forest_args(n_trees, n_features_per_tree, max_depth)
 
@@ -95,6 +130,20 @@ function _forest_to_string(forest::AbstractForest)
     return result
 end
 
+"""
+    print_forest(forest::AbstractForest)
+
+Prints a textual representation of the given `AbstractForest` object.
+
+## Parameters
+- `forest::AbstractForest`: The forest model to be printed.
+
+This function converts the forest into a string representation using `_forest_to_string` and prints it to the standard output.
+
+## Example
+```julia
+print_forest(my_forest)
+"""
 function print_forest(forest::AbstractForest)
     print(_forest_to_string(forest))
 end
