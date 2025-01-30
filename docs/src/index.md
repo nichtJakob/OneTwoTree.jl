@@ -19,6 +19,28 @@ CurrentModule = OneTwoTree
 | Julia       | 1.10    | [![Julia](https://img.shields.io/badge/Julia-v1.10-blue)](https://julialang.org/downloads/) | ✅ |
 
 
+## Explanation of Folders and Files 
+Explanation of Folders and Files
+- `docs/`
+  - Contains everything related to documentation.
+  - `make.jl`: Script to build the documentation using Documenter.jl.
+  - `Project.toml` & Manifest.toml: Separate environment for documentation dependencies.
+  - `src/`: Markdown files structured for different sections of the documentation.
+  - `index.md`: Main landing page for the documentation.
+  - `functions.md`: Lists functions and usage.
+  - `examples/`: Specific examples for classification and regression use cases.
+  - `api/`: Detailed API reference for classifiers, regressors, and utility functions.
+  - `assets/`: Store images or other resources for the documentation.
+- `build/`
+  - Contains the generated documentation output (ignored by Git).
+- `src/`
+  - The main Julia module for OneTwoTree resides here. Documentation and code examples will often reference these files.
+- `test/`
+  - Unit tests ensure code correctness and complement examples in the documentation.
+- `README.md`
+    - A concise overview of the project for GitHub visitors. It should link to the generated documentation hosted (e.g., on GitHub Pages).
+
+
 ## Index for Documentation
 
 Documentation for [OneTwoTree](https://github.com/nichtJakob/OneTwoTree.jl).
