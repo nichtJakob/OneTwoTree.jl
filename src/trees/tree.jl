@@ -102,31 +102,10 @@ function _verify_fit!_args(tree, dataset, labels, column_data)
     if tree isa DecisionTreeRegressor && (labels[1] isa String) # vorher: !(labels[1] isa String)
         throw(ArgumentError("Cannot train a DecisionTreeRegressor on a dataset with categorical labels."))
     end
-
-    # TODO: check if columns of dataset have consistent type either Real or String
-    # if !column_data
-    #     for i in range(1, size(dataset, 2))
-    #         for j in range(1, size(dataset, 1))
-    #             if typeof(dataset[j, i]) != typeof(dataset[1, i])
-    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
-    #             end
-    #         end
-    #     end
-    # end
-
-    # if column_data
-    #     for i in range(1, size(dataset, 1))
-    #         for j in range(1, size(dataset, 2))
-    #             if typeof(dataset[i, j]) != typeof(dataset[i, 1])
-    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
-    #             end
-    #         end
-    #     end
-    # end
 end
 
 """
-    fit!(tree, features, labels)
+    fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
 
 Train a decision tree on the given data using some algorithm (e.g. CART).
 
@@ -134,14 +113,13 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 
 - `tree::AbstractDecisionTree`: the tree to be trained
 - `dataset::AbstractMatrix`: the training data
-- `labels::Vector{Union{Real, String}}`: the target labels
-- `splitting_criterion: a function indicating some notion of gain from splitting a node.
+- `labels::Vector{Union{Number, String}}`: the target labels
+- `splitting_criterion`: a function indicating some notion of gain from splitting a node. If not provided, default criteria for classification and regression are used.
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 (OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
 
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
-2. The function signature must conform to `my_func(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64))` where features is the total data matrix, labels the total label vector and node_data is an index array, that indexes into the former to define a subset of the data to be considered. The last three values define a split of the data.
-3. You can get the split labelsets for your computation by taking analogous steps as in the OneTwoTree.split_indices method.)
+2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
 """
 function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
     _verify_fit!_args(tree, features, labels, column_data)

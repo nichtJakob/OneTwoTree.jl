@@ -1,4 +1,3 @@
-
 # TODO: arguments are probably too generic. Limit scope to Union{Real, String}
 # TODO: replace decision_fn, decision_param, decision_feature by a single Decision struct for compactness
 # split node_data indices according to decision function
@@ -20,30 +19,6 @@ function split_indices(dataset::AbstractMatrix, node_data::Vector{Int64}, decisi
     false_child_data::Vector{Int64} = []
     for datapoint_idx in node_data
         if decision_fn(dataset[datapoint_idx, :], decision_param, feature=decision_feature)
-            push!(true_child_data, datapoint_idx)
-        else
-            push!(false_child_data, datapoint_idx)
-        end
-    end
-    return true_child_data, false_child_data
-end
-
-"""
-    split_indices(dataset, node_data, decision_fn)
-
-Split the dataset indices contained in node_data into two sets via the decision function.
-
-# Arguments
-
-- `dataset::AbstractMatrix`: the dataset to split on (the datapoints are assumed to be contained rowwise)
-- `node_data::Vector{Int64}`: the index list, indexing the dataset, to be split
-- `decision_fn::Function`: the decision function taking as input a datapoint and returning a Bool
-"""
-function split_indices(dataset::AbstractMatrix, node_data::Vector{Int64}, decision_fn::Function)
-    true_child_data::Vector{Int64} = []
-    false_child_data::Vector{Int64} = []
-    for datapoint_idx in node_data
-        if decision_fn(dataset[datapoint_idx, :])
             push!(true_child_data, datapoint_idx)
         else
             push!(false_child_data, datapoint_idx)
@@ -86,30 +61,6 @@ end
 """
     collect_classes(dataset, column)
 
-Collect all unique classes among the specified column of the dataset.
-
-# Arguments
-
-- `dataset::AbstractMatrix`: the dataset to collect classes on
-- `column::Int64`: the index of the dataset column/feature to collect the classes on
-"""
-function collect_classes(dataset::AbstractMatrix, column::Int64)
-    classes = Dict{String, Bool}()
-    # TODO: check if passed column is out of bounds
-    # TODO: check if passed column is categorical
-    rows = size(dataset)[1]
-    for i in range(1, rows)
-        value = dataset[i, column]
-        if !haskey(classes, value)
-            classes[value] = true
-        end
-    end
-    return collect(keys(classes))
-end
-
-"""
-    collect_classes(dataset, column)
-
 Collect all unique classes among a subset of the specified column of the dataset.
 
 # Arguments
@@ -132,7 +83,6 @@ function collect_classes(dataset::AbstractMatrix, indices::Vector{Int64}, column
     return collect(keys(classes))
 end
 
-
 """
     label_mean(labels, indices)
 
@@ -145,19 +95,4 @@ function label_mean(labels::Vector{T}, indices::Vector{Int64}) where T<:Real
     sum = 0.0
     foreach(index -> sum += labels[index], indices)
     return sum / size(labels[indices])[1]
-end
-
-"""
-    printM(M)
-
-Print the matrix M:
-
-# Arguments
-
-- `M::Matrix{Union{Real, String}}`
-"""
-function printM(M::Matrix{S}) where S<:Union{Real, String}
-    for row in eachrow(M)
-        println(row)
-    end
 end
