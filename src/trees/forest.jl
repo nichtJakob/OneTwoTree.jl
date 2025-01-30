@@ -52,15 +52,15 @@ Raises an error if any of the arguments are less than or equal to zero.
 """
 function verify_forest_args(n_trees::Int, n_features_per_tree::Int, max_depth::Int)
     if n_trees <= 0
-        error("A RandomForest needs more than 0 trees.\n (Currently n_trees == $n_trees)")
+        throw(ArgumentError("A RandomForest needs more than 0 trees.\n (Currently n_trees == $n_trees)"))
     end
 
     if n_features_per_tree <= 0
-        error("A RandomForest needs more than 0 features per Tree.\n (Currently n_features_per_tree == $n_features_per_tree)")
+        throw(ArgumentError("A RandomForest needs more than 0 features per Tree.\n (Currently n_features_per_tree == $n_features_per_tree)"))
     end
 
     if max_depth <= 0
-        error("A RandomForest needs more than 0 max depth per Tree.\n (Currently max_depth == $max_depth)")
+        throw(ArgumentError("A RandomForest needs more than 0 max depth per Tree.\n (Currently max_depth == $max_depth)"))
     end
 end
 
@@ -167,7 +167,7 @@ Raises an error if the forest contains no trained trees.
 """
 function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
     if isempty(forest.trees)
-        error("Prediction failed because there are no trees. (Maybe you forgot to fit?)")
+        throw(ArgumentError("Prediction failed because there are no trees. (Maybe you forgot to fit?)"))
     end
 
     predictions = [predict(tree, X) for tree in forest.trees]

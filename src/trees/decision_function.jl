@@ -25,14 +25,14 @@ end
 
 function call(decision::Decision, datapoint::Vector{S}) where S
     if length(datapoint) < decision.feature
-        error("call: passed datapoint of insufficient dimensionality!")
+        throw(ArgumentError("call: passed datapoint of insufficient dimensionality!"))
     end
     return decision.fn(datapoint, decision.param, feature=decision.feature)
 end
 
 function call(decision::Decision, dataset::Matrix{S}) where S
     if size(dataset, 2) < decision.feature
-        error("call: passed dataset with data of insufficient dimensionality!")
+        throw(ArgumentError("call: passed dataset with data of insufficient dimensionality!"))
     end
     return [decision.fn(datapoint, decision.param, feature=decision.feature) for datapoint in dataset]
 end
