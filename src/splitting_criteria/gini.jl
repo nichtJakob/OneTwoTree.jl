@@ -8,6 +8,8 @@ This function calculates the gain in Gini impurity for a split in a decision tre
 - `true_child_labels`: A vector of a subset of data labels contained in parent_labels.
 - `false_child_labels`: A vector of a subset of data labels contained in parent_labels.
 
+# Returns:
+- The gain in Gini impurity of the split.
 """
 function gini_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)::Float64
     return gini_impurity(parent_labels) - gini_impurity(true_child_labels, false_child_labels)
