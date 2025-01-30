@@ -194,6 +194,7 @@ function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S
 end
 
 """
+    _forest_to_string(forest::AbstractForest)
 Converts the forest to a string.
 
 # Arguments:
@@ -213,6 +214,7 @@ function _forest_to_string(forest::AbstractForest)
 end
 
 """
+    print_forest(forest::AbstractForest)
 Prints the numerated trees of a forest.
 
 # Arguments:
