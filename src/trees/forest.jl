@@ -120,6 +120,7 @@ end
 """
 Trains the forest model on a given trainingdataset consisting of training features and corresponding labels.
 
+
 # Arguments:
 - `forest::AbstractForest`: The forest to be trained.
 - `features::Matrix{S}`: The training feature matrix.
@@ -129,7 +130,8 @@ Trains the forest model on a given trainingdataset consisting of training featur
 # Behavior:
 Trains each tree in the forest on randomly drawn subsets of test features and corresponding test labels.
 """
-function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+
     is_classifier = (forest isa ForestClassifier)
 
     for i in 1:forest.n_trees
@@ -142,7 +144,7 @@ function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, co
             tree = DecisionTreeRegressor(max_depth=forest.max_depth)
         end
 
-        fit!(tree, current_tree_features, current_tree_labels)
+        fit!(tree, current_tree_features, current_tree_labels, splitting_criterion=splitting_criterion)
         push!(forest.trees, tree)
     end
 end
