@@ -1,31 +1,29 @@
-  In this example we want to compare the performance
-  of regression trees with regression random forests
-  on the BostonHousing dataset by using the OneTwoTree package
+In this example we want to compare the performance of regression trees with regression random forests on the BostonHousing dataset by using the OneTwoTree package.
+
+If you want to execute this example in your julia REPL you will first need to install some dependencies:
+```julia
+julia>  using Pkg
+julia>  Pkg.add("MLDatasets")
+julia>  Pkg.add("DataFrames")
+julia>  Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl.git")
+```
+
+Import the needed dependencies.
 ```julia
 using OneTwoTree
-```
-  If you want to execute this example in your julia REPL you will first need to
-  1) install dependencies for the dataset:
-    julia>  using Pkg
-    julia>  Pkg.add("MLDatasets")
-    julia>  Pkg.add("DataFrames")
- 
-  2) execute the code in your REPL:
-    julia>  include("demo_regression.jl")
-```julia
 using MLDatasets: BostonHousing
 using Random
 using Statistics
 using DataFrames
 ```
-  First we load the data
+First we load the data.
 ```julia
 dataset = BostonHousing(as_df=false)
 X, y = dataset[:]
 n_samples = size(X, 1)
 ```
-  We split randomly into training and test sets. X are the features and y are the targets
-  You can experiment with different train ratios as long as it stays between 0.1 and 0.9
+We split randomly into training and test sets. X are the features and y are the targets.
+You can experiment with different train ratios as long as it stays between 0.1 and 0.9.
 ```julia
 train_ratio = 0.8
 n_train = Int(round(train_ratio * n_samples))
@@ -35,34 +33,32 @@ test_idx = indices[n_train+1:end]
 X_train, y_train = X[train_idx, :], y[train_idx]
 X_test, y_test = X[test_idx, :], y[test_idx]
 ```
-  Now we use the OneTwoTree package to plant a regression tree.
-  You can experiment with different maximum tree depths.
+Now we use the OneTwoTree package to plant a regression tree.
+You can experiment with different maximum tree depths.
 ```julia
 tree = DecisionTreeRegressor(max_depth=5)
 ```
-  We train it on the training data
+We train it on the training data.
 ```julia
 fit!(tree, X_train, y_train)
-```
-  Let's have a look at our tree
-```julia
+
 println("\n\nOur Tree:\n")
 print_tree(tree)
 ```
-  Now let's look at regression forests
-  You can experiment with the parameters and see how the performance varies
+Now let's look at regression forests.
+You can experiment with the parameters and see how the performance varies.
 ```julia
 forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
 fit!(forest, X_train, y_train)
 ```
-  Let's admire our forest by printing it to the console
-  If you have chosen a large number of trees, you might want to comment out the forest printing
+Let's admire our forest by printing it to the console
+If you have chosen a large number of trees, you might want to not execute the following two lines.
 ```julia
 println("\n \n Our forest: \n")
 print_forest(forest)
 ```
 
-  Let's check the tree performance on test data
+Let's check the tree performance on test data.
 ```julia
 y_pred_tree = predict(tree, X_test)
 
@@ -71,7 +67,7 @@ rmse_tree = sqrt(mse_tree)                    #Root Mean Squared Error
 mae_tree = mean(abs.(y_pred_tree .- y_test))    #Mean Absolute Error
 ```
 
-  And now the forest performance on test data
+And now the forest performance on test data.
 ```julia
 y_pred_forest = predict(forest, X_test)
 
@@ -81,7 +77,7 @@ mae_forest = mean(abs.(y_pred_forest .- y_test))  # Mean Absolute Error
 ```
 
 
-  Finally, we can compare our regression tree with the random forest regressor
+Finally, we can compare our regression tree with the random forest regressor.
 ```julia
 println("\nTest Performance comparison:")
 println("-------------------------------\n")

@@ -1,27 +1,10 @@
+## 🛠️ Prerequisites
+
+| Prerequisite | Version | Installation Guide | Required |
+|--------------|---------|--------------------|----------|
+| Julia       | 1.10    | [![Julia](https://img.shields.io/badge/Julia-v1.10-blue)](https://julialang.org/downloads/) | ✅ |
+
 ## 🚀 Getting Started
-
-#### Explanation of Folders and Files 
-Explanation of Folders and Files
-`docs/`
-  - Contains everything related to documentation.
-  - `make.jl`: Script to build the documentation using Documenter.jl.
-  - `Project.toml` & Manifest.toml: Separate environment for documentation dependencies.
-  - `src/`: Markdown files structured for different sections of the documentation.
-  - `index.md`: Main landing page for the documentation.
-  - `functions.md`: Lists functions and usage.
-  - `examples/`: Specific examples for classification and regression use cases.
-  - `api/`: Detailed API reference for classifiers, regressors, and utility functions.
-  - `assets/`: Store images or other resources for the documentation.
-`build/`
-  - Contains the generated documentation output (ignored by Git).
-`src/`
-  - The main Julia module for OneTwoTree resides here. Documentation and code examples will often reference these files.
-`test/`
-  - Unit tests ensure code correctness and complement examples in the documentation.
-`README.md`
-
-A concise overview of the project for GitHub visitors. It should link to the generated documentation hosted (e.g., on GitHub Pages).
-
 
 #### ✨ Downloading the Package
 - Via `Pkg>` mode (press `]` in Julia REPL):
@@ -40,7 +23,7 @@ using OneTwoTree
 ```
 
 
-## ▶️ **Example: Running a Simple Example**
+## ▶️ **Example**
 
 - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
 
@@ -89,19 +72,16 @@ print("The tree predicted \$(prediction[1]).")
 
 You can find more extensive examples utilising the `Iris` and `BostonHousing` datasets from `MLDatasets` in [`demo_classification.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_classification.jl). and [`demo_regression.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_regression.jl). The latter further compares `DecisionTree` performance to that of a `Forest`.
 
-## 📚 **Further Reading for Developers**
+## 📚 Further Reading for Developers
 
 
-1. ✨ **Downloading the Code for Local Development**
+- ✨ **Downloading the Code for Local Development**
 
-      ``` bash
-      git clone https://github.com/nichtJakob/OneTwoTree.jl.git
-      ```
+```bash
+git clone https://github.com/nichtJakob/OneTwoTree.jl.git
+```
 
-
-
-
-2. 🔧 **Installation and Dependency Setup**
+- 🔧 **Installation and Dependency Setup**
 
     - Run the following commands in the package's root directory to install the dependencies and activate the package's virtual environment:
 
@@ -126,7 +106,23 @@ You can find more extensive examples utilising the `Iris` and `BostonHousing` da
 
     For a quick guide on how to develop julia packages, write tests, ...,  read [this](https://adrianhill.de/julia-ml-course/write/).
 
-## 👩‍💻 Contributors
-[![Contributors](https://contrib.rocks/image?repo=nichtJakob/OneTwoTree.jl)](https://github.com/nichtJakob/OneTwoTree.jl/graphs/contributors)
 
-# OneTwoTree
+  ## 🏙️ Project Structure
+  Here is an overview of the project's main components:
+
+  - `src/`: Contains code for the main functionality of the package.
+    - `OneTwoTree.jl`: Main entry point of the project. Contains includes and exports.
+    - `splitting_criteria/`: Splitting Criteria to construct trees from datasets.
+      - `gini.jl`: Gini Impurity
+      - `info_gain`: Information Gain
+      - `var_gain.jl`: Variance Gain
+    - `trees/`
+      - `cart/`: CART algorithm for constructing trees from data.
+      - `tree.jl`: Classification and regression trees.
+      - `node.jl`: One node of a decision tree.
+      - `forest.jl`: Classification and regression forests for aggregating the decisions of multiple decision trees.
+      - `decision_function.jl`: Decision of a node, e.g. `is x[1] > 5 ?`
+    - `utils/`: Functions we didn't want to import a dependency for.
+  - `test/`: Unit tests to ensure correctness of various package components.
+  - `docs/`: Files for the external documentation (which you are currently reading :D).
+
