@@ -169,3 +169,330 @@ data = [1.0, 2.0, 3.0, 4.0, 5.0]
 variance = calculate_variance(data)
 println("Custom Variance: $variance")
 This custom implementation mimics the standard variance calculation but doesn't depend on external libraries.
+
+
+#################################################################################
+
+Question: 
+Write docstrings for this 
+
+# A forest is a collection of trees wich aggregate their decisions
+# First I cover forests for classification and after that forests for regression
+
+abstract type AbstractForest end
+
+mutable struct ForestClassifier <: AbstractForest
+    trees::Vector{DecisionTreeClassifier}
+    n_trees::Int #TODO: do we need to store this?
+    n_features_per_tree::Int
+    max_depth::Int #TODO: do we need to store this?
+end
+
+mutable struct ForestRegressor <: AbstractForest
+    trees::Vector{DecisionTreeRegressor}
+    n_trees::Int
+    n_features_per_tree::Int
+    max_depth::Int
+end
+
+function verify_forest_args(n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    if n_trees <= 0
+        error("A RandomForest needs more than 0 trees.\n (Currently n_trees == $n_trees)")
+    end
+
+    if n_features_per_tree <= 0
+        error("A RandomForest needs more than 0 features per Tree.\n (Currently n_features_per_tree == $n_features_per_tree)")
+    end
+
+    if max_depth <= 0
+        error("A RandomForest needs more than 0 max depth per Tree.\n (Currently max_depth == $max_depth)")
+    end
+end
+
+#TODO: n_features_per_tree could be defaulted to a percentage of the incoming data in fit!()
+function ForestClassifier(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    verify_forest_args(n_trees, n_features_per_tree, max_depth)
+
+    ForestClassifier(Vector{DecisionTreeClassifier}(), n_trees, n_features_per_tree, max_depth)
+end
+
+function ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    verify_forest_args(n_trees, n_features_per_tree, max_depth)
+
+    ForestRegressor(Vector{DecisionTreeRegressor}(), n_trees, n_features_per_tree, max_depth)
+end
+
+#Returns random features and their labels
+function get_random_features(features::Matrix{S}, labels::Vector{T}, n_features::Int) where {S<:Union{Real, String}, T<:Union{Number, String}}
+    random_indices = rand(1:size(features,1), n_features)
+    random_features = features[random_indices, :]
+    random_labels = labels[random_indices]
+    return random_features, random_labels
+end
+
+
+function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+    is_classifier = (forest isa ForestClassifier)
+
+    for i in 1:forest.n_trees
+        # get random dataset of size forest.n_features_per_tree
+        current_tree_features, current_tree_labels = get_random_features(features, labels, forest.n_features_per_tree)
+
+        if is_classifier
+            tree = DecisionTreeClassifier(max_depth=forest.max_depth)
+        else
+            tree = DecisionTreeRegressor(max_depth=forest.max_depth)
+        end
+
+        fit!(tree, current_tree_features, current_tree_labels)
+        push!(forest.trees, tree)
+    end
+end
+
+function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+    if isempty(forest.trees)
+        error("Prediction failed because there are no trees. (Maybe you forgot to fit?)")
+    end
+
+    predictions = [predict(tree, X) for tree in forest.trees]
+
+    if forest isa ForestClassifier
+        return mode(predictions)
+    else
+        return mean(predictions)
+    end
+end
+
+function _forest_to_string(forest::AbstractForest)
+    result = ""
+    for (i, tree) in enumerate(forest.trees)
+        result *= "\nTree $i:\n"
+        result *= _tree_to_string(tree, false)
+        result *= "\n"
+    end
+    return result
+end
+
+function print_forest(forest::AbstractForest)
+    print(_forest_to_string(forest))
+end
+
+function Base.show(io::IO, tree::AbstractForest)
+    print(io, _forest_to_string(forest))
+end
+
+Answer: 
+ChatGPT said:
+ChatGPT
+julia
+Copy
+Edit
+"""
+Abstract type for representing a general forest.
+A forest is a collection of trees that aggregate their decisions.
+This is a base type for implementing both classifiers and regressors.
+"""
+abstract type AbstractForest end
+
+"""
+A mutable struct representing a Random Forest Classifier.
+
+# Fields:
+- `trees::Vector{DecisionTreeClassifier}`: A vector storing the individual decision trees.
+- `n_trees::Int`: The number of trees in the forest.
+- `n_features_per_tree::Int`: The number of features used for each tree.
+- `max_depth::Int`: The maximum depth of each tree.
+"""
+mutable struct ForestClassifier <: AbstractForest
+    trees::Vector{DecisionTreeClassifier}
+    n_trees::Int
+    n_features_per_tree::Int
+    max_depth::Int
+end
+
+"""
+A mutable struct representing a Random Forest Regressor.
+
+# Fields:
+- `trees::Vector{DecisionTreeRegressor}`: A vector storing the individual decision trees.
+- `n_trees::Int`: The number of trees in the forest.
+- `n_features_per_tree::Int`: The number of features used for each tree.
+- `max_depth::Int`: The maximum depth of each tree.
+"""
+mutable struct ForestRegressor <: AbstractForest
+    trees::Vector{DecisionTreeRegressor}
+    n_trees::Int
+    n_features_per_tree::Int
+    max_depth::Int
+end
+
+"""
+Verifies the validity of arguments used to initialize a forest.
+
+# Arguments:
+- `n_trees::Int`: The number of trees.
+- `n_features_per_tree::Int`: The number of features per tree.
+- `max_depth::Int`: The maximum depth of each tree.
+
+# Errors:
+Raises an error if any of the arguments are less than or equal to zero.
+"""
+function verify_forest_args(n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    if n_trees <= 0
+        error("A RandomForest needs more than 0 trees.\n (Currently n_trees == $n_trees)")
+    end
+
+    if n_features_per_tree <= 0
+        error("A RandomForest needs more than 0 features per Tree.\n (Currently n_features_per_tree == $n_features_per_tree)")
+    end
+
+    if max_depth <= 0
+        error("A RandomForest needs more than 0 max depth per Tree.\n (Currently max_depth == $max_depth)")
+    end
+end
+
+"""
+Constructs a ForestClassifier instance with the specified parameters.
+
+# Arguments:
+- `n_trees::Int`: The number of trees in the forest.
+- `n_features_per_tree::Int`: The number of features used for each tree.
+- `max_depth::Int`: The maximum depth of each tree.
+
+# Returns:
+A `ForestClassifier` instance.
+"""
+function ForestClassifier(; n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    verify_forest_args(n_trees, n_features_per_tree, max_depth)
+    ForestClassifier(Vector{DecisionTreeClassifier}(), n_trees, n_features_per_tree, max_depth)
+end
+
+"""
+Constructs a ForestRegressor instance with the specified parameters.
+
+# Arguments:
+- `n_trees::Int`: The number of trees in the forest.
+- `n_features_per_tree::Int`: The number of features used for each tree.
+- `max_depth::Int`: The maximum depth of each tree.
+
+# Returns:
+A `ForestRegressor` instance.
+"""
+function ForestRegressor(; n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    verify_forest_args(n_trees, n_features_per_tree, max_depth)
+    ForestRegressor(Vector{DecisionTreeRegressor}(), n_trees, n_features_per_tree, max_depth)
+end
+
+"""
+Selects a random subset of features and corresponding labels from the given dataset.
+
+# Arguments:
+- `features::Matrix{S}`: The feature matrix.
+- `labels::Vector{T}`: The labels vector.
+- `n_features::Int`: The number of features to select.
+
+# Returns:
+A tuple `(random_features, random_labels)` containing the selected features and labels.
+"""
+function get_random_features(features::Matrix{S}, labels::Vector{T}, n_features::Int) where {S<:Union{Real, String}, T<:Union{Number, String}}
+    random_indices = rand(1:size(features, 1), n_features)
+    random_features = features[random_indices, :]
+    random_labels = labels[random_indices]
+    return random_features, random_labels
+end
+
+"""
+Fits the forest model to the given features and labels.
+
+# Arguments:
+- `forest::AbstractForest`: The forest to be trained.
+- `features::Matrix{S}`: The feature matrix.
+- `labels::Vector{T}`: The labels vector.
+- `column_data::Bool`: Whether the features are column-oriented (default is `false`).
+
+# Behavior:
+Trains each tree in the forest using random subsets of features and labels.
+"""
+function fit!(forest::AbstractForest, features::Matrix{S}, labels::Vector{T}, column_data=false) where {S<:Union{Real, String}, T<:Union{Number, String}}
+    is_classifier = (forest isa ForestClassifier)
+
+    for i in 1:forest.n_trees
+        current_tree_features, current_tree_labels = get_random_features(features, labels, forest.n_features_per_tree)
+
+        if is_classifier
+            tree = DecisionTreeClassifier(max_depth=forest.max_depth)
+        else
+            tree = DecisionTreeRegressor(max_depth=forest.max_depth)
+        end
+
+        fit!(tree, current_tree_features, current_tree_labels)
+        push!(forest.trees, tree)
+    end
+end
+
+"""
+Generates predictions using the trained forest.
+
+# Arguments:
+- `forest::AbstractForest`: The trained forest.
+- `X::Union{Matrix{S}, Vector{S}}`: The input data.
+
+# Returns:
+Predictions for the input data, aggregated across all trees in the forest.
+
+# Errors:
+Raises an error if the forest contains no trained trees.
+"""
+function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+    if isempty(forest.trees)
+        error("Prediction failed because there are no trees. (Maybe you forgot to fit?)")
+    end
+
+    predictions = [predict(tree, X) for tree in forest.trees]
+
+    if forest isa ForestClassifier
+        return mode(predictions)
+    else
+        return mean(predictions)
+    end
+end
+
+"""
+Converts the forest's structure and contents to a string representation.
+
+# Arguments:
+- `forest::AbstractForest`: The forest to be represented.
+
+# Returns:
+A string summarizing the forest and its individual trees.
+"""
+function _forest_to_string(forest::AbstractForest)
+    result = ""
+    for (i, tree) in enumerate(forest.trees)
+        result *= "\nTree $i:\n"
+        result *= _tree_to_string(tree, false)
+        result *= "\n"
+    end
+    return result
+end
+
+"""
+Prints a detailed representation of the forest and its trees.
+
+# Arguments:
+- `forest::AbstractForest`: The forest to be printed.
+"""
+function print_forest(forest::AbstractForest)
+    print(_forest_to_string(forest))
+end
+
+"""
+Displays a string representation of the forest when shown in the REPL or other I/O streams.
+
+# Arguments:
+- `io::IO`: The I/O stream.
+- `forest::AbstractForest`: The forest to be displayed.
+"""
+function Base.show(io::IO, forest::AbstractForest)
+    print(io, _forest_to_string(forest))
+end
