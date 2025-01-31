@@ -24,19 +24,16 @@
 ## 🚀 Getting Started
 
 #### ✨ Downloading the Package
-- Via `Pkg>` mode (press `]` in Julia REPL):
+Via `Pkg>` mode (press <kbd>]</kbd> in Julia REPL):
 
 ```bash
 activate --temp
 add https://github.com/nichtJakob/OneTwoTree.jl.git
 ```
+Quit the package manager prompt by pressing <kbd>⌫ Delete</kbd>.
 
-- For Pluto notebooks: We can't use Pluto's environments but have to create our own:
 ```julia
-using Pkg
-Pkg.activate("MyEnvironment")
-Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl.git")
-using OneTwoTree
+julia> using OneTwoTree
 ```
 
 
