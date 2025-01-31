@@ -19,6 +19,7 @@ makedocs(;
         "Demo Classification" => "demo_classification.md",
         "Demo Regression" => "demo_regression.md",
     ],
+    checkdocs = :none
 )
 
 deploydocs(;

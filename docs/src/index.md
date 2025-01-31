@@ -12,4 +12,5 @@ CurrentModule = OneTwoTree
 Documentation for [OneTwoTree](https://github.com/nichtJakob/OneTwoTree.jl).
 
 ```@index
+Private = false
 ```
