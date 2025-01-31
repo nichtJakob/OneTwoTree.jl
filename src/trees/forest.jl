@@ -219,9 +219,10 @@ Prints the numerated trees of a forest.
 
 # Arguments:
 - `forest::AbstractForest`: The forest to be printed.
+- `io::IO=stdout`: (Optional) The I/O stream for printing
 """
-function print_forest(forest::AbstractForest)
-    print(_forest_to_string(forest))
+function print_forest(forest::AbstractForest; io::IO=stdout)
+    print(io, _forest_to_string(forest))
 end
 
 """
