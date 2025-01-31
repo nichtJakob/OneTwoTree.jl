@@ -9,6 +9,8 @@ using DataFrames
 using Statistics
 using Random
 
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+
 @testset "ReadMe Examples" begin
     @testset "Classification" begin
         dataset = [
