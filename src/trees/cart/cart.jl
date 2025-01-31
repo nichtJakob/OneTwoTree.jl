@@ -10,18 +10,16 @@ Determine the optimal split of a node. Handles numerical and categorical data an
 function split(N::Node, splitting_criterion::Function)
     decision::Union{Decision, Nothing} = nothing
 
-    # 1. find best feature to split i.e. calc best split for each feature
+    # find best feature to split i.e. calc best split for each feature
     num_features = size(N.dataset)[2]
     best_feature = -1
     best_decision::Union{Decision, Nothing} = nothing
     best_gain = -1.0
 
     data = N.dataset[N.node_data, :]
-    # @info "\n\nUsing data" data
     for i in range(1, num_features)
         # NOTE: This determination of whether a column is categorical or numerical assumes, that the types do not vary among a column
         is_categorical = (typeof(N.dataset[1, i]) == String)
-        # @info "\n\n\nChecking decisions for feature $(i) where is_categorical=$(is_categorical): "
         # for categorical features, we calculate the splitting gain (via the splitting criterion) for each split (e.g. feature == class1, feature == class2, ...)
         if is_categorical
             classes = collect_classes(N.dataset, N.node_data, i)
@@ -80,7 +78,6 @@ function split(N::Node, splitting_criterion::Function)
         end
     end
 
-    # @info "determined best decision as " best_decision best_gain
     # if best_decision isnothing, this means that no split could be found.
     return best_decision, best_gain
 end
@@ -97,22 +94,15 @@ Determines whether to split the node N given.
 - `max_depth::Int64`: The maximum depth of the tree N is part of.
 """
 function should_split(N::Node, splitting_gain::Float64, max_depth::Int64)
-    # TODO: implement actual splitting decision logic i.e. do we want to split this node yey or nay?
     # There are a variety of criteria one could imagine. For now we only posit that the current node should have a splitting_gain > 0 and the max_depth hasn't been reached.
     if isnothing(N.decision) || splitting_gain == -1.0
-        # @info "Could not find optimal split => No Split"
         return false
     end
     if splitting_gain == 0.0
-        # @info "Node splitting gain == 0.0 => No Split"
         return false
     end
     if N.depth == max_depth
-        # @info "max_depth has been reached => No Split"
       return false
     end
-    # if splitting_gain < min_gain
-    #   return false
-    # end
     return true
 end

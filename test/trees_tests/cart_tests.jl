@@ -165,7 +165,6 @@ Tests whether constructed trees predict expected values and conform to given con
         end
     end
 
-    # TODO: readd integer and string type tests as soon as they can be handled!
     @testset "Data Types" begin
         if !USE_INT_FEATURES
             dataset_int = convert(Matrix{Float64}, dataset_int)
@@ -192,7 +191,7 @@ Tests whether constructed trees predict expected values and conform to given con
         @test OneTwoTree.calc_depth(t_float) == 2
         @test OneTwoTree.calc_depth(t_string) == 2
         @test OneTwoTree.calc_depth(t_int) == 2
-        @test OneTwoTree.calc_depth(t_mixfs) == 3 # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution # TODO: optimal solution would be depth 2, but gini_impurity evaluates in a way, where all splits are considered equally good. Thus we get a suboptimal solution.
+        @test OneTwoTree.calc_depth(t_mixfs) == 3
 
         pred_float = predict(t_float, dataset_float)
         pred_string = predict(t_string, dataset_string)
@@ -207,12 +206,8 @@ Tests whether constructed trees predict expected values and conform to given con
         @test calc_accuracy(abc_labels, pred_string) == 1.0
         @test calc_accuracy(aabcbb_labels, pred_int) == 1.0
         @test calc_accuracy(abcd_labels, pred_mixfs) == 1.0
-
-        #TODO: test mixed type and int features
-        #TODO: test invalid inputs, should throw errors
     end
 
-    # TODO: readd integer label type tests as soon as it is fixed!
     @testset "Int Label" begin
         t_int_label = DecisionTreeClassifier(max_depth=3)
         fit!(t_int_label, dataset_float, [1, 2, 3])
@@ -305,42 +300,6 @@ end
         @test calc_accuracy(zork_labels, pred) == 1.0
     end
 end
-
-"""
-Loads large FashionMNIST dataset from MLDatasets and tests tree construction and prediction
-as well as consistency in the tree.
-"""
-
-# @testset "FashionMNIST-1000" begin
-#     if !RUN_MNIST
-#         #@warn "Skipping FashionMNIST tests"
-#         return
-#     end
-
-#     features, labels = OneTwoTree.load_data("fashion_mnist_1000")
-#     tree = DecisionTreeClassifier(max_depth=10)
-
-#     @testset "Tree Construction" begin
-#         fit!(tree, features, labels)
-
-#         @test tree.root isa OneTwoTree.Node
-#         @test tree.max_depth == 10
-#         test_tree_consistency(tree=tree, run_tests=!isnothing(tree.root))
-#     end
-
-#     #@warn "Skipping prediction tests"
-#     if(isnothing(tree.root))
-#         @warn "Skipping prediction tests"
-#         return
-#     end
-#     @testset "Prediction" begin
-#         pred = predict(tree, features)
-
-#         @test length(pred) == length(labels)
-#         @test calc_accuracy(labels, pred) > 0.2
-#     end
-# end
-
 
 """
 Runs the examples from the ReadMe to make sure that they work.

@@ -16,7 +16,6 @@ struct Decision{S<:Union{Number, String}}
     feature::Int64
 
     function Decision(fn::Function, feature::Int64, param::S) where S
-        # TODO: feature index can be chosen out of bounds... Idk, just be careful?
         new{S}(fn, param, feature)
     end
 end
