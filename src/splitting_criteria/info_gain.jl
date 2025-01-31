@@ -11,7 +11,7 @@ This function calculates the entropy of set of lables
 - The entropy H(X) = -sum^n_{i=1} P(x_i) log_2(P(x_i))
     with X beeing the labels
     and n the number of elements in X
-    and P() beeing the Probability 
+    and P() beeing the Probability
 """
 function entropy(labels)
     num_occurences = countmap(labels)

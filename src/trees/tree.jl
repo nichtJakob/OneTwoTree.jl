@@ -105,7 +105,7 @@ function _verify_fit!_args(tree, dataset, labels, column_data)
 end
 
 """
-    fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+    fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Real, String}}
 
 Train a decision tree on the given data using some algorithm (e.g. CART).
 
@@ -121,7 +121,7 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
 2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
 """
-function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Real, String}}
     _verify_fit!_args(tree, features, labels, column_data)
 
     classify = (tree isa DecisionTreeClassifier)
@@ -190,7 +190,7 @@ end
 
 Calculates the accuracy of the predictions compared to the labels.
 """
-function calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T}) where {S , T}
+function calc_accuracy(labels::AbstractArray, predictions::AbstractArray)
     if length(labels) != length(predictions)
         throw(ArgumentError("Length of labels and predictions must be equal."))
     end

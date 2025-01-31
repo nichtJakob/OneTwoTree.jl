@@ -6,12 +6,12 @@ A Node represents a decision in the Tree.
 It is a leaf with a prediction or has exactly one true and one false child and a decision
 function.
 """
-mutable struct Node{T<:Union{Number, String}}
+mutable struct Node{T<:Union{Real, String}}
     # Reference to whole dataset governed by the tree (This is not a copy as julia doesn't copy but only binds new aliases to the same object)
     # data points are rows, data features are columns
     dataset::Union{AbstractMatrix, Nothing}
     # labels can be categorical => String or numerical => Real
-    labels::Union{Vector{T}, Nothing}
+    labels::Union{AbstractVector{T}, Nothing}
     # Indices of the data in the dataset being governed by this node
     node_data::Vector{Int64}
     # TODO: Index list of constant columns or columns the label does not vary with
@@ -32,7 +32,7 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::AbstractVector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
         N.depth = depth
         N.true_child = nothing

@@ -118,7 +118,7 @@ Returns random features and their corresponding labels from the given dataset.
 # Returns:
 A tuple `(random_features, random_labels)` containing the randomly drawn features and labels.
 """
-function get_random_features(features::Matrix{S}, labels::Vector{T}, n_features::Int) where {S<:Union{Real, String}, T<:Union{Number, String}}
+function get_random_features(features::AbstractMatrix{S}, labels::AbstractVector{T}, n_features::Int) where {S, T<:Union{Real, String}}
     random_indices = rand(1:size(features,1), n_features)
     random_features = features[random_indices, :]
     random_labels = labels[random_indices]
@@ -143,7 +143,7 @@ Trains each tree in the forest on randomly drawn subsets of test features and co
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
 2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
 """
-function fit!(forest::AbstractForest, dataset::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+function fit!(forest::AbstractForest, dataset::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
     is_classifier = (forest isa ForestClassifier)
 
     for i in 1:forest.n_trees
@@ -156,7 +156,7 @@ function fit!(forest::AbstractForest, dataset::AbstractMatrix, labels::Vector{T}
             tree = DecisionTreeRegressor(max_depth=forest.max_depth)
         end
 
-        fit!(tree, current_tree_dataset, current_tree_labels, splitting_criterion=splitting_criterion)
+        fit!(tree, current_tree_dataset, current_tree_labels, splitting_criterion=splitting_criterion, column_data=column_data)
         push!(forest.trees, tree)
     end
 end
@@ -179,7 +179,7 @@ Predictions for the input data X, aggregated across all trees in the forest.
 # Errors:
 Raises an error if the forest contains no trained trees.
 """
-function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+function predict(forest::AbstractForest, X::Union{AbstractMatrix{S}, AbstractVector{S}}) where S<:Union{Real, String}
     if isempty(forest.trees)
         throw(ArgumentError("Prediction failed because there are no trees. (Maybe you forgot to fit?)"))
     end
