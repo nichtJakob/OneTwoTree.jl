@@ -1,5 +1,6 @@
 # Run the demo examples of the ReadMe and external documentation as tests to make sure
 # they are working at all times.
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
 using Test
 using OneTwoTree
@@ -9,7 +10,7 @@ using DataFrames
 using Statistics
 using Random
 
-ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+
 
 @testset "ReadMe Examples" begin
     @testset "Classification" begin
