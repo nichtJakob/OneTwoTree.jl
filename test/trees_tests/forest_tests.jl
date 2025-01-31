@@ -94,13 +94,13 @@ using OneTwoTree
     end
 
     @testset "Argument Errors" begin
-        @test_throws ErrorException ForestClassifier(n_trees=0, n_features_per_tree=1, max_depth=1)
-        @test_throws ErrorException ForestClassifier(n_trees=1, n_features_per_tree=0, max_depth=1)
-        @test_throws ErrorException ForestClassifier(n_trees=1, n_features_per_tree=1, max_depth=0)
+        @test_throws ArgumentError ForestClassifier(n_trees=0, n_features_per_tree=1, max_depth=1)
+        @test_throws ArgumentError ForestClassifier(n_trees=1, n_features_per_tree=0, max_depth=1)
+        @test_throws ArgumentError ForestClassifier(n_trees=1, n_features_per_tree=1, max_depth=0)
 
         forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
         X_test = [2.4; 3.0; -9.2]
-        @test_throws ErrorException predict(forest, X_test)
+        @test_throws ArgumentError predict(forest, X_test)
     end
 
     @testset "Printing forests" begin
