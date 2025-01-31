@@ -23,6 +23,16 @@ using Test
     t3 = DecisionTreeClassifier(root=n2)
     @test t3.root === n2
     @test t3.max_depth === -1
+
+
+
+    #test predict(leaf)
+    #Node(dataset, labels, classify; splitting_criterion=nothing, column_data=false, node_data=nothing, max_depth=0)
+    node1 = OneTwoTree.Node( dataset, ["yes", "yes", "yes"], true )
+    node1.prediction = "yes"
+    #function predict(node::Node, dataset::AbstractMatrix)
+    @test OneTwoTree.predict(node1, dataset) == ["yes", "yes", "yes"]
+
 end
 
 
