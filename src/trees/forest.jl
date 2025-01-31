@@ -1,7 +1,6 @@
-# A forest is a collection of trees wich aggregate their decisions
-# First I cover forests for classification and after that forests for regression
-
 """
+    AbstractForest
+
 Base type for classification and regression forests.
 
 Forests are collections of trees which aggregate their decisions.
@@ -10,6 +9,8 @@ We use this abstract type to differentiate tree construction intricacies in the 
 abstract type AbstractForest end
 
 """
+    ForestClassifier <: AbstractForest
+
 Forest for classification problems
 
 # Fields:
@@ -26,6 +27,8 @@ mutable struct ForestClassifier <: AbstractForest
 end
 
 """
+    ForestRegressor <: AbstractForest
+
 Forest for regression problems
 
 # Fields:
@@ -89,6 +92,7 @@ end
 
 """
     ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+
 Constructs a ForestRegressor instance.
 
 # Arguments:
@@ -106,19 +110,19 @@ function ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int
 end
 
 """
-    get_random_features(features::Matrix{S}, labels::Vector{T}, n_features::Int)
+    get_random_features(features::AbstractMatrix{S}, labels::AbstractVector{T}, n_features::Int) where {S, T<:Union{Real, String}}
 
 Returns random features and their corresponding labels from the given dataset.
 
 # Arguments:
-- `features::Matrix{S}`: The feature matrix.
-- `labels::Vector{T}`: The labels vector.
+- `features::AbstractMatrix{S}`: The feature matrix.
+- `labels::AbstractVector{T}`: The labels vector.
 - `n_features::Int`: The number of features to draw randomly.
 
 # Returns:
 A tuple `(random_features, random_labels)` containing the randomly drawn features and labels.
 """
-function get_random_features(features::Matrix{S}, labels::Vector{T}, n_features::Int) where {S<:Union{Real, String}, T<:Union{Number, String}}
+function get_random_features(features::AbstractMatrix{S}, labels::AbstractVector{T}, n_features::Int) where {S, T<:Union{Real, String}}
     random_indices = rand(1:size(features,1), n_features)
     random_features = features[random_indices, :]
     random_labels = labels[random_indices]
@@ -127,23 +131,24 @@ end
 
 
 """
-    fit!(forest::AbstractForest, dataset::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+    fit!(forest::AbstractForest, dataset::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
 
 Trains each tree in the forest on randomly drawn subsets of test features and corresponding test labels.
 
 # Arguments
 
 - `forest::AbstractForest`: the forest to be trained
-- `dataset::AbstractMatrix`: the training data
-- `labels::Vector{Union{Number, String}}`: the target labels
+- `dataset::AbstractMatrix{S}`: the training data
+- `labels::AbstractVector{T}`: the target labels
 - `splitting_criterion`: a function indicating some notion of gain from splitting a node. If not provided, default criteria for classification and regression are used.
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 (OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
 
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
-2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
+2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)`,
+where `parent_labels` is a set of datapoint labels, which is split into two subsets `true_child_labels` & `false_child_labels` by some discriminating function. (Each label in `parent_labels` is contained in exactly one of the two subsets.)
 """
-function fit!(forest::AbstractForest, dataset::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+function fit!(forest::AbstractForest, dataset::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
     is_classifier = (forest isa ForestClassifier)
 
     for i in 1:forest.n_trees
@@ -156,22 +161,22 @@ function fit!(forest::AbstractForest, dataset::AbstractMatrix, labels::Vector{T}
             tree = DecisionTreeRegressor(max_depth=forest.max_depth)
         end
 
-        fit!(tree, current_tree_dataset, current_tree_labels, splitting_criterion=splitting_criterion)
+        fit!(tree, current_tree_dataset, current_tree_labels, splitting_criterion=splitting_criterion, column_data=column_data)
         push!(forest.trees, tree)
     end
 end
 
 """
-    predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+    predict(forest::AbstractForest, X::Union{AbstractMatrix{S}, AbstractVector{S}}) where S<:Union{Real, String}
 
 Outputs the forest-prediction for a given datapoint X.
 The prediction is based on the aggregation of the tree decisions.
-For agregation in a regression scenario the mean is used.
-For agregation in a classification scenario the most voted class label is used.
+For aggregation in a regression scenario the mean is used.
+For aggregation in a classification scenario the most voted class label is used.
 
 # Arguments:
 - `forest::AbstractForest`: The trained forest.
-- `X::Union{Matrix{S}, Vector{S}}`: The input data for which a prediction is searched.
+- `X::Union{AbstractMatrix{S}, AbstractVector{S}}`: The input data for which a prediction is searched.
 
 # Returns:
 Predictions for the input data X, aggregated across all trees in the forest.
@@ -179,7 +184,7 @@ Predictions for the input data X, aggregated across all trees in the forest.
 # Errors:
 Raises an error if the forest contains no trained trees.
 """
-function predict(forest::AbstractForest, X::Union{Matrix{S}, Vector{S}}) where S<:Union{Real, String}
+function predict(forest::AbstractForest, X::Union{AbstractMatrix{S}, AbstractVector{S}}) where S<:Union{Real, String}
     if isempty(forest.trees)
         throw(ArgumentError("Prediction failed because there are no trees. (Maybe you forgot to fit?)"))
     end
@@ -195,6 +200,7 @@ end
 
 """
     _forest_to_string(forest::AbstractForest)
+
 Converts the forest to a string.
 
 # Arguments:
@@ -214,7 +220,8 @@ function _forest_to_string(forest::AbstractForest)
 end
 
 """
-    print_forest(forest::AbstractForest)
+    print_forest(forest::AbstractForest; io::IO=stdout)
+
 Prints the numerated trees of a forest.
 
 # Arguments:

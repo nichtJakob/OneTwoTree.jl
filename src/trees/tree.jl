@@ -4,19 +4,14 @@
 # MARK: Structs & Constructors
 # ----------------------------------------------------------------
 
-#MARK: DecisionTree
 abstract type AbstractDecisionTree end
 
 """
-    DecisionTreeClassifier
+    DecisionTreeClassifier <: AbstractDecisionTree
 
 A DecisionTreeClassifier is a tree of decision nodes. It can predict classes based on the input data.
 In addition to a root node it holds meta informations such as max_depth etc.
-Use `fit(tree, features, labels)` to create a tree from data
-
-# Arguments
-- root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
-- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
+Use `fit(tree, features, labels)` to create a tree from data.
 """
 mutable struct DecisionTreeClassifier <: AbstractDecisionTree
     root::Union{Node, Nothing}
@@ -24,14 +19,16 @@ mutable struct DecisionTreeClassifier <: AbstractDecisionTree
 end
 
 """
-    Initialises a decision tree model.
+    DecisionTreeClassifier(; root=nothing, max_depth=-1)
+
+Initialises a decision tree model.
 
 # Arguments
 
 - `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-function DecisionTreeClassifier(; root=nothing, max_depth=-1)
+function DecisionTreeClassifier(; root::Union{Node, Nothing}=nothing, max_depth::Int=-1)
     if max_depth < -1
         throw(ArgumentError("DecisionTreeClassifier: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)"))
     end
@@ -43,11 +40,7 @@ end
 
 A DecisionTreeRegressor is a tree of decision nodes. It can predict function values based on the input data.
 In addition to a root node it holds meta informations such as max_depth etc.
-Use `fit(tree, features, labels)` to create a tree from data
-
-# Arguments
-- root::Union{Node, Nothing}: the root node of the decision tree; `nothing` if the tree is empty
-- `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
+Use `fit(tree, features, labels)` to create a tree from data.
 """
 mutable struct DecisionTreeRegressor <: AbstractDecisionTree
     root::Union{Node, Nothing}
@@ -55,14 +48,16 @@ mutable struct DecisionTreeRegressor <: AbstractDecisionTree
 end
 
 """
-    Initialises a decision tree model.
+    DecisionTreeRegressor(; root=nothing, max_depth=-1)
+
+Initialises a decision tree model.
 
 # Arguments
 
 - `root::Union{Node, Nothing}`: the root node of the decision tree; `nothing` if the tree is empty
 - `max_depth::Int`: maximum depth of the decision tree; no limit if equal to -1
 """
-function DecisionTreeRegressor(; root=nothing, max_depth=-1)
+function DecisionTreeRegressor(; root::Union{Node, Nothing}=nothing, max_depth::Int=-1)
     if max_depth < -1
         throw(ArgumentError("DecisionTreeRegressor: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)"))
     end
@@ -76,6 +71,8 @@ end
 # ----------------------------------------------------------------
 
 """
+    _verify_fit!_args(tree, dataset, labels, column_data)
+
 Some guards to ensure the input data is valid for training a tree.
 """
 function _verify_fit!_args(tree, dataset, labels, column_data)
@@ -105,23 +102,24 @@ function _verify_fit!_args(tree, dataset, labels, column_data)
 end
 
 """
-    fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+    fit!(tree::AbstractDecisionTree, features::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
 
 Train a decision tree on the given data using some algorithm (e.g. CART).
 
 # Arguments
 
 - `tree::AbstractDecisionTree`: the tree to be trained
-- `dataset::AbstractMatrix`: the training data
-- `labels::Vector{Union{Number, String}}`: the target labels
-- `splitting_criterion`: a function indicating some notion of gain from splitting a node. If not provided, default criteria for classification and regression are used.
+- `dataset::AbstractMatrix{S}`: the training data
+- `labels::AbstractVector{T}`: the target labels
+- `splitting_criterion::Function`: a function indicating some notion of gain from splitting a node. If not provided, default criteria for classification and regression are used.
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 (OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
 
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
-2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
+2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)`,
+where `parent_labels` is a set of datapoint labels, which is split into two subsets `true_child_labels` & `false_child_labels` by some discriminating function. (Each label in `parent_labels` is contained in exactly one of the two subsets.)
 """
-function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
+function fit!(tree::AbstractDecisionTree, features::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
     _verify_fit!_args(tree, features, labels, column_data)
 
     classify = (tree isa DecisionTreeClassifier)
@@ -136,14 +134,14 @@ function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vect
 end
 
 """
-    predict
+    predict(tree::AbstractDecisionTree, X::Union{AbstractMatrix, AbstractVector})
 
-Traverses the tree for a given datapoint x and returns that trees prediction.
+Traverses the tree for given datapoints and returns that trees prediction.
 
 # Arguments
 
 - `tree::AbstractDecisionTree`: the tree to predict with
-- `X::Union{AbstractMatrix, AbstractVector`: the data to predict on
+- `X::Union{AbstractMatrix, AbstractVector}`: the data to predict on
 """
 function predict(tree::AbstractDecisionTree, X::Union{AbstractMatrix, AbstractVector})
     if isnothing(tree.root)
@@ -186,11 +184,11 @@ function predict(node::Node, dataset::AbstractMatrix)
 end
 
 """
-    calc_accuracy(labels, predictions)
+    calc_accuracy(labels::AbstractArray, predictions::AbstractArray)
 
 Calculates the accuracy of the predictions compared to the labels.
 """
-function calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T}) where {S , T}
+function calc_accuracy(labels::AbstractArray, predictions::AbstractArray)
     if length(labels) != length(predictions)
         throw(ArgumentError("Length of labels and predictions must be equal."))
     end
@@ -200,7 +198,7 @@ function calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T}) 
     end
 
     correct = 0.0
-    for i in 1:lastindex(labels)
+    for i in eachindex(labels)
         if labels[i] == predictions[i]
             correct += 1.0
         end
@@ -210,12 +208,11 @@ function calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T}) 
 end
 
 """
-    depth(tree)
+    calc_depth(tree::AbstractDecisionTree)
 
 Traverses the tree and returns the maximum depth.
 """
 function calc_depth(tree::AbstractDecisionTree)
-
     max_depth = 0
     if isnothing(tree.root)
         return max_depth
@@ -245,21 +242,23 @@ end
 #----------------------------------------
 
 """
-    tree_to_string(tree::AbstractDecisionTree)
+    _tree_to_string(tree::AbstractDecisionTree, print_parameters=true)
 
 Returns a textual visualization of the decision tree.
 
 # Arguments
 
 - `tree::AbstractDecisionTree` The `DecisionTree` instance to print.
+- `print_parameters::Bool=true`: (Optional) Whether to print the tree parameters like `max_depth`.
 
 # Example output:
-
+```
 x < 28.0 ?
 ├─ False: x == 161.0 ?
 │  ├─ False: 842
 │  └─ True: 2493
 └─ True: 683
+```
 """
 function _tree_to_string(tree::AbstractDecisionTree, print_parameters=true)
     if isnothing(tree.root)
@@ -279,21 +278,23 @@ function Base.show(io::IO, tree::AbstractDecisionTree)
 end
 
 """
-    print_tree(tree::AbstractDecisionTree)
+    print_tree(tree::AbstractDecisionTree; io::IO=stdout)
 
 Returns a textual visualization of the decision tree.
 
 # Arguments
 
 - `tree::AbstractDecisionTree` The `DecisionTree` instance to print.
+- `io::IO=stdout`: (Optional) The I/O stream for printing
 
 # Example output:
-
+```
 x < 28.0 ?
 ├─ False: x == 161.0 ?
 │  ├─ False: 842
 │  └─ True: 2493
 └─ True: 683
+```
 """
 function print_tree(tree::AbstractDecisionTree; io::IO=stdout)
     print(io, _tree_to_string(tree, false))

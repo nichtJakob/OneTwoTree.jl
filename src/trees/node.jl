@@ -6,33 +6,26 @@ A Node represents a decision in the Tree.
 It is a leaf with a prediction or has exactly one true and one false child and a decision
 function.
 """
-mutable struct Node{T<:Union{Number, String}}
+mutable struct Node{T<:Union{Real, String}}
     # Reference to whole dataset governed by the tree (This is not a copy as julia doesn't copy but only binds new aliases to the same object)
     # data points are rows, data features are columns
     dataset::Union{AbstractMatrix, Nothing}
     # labels can be categorical => String or numerical => Real
-    labels::Union{Vector{T}, Nothing}
+    labels::Union{AbstractVector{T}, Nothing}
     # Indices of the data in the dataset being governed by this node
     node_data::Vector{Int64}
-    # TODO: Index list of constant columns or columns the label does not vary with
-    # constant_columns::Vector{Int64}
     depth::Int64
 
-    # TODO: should implement split_function; split function should only work if this node is a leaf
-    # decision::Union{Function, Nothing} #returns True -> go to right child else left
     decision::Union{Decision, Nothing} #returns True -> go to right child else left
     decision_string::Union{String, Nothing} # *Optional* string for printing
 
     true_child::Union{Node, Nothing} #decision is True
     false_child::Union{Node, Nothing} #decision is NOT true
     prediction::Union{T, Nothing} # for leaves
-
-    # TODO: only temporary
     classify::Bool
 
     # Constructor handling assignments & splitting
-    # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::AbstractVector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
         N.depth = depth
         N.true_child = nothing
@@ -48,17 +41,14 @@ mutable struct Node{T<:Union{Number, String}}
             N.prediction = label_mean(labels, node_data)
         end
 
-        # TODO: only temporary
         N.classify = classify
 
         N.decision, splitting_gain = split(N, splitting_criterion)
         if should_split(N, splitting_gain, max_depth)
-            # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)
             N.true_child = Node(dataset, labels, true_data, classify, splitting_criterion, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
             N.false_child = Node(dataset, labels, false_data, classify, splitting_criterion, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
-            # TODO: Do we want to set prediction to nothing in non-leaf nodes? It could be neat to just have it, if we already had to calculate it anyways.
             # NOTE: The reason it is set to nothing here atm, is because N.prediction being nothing is later used to identify non-leaf nodes.
             N.prediction = nothing
         else
@@ -92,7 +82,7 @@ function Node(dataset, labels, classify; splitting_criterion=nothing, column_dat
 end
 
 """
-    is_leaf(node)
+    is_leaf(node::Node)::Bool
 
 Do you seriously expect a description for this?
 """
@@ -101,15 +91,15 @@ function is_leaf(node::Node)::Bool
 end
 
 """
-    _node_to_string(node::Node, prefix::String, is_true_child::Bool, indentation::String)
+    _node_to_string(node::Node, is_true_child::Bool, indentation::String)
 
 Recursive helper function to stringify the decision tree structure.
 
 # Arguments
 
-- `node`: The current node to print.
-- `is_true_child`: Boolean indicating if the node is a true branch child.
-- `indentation`: The current indentation.
+- `node::Node`: The current node to print.
+- `is_true_child::Bool`: Boolean indicating if the node is a true branch child.
+- `indentation::String`: The current indentation.
 """
 function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
     if is_true_child
@@ -136,6 +126,11 @@ function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
     return result
 end
 
+"""
+    _node_to_string_as_root(node::Node)
+
+Print the tree from the given node by considering it to be the root of the tree.
+"""
 function _node_to_string_as_root(node::Node)
     if is_leaf(node)
         return "\nPrediction: $(node.prediction)\n"

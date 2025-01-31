@@ -4,6 +4,7 @@ using Documenter
 DocMeta.setdocmeta!(OneTwoTree, :DocTestSetup, :(using OneTwoTree); recursive=true)
 
 makedocs(;
+    checkdocs = :none,
     modules=[OneTwoTree],
     sitename="OneTwoTree.jl",
     authors="Jakob Balasus <balasus@campus.tu-berlin.de>, Eloi Sandt <eloi.sandt@campus.tu-berlin.de>, Andreas Paul Bruno Lönne <loenne@campus.tu-berlin.de>, Alexander Obradovic <obradovic@campus.tu-berlin.de>",

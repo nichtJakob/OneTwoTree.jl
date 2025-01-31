@@ -1,5 +1,5 @@
 """
-    Decision
+    Decision{S<:Union{Number, String}}
 
 A structure representing a decision with a function and its parameter.
 
@@ -16,21 +16,20 @@ struct Decision{S<:Union{Number, String}}
     feature::Int64
 
     function Decision(fn::Function, feature::Int64, param::S) where S
-        # TODO: feature index can be chosen out of bounds... Idk, just be careful?
         new{S}(fn, param, feature)
     end
 end
 
 # for easier calls depending on data type
 
-function call(decision::Decision, datapoint::Vector{S}) where S
+function call(decision::Decision, datapoint::AbstractVector)
     if length(datapoint) < decision.feature
         throw(ArgumentError("call: passed datapoint of insufficient dimensionality!"))
     end
     return decision.fn(datapoint, decision.param, feature=decision.feature)
 end
 
-function call(decision::Decision, dataset::Matrix{S}) where S
+function call(decision::Decision, dataset::AbstractMatrix)
     if size(dataset, 2) < decision.feature
         throw(ArgumentError("call: passed dataset with data of insufficient dimensionality!"))
     end
@@ -42,19 +41,19 @@ end
 #--------------------------------------
 
 """
-    _decision_to_string(d::DecisionFn)
+    _decision_to_string(d::Decision)
 
 Returns a string representation of the decision function.
 
 # Arguments
-- `d::DecisionFn`: The decision function to convert to a string.
+- `d::Decision`: The decision function to convert to a string.
 """
-function _decision_to_string(d::Decision)
-    if isa(d.param, Number)
-        return "x[" * string(d.feature) * "] <= " * string(d.param)
-    else
-        return "x[" * string(d.feature) * "] == " * string(d.param)
-    end
+function _decision_to_string(d::Decision{<:Number})
+    return "x[" * string(d.feature) * "] <= " * string(d.param)
+end
+
+function _decision_to_string(d::Decision{<:String})
+    return "x[" * string(d.feature) * "] == " * string(d.param)
 end
 
 function Base.show(io::IO, d::Decision)
@@ -66,7 +65,7 @@ end
 #--------------------------------------
 
 """
-    less_than_or_equal
+    less_than_or_equal(x, threshold::Float64; feature::Int64 = 1)::Bool
 
 A basic numerical decision function for testing and playing around.
 """
@@ -75,7 +74,7 @@ function less_than_or_equal(x, threshold::Float64; feature::Int64 = 1)::Bool
 end
 
 """
-    equal
+    equal(x, class::String; feature::Int64 = 1)::Bool
 
 A basic categorical decision function for testing and playing around.
 """
