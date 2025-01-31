@@ -99,24 +99,78 @@ x[1] <= 0.0 ?
         @test returned_string == expected_string
     end
 
-    @testset "Tree Argument Errors" begin
-        @test_throws ArgumentError OneTwoTree.DecisionTreeRegressor(max_depth= -5)
-        @test_throws ArgumentError OneTwoTree.DecisionTreeClassifier(max_depth= -5)
 
-        # test Argument errors on function _verify_fit!_args(tree, dataset, labels, column_data)
+    @testset "print_tree" begin
+        function tolerance(text::String)
+            return replace(text, r"[\s\n]+" => "")
+        end 
+
+        X_train = reshape([12], 1, 1)
+        y_train = ["A"]
+
         tree = DecisionTreeClassifier()
-        tree_regressor = DecisionTreeRegressor()
-        dataset = [1.0 2.0; 3.0 4.0;]
-        labels = ["yes", "no"]
-        column_data = false
+        fit!(tree, X_train, y_train)
 
-        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, [], column_data)
-        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, [], labels, column_data)
-        #maxDepth @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, labels, column_data)
-        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], column_data)
-        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], false)
-        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", 4], column_data)
-        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree_regressor, dataset, labels, column_data)
+        expected_output = tolerance("Tree(max_depth=-1)Prediction:A")
+        expected_output_short = tolerance("Prediction:A")
+        
+        #test _tree_to_string()
+        @test tolerance(OneTwoTree._tree_to_string(tree)) == expected_output
+
+
+        #test print_tree()
+        function get_print_tree(ftree)
+            buffer_1 = IOBuffer()
+            print_tree(tree, io=buffer_1)
+            output = String(take!(buffer_1))
+        end
+
+        printed_tree = get_print_tree(tree)
+        @test tolerance(printed_tree) == expected_output_short
+        
+
+        #test Base.show()
+        function get_show_tree(tree)
+            buffer_1 = IOBuffer()
+            show(buffer_1, tree)
+            output = String(take!(buffer_1))
+        end
+
+        shown_tree = get_show_tree(tree)
+        @test tolerance(shown_tree) == expected_output
     end
 
+end
+
+@testset "Tree Argument Errors" begin
+    @test_throws ArgumentError OneTwoTree.DecisionTreeRegressor(max_depth= -5)
+    @test_throws ArgumentError OneTwoTree.DecisionTreeClassifier(max_depth= -5)
+
+    # test Argument errors on function _verify_fit!_args(tree, dataset, labels, column_data)
+    tree = DecisionTreeClassifier()
+    tree_regressor = DecisionTreeRegressor()
+    dataset = [1.0 2.0; 3.0 4.0;]
+    labels = ["yes", "no"]
+    column_data = false
+
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, [], column_data)
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, [], labels, column_data)
+    #maxDepth @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, labels, column_data)
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], column_data)
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], false)
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", 4], column_data)
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree_regressor, dataset, labels, column_data)
+
+
+    # test Argument errors on function predict(tree::AbstractDecisionTree, X::Union{AbstractMatrix, AbstractVector})
+    @test_throws ArgumentError OneTwoTree.predict(tree, [15])
+
+
+     # tests on calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T})
+     @test_throws ArgumentError OneTwoTree.calc_accuracy([1, 2, 3, 4], [1, 2, 3, 4, 5])
+     @test OneTwoTree.calc_accuracy([], []) == 0.0
+
+
+     # tests on function calc_depth(tree::AbstractDecisionTree)
+     @test OneTwoTree.calc_depth( OneTwoTree.DecisionTreeRegressor()) == 0
 end

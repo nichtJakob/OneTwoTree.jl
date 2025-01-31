@@ -295,6 +295,6 @@ x < 28.0 ?
 │  └─ True: 2493
 └─ True: 683
 """
-function print_tree(tree::AbstractDecisionTree)
-    print(_tree_to_string(tree, false))
+function print_tree(tree::AbstractDecisionTree; io::IO=stdout)
+    print(io, _tree_to_string(tree, false))
 end
