@@ -42,19 +42,19 @@ end
 #--------------------------------------
 
 """
-    _decision_to_string(d::DecisionFn)
+    _decision_to_string(d::Decision)
 
 Returns a string representation of the decision function.
 
 # Arguments
-- `d::DecisionFn`: The decision function to convert to a string.
+- `d::Decision`: The decision function to convert to a string.
 """
-function _decision_to_string(d::Decision)
-    if isa(d.param, Number)
-        return "x[" * string(d.feature) * "] <= " * string(d.param)
-    else
-        return "x[" * string(d.feature) * "] == " * string(d.param)
-    end
+function _decision_to_string(d::Decision{<:Number})
+    return "x[" * string(d.feature) * "] <= " * string(d.param)
+end
+
+function _decision_to_string(d::Decision{<:String})
+    return "x[" * string(d.feature) * "] == " * string(d.param)
 end
 
 function Base.show(io::IO, d::Decision)
