@@ -83,7 +83,7 @@ function _verify_fit!_args(tree, dataset, labels, column_data)
         throw(ArgumentError("fit!: Cannot build tree from empty dataset."))
     end
     if tree.max_depth < -1
-        throw(ArgumentError("fit!: Cannot build tree with negative depth, but got max_depth=$(max_depth)."))
+        throw(ArgumentError("fit!: Cannot build tree with negative depth, but got max_depth=$(tree.max_depth)."))
     end
     if (!column_data && size(dataset, 1) != length(labels))
         throw(ArgumentError("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?"))
