@@ -1,10 +1,12 @@
-In this example we want to compare the performance of regression trees with regression random forests on the BostonHousing dataset by using the OneTwoTree package.
+In this example we want to compare the performance of regression trees with regression random forests on the BostonHousing dataset by using the OneTwoTree package. The **code** can also be found [here](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_regression.jl).
 
 If you want to execute this example in your julia REPL you will first need to install some dependencies:
 ```julia
 julia>  using Pkg
 julia>  Pkg.add("MLDatasets")
 julia>  Pkg.add("DataFrames")
+julia>  Pkg.add("Random")
+julia>  Pkg.add("Statistics")
 julia>  Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl.git")
 ```
 

@@ -8,6 +8,8 @@ using OneTwoTree
 #   julia>  using Pkg
 #   julia>  Pkg.add("MLDatasets")
 #   julia>  Pkg.add("DataFrames")
+#   julia>  Pkg.add("Random")
+#   julia>  Pkg.add("Statistics")
 #
 # 2) execute the code in your REPL:
 #   julia>  include("demo_regression.jl")
