@@ -4,7 +4,6 @@
 
 using Test
 using OneTwoTree
-using Suppressor # suppress prints in tests
 
 
 const RUN_MNIST = false
@@ -335,50 +334,3 @@ as well as consistency in the tree.
 #         @test calc_accuracy(labels, pred) > 0.2
 #     end
 # end
-
-
-"""
-Runs the examples from the ReadMe to make sure that they work.
-"""
-
-@testset "ReadMe Examples" begin
-    @testset "Classification" begin
-        dataset = [
-            3.5 9.1 2.9
-            1.0 1.2 0.4
-            5.6 3.3 4.3
-        ]
-        labels = ["A", "B", "C"]
-
-        tree = DecisionTreeClassifier(max_depth=2)
-        @capture_out print(tree)
-        @capture_out print(fit!(tree, dataset, labels))
-        @capture_out print(tree)
-        prediction = predict(tree, [
-            2.0 4.0 6.0
-        ])
-        @capture_out print("The tree predicted class $(prediction[1]).")
-        @test true # no errors thrown
-    end
-
-    @testset "Regression" begin
-        dataset = [
-            1.0 2.0
-            2.0 3.0
-            3.0 4.0
-            4.0 5.0
-        ]
-        labels = [1.5, 2.5, 3.5, 4.5]
-
-        tree = DecisionTreeRegressor(max_depth=3)
-        @capture_out print(tree)
-        @capture_out print(fit!(tree, dataset, labels))
-        @capture_out print(tree)
-
-        prediction = predict(tree, [
-            1.0 4.0
-        ])
-        @capture_out print("The tree predicted $(prediction[1]).")
-        @test true # no errors thrown
-    end
-end

@@ -5,6 +5,8 @@ If you want to execute this example in your julia REPL you will first need to in
 julia>  using Pkg
 julia>  Pkg.add("MLDatasets")
 julia>  Pkg.add("DataFrames")
+julia>  Pkg.add("Random")
+julia>  Pkg.add("Statistics")
 julia>  Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl.git")
 ```
 
