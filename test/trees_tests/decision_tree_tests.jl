@@ -26,7 +26,16 @@ using Test
     @test t3.root === n3
     @test t3.max_depth === -1
 
+    #test predict(leaf)
+    #Node(dataset, labels, classify; splitting_criterion=nothing, column_data=false, node_data=nothing, max_depth=0)
+    node1 = OneTwoTree.Node( dataset, ["yes", "yes", "yes"], true )
+    node1.prediction = "yes"
+    #function predict(node::Node, dataset::AbstractMatrix)
+    @test OneTwoTree.predict(node1, dataset) == ["yes", "yes", "yes"]
+
 end
+
+
 
 @testset "Print Tree" begin # Test: stringify tree with multiple decision nodes
     @testset "Basic" begin
@@ -109,7 +118,7 @@ x[1] <= 0.0 ?
     @testset "print_tree" begin
         function tolerance(text::String)
             return replace(text, r"[\s\n]+" => "")
-        end
+        end 
 
         X_train = reshape([12], 1, 1)
         y_train = ["A"]
@@ -119,7 +128,7 @@ x[1] <= 0.0 ?
 
         expected_output = tolerance("Tree(max_depth=-1)Prediction:A")
         expected_output_short = tolerance("Prediction:A")
-
+        
         #test _tree_to_string()
         @test tolerance(OneTwoTree._tree_to_string(tree)) == expected_output
 
@@ -133,7 +142,7 @@ x[1] <= 0.0 ?
 
         printed_tree = get_print_tree(tree)
         @test tolerance(printed_tree) == expected_output_short
-
+        
 
         #test Base.show()
         function get_show_tree(tree)
