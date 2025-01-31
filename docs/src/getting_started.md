@@ -28,7 +28,7 @@ using OneTwoTree
 - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
 
 ### Classification
-```julia
+```@example
 using OneTwoTree
 dataset = [ # The rows are the different data points
 3.5 9.1 2.9
@@ -44,11 +44,11 @@ print(tree)
 prediction = predict(tree, [
 2.0 4.0 6.0
 ])
-print("The tree predicted class \$(prediction[1]).")
+print("\nThe tree predicted class $(prediction[1]).")
 ```
 
 ### Regression
-```julia
+```@example
 using OneTwoTree
 dataset = [
   1.0 2.0
@@ -65,7 +65,7 @@ print(tree)
 prediction = predict(tree, [
   1.0 4.0
 ])
-print("The tree predicted \$(prediction[1]).")
+print("\nThe tree predicted $(prediction[1]).")
 ```
 
 ### Forests and Loading Other Datasets
