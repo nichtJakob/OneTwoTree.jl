@@ -14,24 +14,17 @@ mutable struct Node{T<:Union{Real, String}}
     labels::Union{AbstractVector{T}, Nothing}
     # Indices of the data in the dataset being governed by this node
     node_data::Vector{Int64}
-    # TODO: Index list of constant columns or columns the label does not vary with
-    # constant_columns::Vector{Int64}
     depth::Int64
 
-    # TODO: should implement split_function; split function should only work if this node is a leaf
-    # decision::Union{Function, Nothing} #returns True -> go to right child else left
     decision::Union{Decision, Nothing} #returns True -> go to right child else left
     decision_string::Union{String, Nothing} # *Optional* string for printing
 
     true_child::Union{Node, Nothing} #decision is True
     false_child::Union{Node, Nothing} #decision is NOT true
     prediction::Union{T, Nothing} # for leaves
-
-    # TODO: only temporary
     classify::Bool
 
     # Constructor handling assignments & splitting
-    # TODO: replace classify::Bool with enum value for readability
     function Node(dataset::AbstractMatrix, labels::AbstractVector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
         N.depth = depth
@@ -48,17 +41,14 @@ mutable struct Node{T<:Union{Real, String}}
             N.prediction = label_mean(labels, node_data)
         end
 
-        # TODO: only temporary
         N.classify = classify
 
         N.decision, splitting_gain = split(N, splitting_criterion)
         if should_split(N, splitting_gain, max_depth)
-            # N.decision_column = split_info...
             # Partition dataset into true/false datasets & pass them to the children
             true_data, false_data = split_indices(N.dataset, N.node_data, N.decision.fn, N.decision.param, N.decision.feature)
             N.true_child = Node(dataset, labels, true_data, classify, splitting_criterion, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
             N.false_child = Node(dataset, labels, false_data, classify, splitting_criterion, depth=N.depth+1, min_purity_gain=min_purity_gain, max_depth=max_depth)
-            # TODO: Do we want to set prediction to nothing in non-leaf nodes? It could be neat to just have it, if we already had to calculate it anyways.
             # NOTE: The reason it is set to nothing here atm, is because N.prediction being nothing is later used to identify non-leaf nodes.
             N.prediction = nothing
         else
