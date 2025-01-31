@@ -6,12 +6,12 @@ A Node represents a decision in the Tree.
 It is a leaf with a prediction or has exactly one true and one false child and a decision
 function.
 """
-mutable struct Node{T<:Union{Number, String}}
+mutable struct Node{T<:Union{Real, String}}
     # Reference to whole dataset governed by the tree (This is not a copy as julia doesn't copy but only binds new aliases to the same object)
     # data points are rows, data features are columns
     dataset::Union{AbstractMatrix, Nothing}
     # labels can be categorical => String or numerical => Real
-    labels::Union{Vector{T}, Nothing}
+    labels::Union{AbstractVector{T}, Nothing}
     # Indices of the data in the dataset being governed by this node
     node_data::Vector{Int64}
     # TODO: Index list of constant columns or columns the label does not vary with
@@ -32,7 +32,7 @@ mutable struct Node{T<:Union{Number, String}}
 
     # Constructor handling assignments & splitting
     # TODO: replace classify::Bool with enum value for readability
-    function Node(dataset::AbstractMatrix, labels::Vector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
+    function Node(dataset::AbstractMatrix, labels::AbstractVector{T}, node_data::Vector{Int64}, classify::Bool, splitting_criterion::Function; depth=0, min_purity_gain=nothing, max_depth=0) where {T}
         N = new{T}(dataset, labels, node_data)
         N.depth = depth
         N.true_child = nothing
@@ -92,7 +92,7 @@ function Node(dataset, labels, classify; splitting_criterion=nothing, column_dat
 end
 
 """
-    is_leaf(node)
+    is_leaf(node::Node)::Bool
 
 Do you seriously expect a description for this?
 """
@@ -101,15 +101,15 @@ function is_leaf(node::Node)::Bool
 end
 
 """
-    _node_to_string(node::Node, prefix::String, is_true_child::Bool, indentation::String)
+    _node_to_string(node::Node, is_true_child::Bool, indentation::String)
 
 Recursive helper function to stringify the decision tree structure.
 
 # Arguments
 
-- `node`: The current node to print.
-- `is_true_child`: Boolean indicating if the node is a true branch child.
-- `indentation`: The current indentation.
+- `node::Node`: The current node to print.
+- `is_true_child::Bool`: Boolean indicating if the node is a true branch child.
+- `indentation::String`: The current indentation.
 """
 function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
     if is_true_child
@@ -136,6 +136,11 @@ function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
     return result
 end
 
+"""
+    _node_to_string_as_root(node::Node)
+
+Print the tree from the given node by considering it to be the root of the tree.
+"""
 function _node_to_string_as_root(node::Node)
     if is_leaf(node)
         return "\nPrediction: $(node.prediction)\n"

@@ -99,11 +99,32 @@ x[1] <= 0.0 ?
         @test returned_string == expected_string
     end
 
-
     @testset "print_tree" begin
+        function get_print_tree(tree)
+            buffer_1 = IOBuffer()
+            print_tree(tree, io=buffer_1)
+            output = String(take!(buffer_1))
+        end
+
+        dataset2 = [
+            1.0 2.0 3.0
+            1.0 2.0 4.0
+            1.0 -2.0 3.0
+            1.0 -2.0 4.0
+            -1.0 2.0 3.0
+        ]
+        labels2 = ["A", "B", "C", "D", "E"]
+
+        t = DecisionTreeClassifier()
+        fit!(t, dataset2, labels2)
+
+        printed_tree = get_print_tree(t)
+        @test printed_tree != ""
+
+
         function tolerance(text::String)
             return replace(text, r"[\s\n]+" => "")
-        end 
+        end
 
         X_train = reshape([12], 1, 1)
         y_train = ["A"]
@@ -113,21 +134,15 @@ x[1] <= 0.0 ?
 
         expected_output = tolerance("Tree(max_depth=-1)Prediction:A")
         expected_output_short = tolerance("Prediction:A")
-        
+
         #test _tree_to_string()
         @test tolerance(OneTwoTree._tree_to_string(tree)) == expected_output
 
 
         #test print_tree()
-        function get_print_tree(ftree)
-            buffer_1 = IOBuffer()
-            print_tree(tree, io=buffer_1)
-            output = String(take!(buffer_1))
-        end
-
         printed_tree = get_print_tree(tree)
         @test tolerance(printed_tree) == expected_output_short
-        
+
 
         #test Base.show()
         function get_show_tree(tree)
