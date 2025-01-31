@@ -24,25 +24,20 @@
 ## 🚀 Getting Started
 
 #### ✨ Downloading the Package
-- Via `Pkg>` mode (press `]` in Julia REPL):
+Via `Pkg>` mode (press <kbd>]</kbd> in Julia REPL):
 
 ```bash
 activate --temp
 add https://github.com/nichtJakob/OneTwoTree.jl.git
 ```
+Quit the package manager prompt by pressing <kbd>⌫ Delete</kbd>.
 
-- For Pluto notebooks: We can't use Pluto's environments but have to create our own:
 ```julia
-using Pkg
-Pkg.activate("MyEnvironment")
-Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl.git")
-using OneTwoTree
+julia> using OneTwoTree
 ```
 
 
 ## ▶️ **Example**
-
-- Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
 
 ### Classification
   ```julia
@@ -89,6 +84,9 @@ using OneTwoTree
 
 You can find more extensive examples utilising the `Iris` and `BostonHousing` datasets from `MLDatasets` in [`demo_classification.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_classification.jl). and [`demo_regression.jl`](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_regression.jl). The latter further compares `DecisionTree` performance to that of a `Forest`.
 
+> [!NOTE]  
+> Tree Construction in its current state can be slow. Therefore, it may be advised to use small/low dimensional training datasets for the moment.
+
 ## 📚 **Further Reading for Developers**
 
 
@@ -119,8 +117,8 @@ You can find more extensive examples utilising the `Iris` and `BostonHousing` da
      include("runtests.jl")         # run all tests
      include("trees_tests/regression_tests.jl") # run specific test (example)
      ```
-
-    For a quick guide on how to develop julia packages, write tests, ...,  read [this](https://adrianhill.de/julia-ml-course/write/).
+> [!TIP]
+> For a quick guide on how to develop julia packages, write tests, ...,  check [this](https://adrianhill.de/julia-ml-course/write/) out.
 
 ## 👩‍💻 Contributors
 [![Contributors](https://contrib.rocks/image?repo=nichtJakob/OneTwoTree.jl)](https://github.com/nichtJakob/OneTwoTree.jl/graphs/contributors)
