@@ -101,7 +101,7 @@ Recursive helper function to stringify the decision tree structure.
 - `is_true_child::Bool`: Boolean indicating if the node is a true branch child.
 - `indentation::String`: The current indentation.
 """
-function _node_to_string(node::Node, is_true_child::Bool, indentation::String)
+function _node_to_string(node::Union{Node, Nothing}, is_true_child::Bool, indentation::String)
     if is_true_child
         prefix = indentation * "├─ True: "
     else
