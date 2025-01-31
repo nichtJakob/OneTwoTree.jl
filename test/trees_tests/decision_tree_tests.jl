@@ -20,15 +20,15 @@ using Test
     @test t2.root === n2
     @test t2.max_depth === 5
 
-    t3 = DecisionTreeClassifier(root=n2)
-    @test t3.root === n2
+    labels2 = [1.0, 2.0, 3.0]
+    n3 = OneTwoTree.Node(dataset, labels2, false, column_data=true)
+    t3 = DecisionTreeClassifier(root=n3)
+    @test t3.root === n3
     @test t3.max_depth === -1
+
 end
 
-
-
 @testset "Print Tree" begin # Test: stringify tree with multiple decision nodes
-
     @testset "Basic" begin
         dataset = reshape([
             1.0;
@@ -46,6 +46,10 @@ x[1] <= 5.0 ?
 └─ False: B
 "
         @test returned_string == expected_string
+
+        # _node_to_string edge case for codecov :D
+        nothing_str = OneTwoTree._node_to_string(nothing, true, "")
+        @test nothing_str == "├─ True:  <Nothing>\n"
     end
 
     @testset "Depth 2" begin
@@ -105,7 +109,7 @@ x[1] <= 0.0 ?
     @testset "print_tree" begin
         function tolerance(text::String)
             return replace(text, r"[\s\n]+" => "")
-        end 
+        end
 
         X_train = reshape([12], 1, 1)
         y_train = ["A"]
@@ -115,7 +119,7 @@ x[1] <= 0.0 ?
 
         expected_output = tolerance("Tree(max_depth=-1)Prediction:A")
         expected_output_short = tolerance("Prediction:A")
-        
+
         #test _tree_to_string()
         @test tolerance(OneTwoTree._tree_to_string(tree)) == expected_output
 
@@ -129,7 +133,7 @@ x[1] <= 0.0 ?
 
         printed_tree = get_print_tree(tree)
         @test tolerance(printed_tree) == expected_output_short
-        
+
 
         #test Base.show()
         function get_show_tree(tree)
@@ -141,7 +145,6 @@ x[1] <= 0.0 ?
         shown_tree = get_show_tree(tree)
         @test tolerance(shown_tree) == expected_output
     end
-
 end
 
 @testset "Tree Argument Errors" begin

@@ -1,4 +1,4 @@
-In this example we want to distinguish between 3 types of the iris flower.
+In this example we want to distinguish between 3 types of the iris flower. The **code** can also be found [here](https://github.com/nichtJakob/OneTwoTree.jl/blob/master/demo_classification.jl).
 
 If you want to execute this example in your julia REPL you will first need to install some dependencies:
 ```julia
