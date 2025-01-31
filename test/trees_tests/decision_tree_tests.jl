@@ -98,4 +98,25 @@ x[1] <= 0.0 ?
         # println(cmp(expected_string, returned_string))
         @test returned_string == expected_string
     end
+
+    @testset "Tree Argument Errors" begin
+        @test_throws ArgumentError OneTwoTree.DecisionTreeRegressor(max_depth= -5)
+        @test_throws ArgumentError OneTwoTree.DecisionTreeClassifier(max_depth= -5)
+
+        # test Argument errors on function _verify_fit!_args(tree, dataset, labels, column_data)
+        tree = DecisionTreeClassifier()
+        tree_regressor = DecisionTreeRegressor()
+        dataset = [1.0 2.0; 3.0 4.0;]
+        labels = ["yes", "no"]
+        column_data = false
+
+        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, [], column_data)
+        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, [], labels, column_data)
+        #maxDepth @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, labels, column_data)
+        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], column_data)
+        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], false)
+        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", 4], column_data)
+        @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree_regressor, dataset, labels, column_data)
+    end
+
 end
