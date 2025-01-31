@@ -9,10 +9,8 @@ function countmap(collection::AbstractVector{T}) where T
 end
 
 
-function mode(collection)
-    # Erstelle ein Countmap
+function mode(collection::AbstractVector{T}) where T
     counts = countmap(collection)
-
     # Finde das häufigste Element
     max_count = -1
     mode_element = nothing
@@ -26,6 +24,6 @@ function mode(collection)
     return mode_element
 end
 
-function mean(collection)
+function mean(collection::AbstractVector{T}) where T
     return sum(collection) / length(collection)
 end
