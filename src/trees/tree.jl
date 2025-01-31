@@ -200,7 +200,7 @@ function calc_accuracy(labels::AbstractArray, predictions::AbstractArray)
     end
 
     correct = 0.0
-    for i in 1:lastindex(labels)
+    for i in eachindex(labels)
         if labels[i] == predictions[i]
             correct += 1.0
         end
