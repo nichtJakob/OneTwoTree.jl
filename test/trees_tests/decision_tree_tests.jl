@@ -25,6 +25,8 @@ using Test
     @test t3.max_depth === -1
 end
 
+
+
 @testset "Print Tree" begin # Test: stringify tree with multiple decision nodes
 
     @testset "Basic" begin
@@ -155,7 +157,10 @@ end
 
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, [], column_data)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, [], labels, column_data)
-    #maxDepth @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, labels, column_data)
+    #maxDepth 
+    tree2 = DecisionTreeClassifier()
+    tree2.max_depth = -7
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree2, dataset, labels, column_data)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], false)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes", "yes"], true)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", 4], column_data)
