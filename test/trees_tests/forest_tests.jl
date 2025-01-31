@@ -116,7 +116,7 @@ using OneTwoTree
         fit!(forest, X_train, y_train)
 
         expected_output = tolerance("Tree 1:\n\nPrediction: 5.0\n\n\nTree 2:\n\nPrediction: 5.0\n\n")
-        
+
         #test _forest_to_string(forest::AbstractForest)
         @test tolerance(tolerance(OneTwoTree._forest_to_string(forest))) == expected_output
 
@@ -130,7 +130,7 @@ using OneTwoTree
 
         printed_forest = get_print_forest(forest)
         @test tolerance(printed_forest) == expected_output
-        
+
 
         #test Base.show(io::IO, forest::AbstractForest)
         function get_show_forest(forest)

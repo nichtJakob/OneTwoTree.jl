@@ -98,4 +98,25 @@ x[1] <= 0.0 ?
         # println(cmp(expected_string, returned_string))
         @test returned_string == expected_string
     end
+
+    function get_print_tree(tree)
+        buffer_1 = IOBuffer()
+        print_tree(tree, io=buffer_1)
+        output = String(take!(buffer_1))
+    end
+
+    dataset2 = [
+        1.0 2.0 3.0
+        1.0 2.0 4.0
+        1.0 -2.0 3.0
+        1.0 -2.0 4.0
+        -1.0 2.0 3.0
+    ]
+    labels2 = ["A", "B", "C", "D", "E"]
+
+    t = DecisionTreeClassifier()
+    fit!(t, dataset2, labels2)
+
+    printed_tree = get_print_tree(t)
+    @test printed_tree != ""
 end

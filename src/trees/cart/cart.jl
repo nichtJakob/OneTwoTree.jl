@@ -1,11 +1,12 @@
 """
-    split(N)
+    split(N::Node, splitting_criterion::Function)
 
 Determine the optimal split of a node. Handles numerical and categorical data and labels.
 
 # Arguments
 
 - `N::Node`: The node to be split. All additional information for the split calculation (e.g. dataset, labels, node_data) is contained in N.
+- `splitting_criterion::Function`: The function to calculate the gain of a split. See docstring of `fit!` for more information.
 """
 function split(N::Node, splitting_criterion::Function)
     decision::Union{Decision, Nothing} = nothing
@@ -86,7 +87,7 @@ function split(N::Node, splitting_criterion::Function)
 end
 
 """
-    should_split(N, splitting_gain, max_depth)
+    should_split(N::Node, splitting_gain::Float64, max_depth::Int64)
 
 Determines whether to split the node N given.
 

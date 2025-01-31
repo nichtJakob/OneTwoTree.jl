@@ -1,5 +1,5 @@
 """
-    Decision
+    Decision{S<:Union{Number, String}}
 
 A structure representing a decision with a function and its parameter.
 
@@ -16,7 +16,6 @@ struct Decision{S<:Union{Number, String}}
     feature::Int64
 
     function Decision(fn::Function, feature::Int64, param::S) where S
-        # TODO: feature index can be chosen out of bounds... Idk, just be careful?
         new{S}(fn, param, feature)
     end
 end
@@ -66,7 +65,7 @@ end
 #--------------------------------------
 
 """
-    less_than_or_equal
+    less_than_or_equal(x, threshold::Float64; feature::Int64 = 1)::Bool
 
 A basic numerical decision function for testing and playing around.
 """
@@ -75,7 +74,7 @@ function less_than_or_equal(x, threshold::Float64; feature::Int64 = 1)::Bool
 end
 
 """
-    equal
+    equal(x, class::String; feature::Int64 = 1)::Bool
 
 A basic categorical decision function for testing and playing around.
 """

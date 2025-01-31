@@ -1,6 +1,5 @@
-#using StatsBase
 
-function variance(data::AbstractVector) :: Float64
+function variance(data::AbstractVector)::Float64
     if isempty(data)
         return 0.0
     end
@@ -10,7 +9,7 @@ function variance(data::AbstractVector) :: Float64
 end
 
 """
-    variance_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels) -> Float64
+    variance_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)::Float64
 
 This function calculates the variance gain for a split in a decision tree. The split is characterized by the partition of the parent_labels into true_child_labels and false_child_labels according to some discriminant function.
 
@@ -22,7 +21,7 @@ This function calculates the variance gain for a split in a decision tree. The s
 # Returns:
 - The variance gain of the split.
 """
-function variance_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector) :: Float64
+function variance_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)::Float64
     max_gain = variance(parent_labels)
 
     if isempty(true_child_labels) || isempty(false_child_labels) || max_gain == 0.0
@@ -40,7 +39,7 @@ function variance_gain(parent_labels::AbstractVector, true_child_labels::Abstrac
 
     gain = max_gain - weighted_var
 
-    # normalization not neccessery but cool
+    # normalization not necessary but cool
     normalized_gain = gain / max_gain
 
     return normalized_gain
