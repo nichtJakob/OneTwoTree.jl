@@ -92,4 +92,55 @@ using OneTwoTree
         @test y_pred <= 9999.001
         @test y_pred >= -5.0
     end
+
+    @testset "Argument Errors" begin
+        @test_throws ErrorException ForestClassifier(n_trees=0, n_features_per_tree=1, max_depth=1)
+        @test_throws ErrorException ForestClassifier(n_trees=1, n_features_per_tree=0, max_depth=1)
+        @test_throws ErrorException ForestClassifier(n_trees=1, n_features_per_tree=1, max_depth=0)
+
+        forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
+        X_test = [2.4; 3.0; -9.2]
+        @test_throws ErrorException predict(forest, X_test)
+    end
+
+    @testset "Printing forests" begin
+
+        function tolerance(text::String)
+            return replace(text, r"[\s\n]+" => "")
+        end 
+
+        X_train = reshape([42], 1, 1)
+        y_train = [5.0]
+
+        forest = ForestRegressor(n_trees=2, n_features_per_tree= 5, max_depth=3)
+        fit!(forest, X_train, y_train)
+
+        expected_output = tolerance("Tree 1:\n\nPrediction: 5.0\n\n\nTree 2:\n\nPrediction: 5.0\n\n")
+        
+        #test _forest_to_string(forest::AbstractForest)
+        @test tolerance(tolerance(OneTwoTree._forest_to_string(forest))) == expected_output
+
+
+        #test print_forest(forest::AbstractForest; io::IO=stdout)
+        function get_print_forest(forest)
+            buffer_1 = IOBuffer()
+            print_forest(forest, io=buffer_1)
+            output = String(take!(buffer_1))
+        end
+
+        printed_forest = get_print_forest(forest)
+        @test tolerance(printed_forest) == expected_output
+        
+
+        #test Base.show(io::IO, forest::AbstractForest)
+        function get_show_forest(forest)
+            buffer_1 = IOBuffer()
+            show(buffer_1, forest)
+            output = String(take!(buffer_1))
+        end
+
+        shown_forest = get_show_forest(forest)
+        @test tolerance(shown_forest) == expected_output
+    end
+    
 end

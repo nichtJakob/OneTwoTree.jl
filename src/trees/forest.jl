@@ -95,6 +95,10 @@ function _forest_to_string(forest::AbstractForest)
     return result
 end
 
-function print_forest(forest::AbstractForest)
-    print(_forest_to_string(forest))
+function print_forest(forest::AbstractForest; io::IO=stdout)
+    print(io, _forest_to_string(forest))
+end
+
+function Base.show(io::IO, forest::AbstractForest)
+    print(io, _forest_to_string(forest))
 end
