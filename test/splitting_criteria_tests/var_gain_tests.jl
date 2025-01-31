@@ -34,4 +34,16 @@ using Test
         @test isa(var_gain_result, Float64)
         @test isapprox(var_gain_result, 0, atol=0)
     end
+
+    @testset "Empty returns 0.0" begin
+        @test OneTwoTree.variance([]) == 0.0
+
+        parent_labels = [1, 0, 1, 0]
+        child_1_labels = [1, 0, 1, 0]
+        child_2_labels = []
+        
+        @test variance_gain(parent_labels, child_1_labels, child_2_labels) == 0.0
+        @test variance_gain(parent_labels, child_2_labels, child_1_labels) == 0.0
+        @test variance_gain([], [], []) == 0.0
+    end
 end
