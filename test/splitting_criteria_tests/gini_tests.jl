@@ -89,4 +89,9 @@ using Test
         gini9 = OneTwoTree.gini_impurity(view(labels9, split_true), view(labels9, split_false))
         @test gini9 == 0.5
     end
+
+    @testset "Empty returns 0 and error returns -1" begin
+        @test OneTwoTree.gini_impurity([]) == 0
+        @test OneTwoTree.gini_impurity([], []) == -1
+    end
 end
