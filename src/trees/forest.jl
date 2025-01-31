@@ -145,7 +145,8 @@ Trains each tree in the forest on randomly drawn subsets of test features and co
 (OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
 
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
-2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
+2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)`,
+where `parent_labels` is a set of datapoint labels, which is split into two subsets `true_child_labels` & `false_child_labels` by some discriminating function. (Each label in `parent_labels` is contained in exactly one of the two subsets.)
 """
 function fit!(forest::AbstractForest, dataset::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
     is_classifier = (forest isa ForestClassifier)
@@ -170,8 +171,8 @@ end
 
 Outputs the forest-prediction for a given datapoint X.
 The prediction is based on the aggregation of the tree decisions.
-For agregation in a regression scenario the mean is used.
-For agregation in a classification scenario the most voted class label is used.
+For aggregation in a regression scenario the mean is used.
+For aggregation in a classification scenario the most voted class label is used.
 
 # Arguments:
 - `forest::AbstractForest`: The trained forest.
