@@ -40,7 +40,7 @@ using OneTwoTree
 ```
 
 
-## ▶️ **Example: Running a Simple Example**
+## ▶️ **Example**
 
 - Note that that the Tree Construction in its current state can be very slow. Therefore, it may be advised to use small training datasets for the moment.
 
@@ -93,13 +93,9 @@ You can find more extensive examples utilising the `Iris` and `BostonHousing` da
 
 
 1. ✨ **Downloading the Code for Local Development**
-
-      ``` bash
+      ```bash
       git clone https://github.com/nichtJakob/OneTwoTree.jl.git
       ```
-
-
-
 
 2. 🔧 **Installation and Dependency Setup**
 
