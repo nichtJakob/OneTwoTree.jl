@@ -33,7 +33,7 @@ end
 """
 function DecisionTreeClassifier(; root=nothing, max_depth=-1)
     if max_depth < -1
-        error("DecisionTreeClassifier: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)")
+        throw(ArgumentError("DecisionTreeClassifier: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)"))
     end
     DecisionTreeClassifier(root, max_depth)
 end
@@ -64,7 +64,7 @@ end
 """
 function DecisionTreeRegressor(; root=nothing, max_depth=-1)
     if max_depth < -1
-        error("DecisionTreeRegressor: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)")
+        throw(ArgumentError("DecisionTreeRegressor: Got invalid max_depth. Set it to a value >= -1. (-1 means unlimited depth)"))
     end
     DecisionTreeRegressor(root, max_depth)
 end
@@ -80,53 +80,32 @@ Some guards to ensure the input data is valid for training a tree.
 """
 function _verify_fit!_args(tree, dataset, labels, column_data)
     if isempty(labels)
-        error("fit!: Cannot build tree from empty label set.")
+        throw(ArgumentError("fit!: Cannot build tree from empty label set."))
     end
     if isempty(dataset)
-        error("fit!: Cannot build tree from empty dataset.")
+        throw(ArgumentError("fit!: Cannot build tree from empty dataset."))
     end
     if tree.max_depth < -1
-        error("fit!: Cannot build tree with negative depth, but got max_depth=$(max_depth).")
+        throw(ArgumentError("fit!: Cannot build tree with negative depth, but got max_depth=$(max_depth)."))
     end
     if (!column_data && size(dataset, 1) != length(labels))
-        error("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?")
+        throw(ArgumentError("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 1)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=true helps?"))
     end
     if (column_data && size(dataset, 2) != length(labels))
-        error("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 2)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=false helps?")
+        throw(ArgumentError("fit!: Dimension mismatch! Number of datapoints $(size(dataset, 2)) != number of labels $(length(labels)).\n Maybe transposing your dataset matrix or setting column_data=false helps?"))
     end
     for label in labels
         if typeof(label) != typeof(labels[1])
-            error("fit!: Encountered heterogeneous label types. Please make sure all labels are of the same type.")
+            throw(ArgumentError("fit!: Encountered heterogeneous label types. Please make sure all labels are of the same type."))
         end
     end
     if tree isa DecisionTreeRegressor && (labels[1] isa String) # vorher: !(labels[1] isa String)
-        error("Cannot train a DecisionTreeRegressor on a dataset with categorical labels.")
+        throw(ArgumentError("Cannot train a DecisionTreeRegressor on a dataset with categorical labels."))
     end
-
-    # TODO: check if columns of dataset have consistent type either Real or String
-    # if !column_data
-    #     for i in range(1, size(dataset, 2))
-    #         for j in range(1, size(dataset, 1))
-    #             if typeof(dataset[j, i]) != typeof(dataset[1, i])
-    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
-    #             end
-    #         end
-    #     end
-    # end
-
-    # if column_data
-    #     for i in range(1, size(dataset, 1))
-    #         for j in range(1, size(dataset, 2))
-    #             if typeof(dataset[i, j]) != typeof(dataset[i, 1])
-    #                 error("build_tree: Encountered heterogeneous feature types. Please make sure matching features of all datapoints have the same type.")
-    #             end
-    #         end
-    #     end
-    # end
 end
 
 """
-    fit!(tree, features, labels)
+    fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
 
 Train a decision tree on the given data using some algorithm (e.g. CART).
 
@@ -134,14 +113,13 @@ Train a decision tree on the given data using some algorithm (e.g. CART).
 
 - `tree::AbstractDecisionTree`: the tree to be trained
 - `dataset::AbstractMatrix`: the training data
-- `labels::Vector{Union{Real, String}}`: the target labels
-- `splitting_criterion: a function indicating some notion of gain from splitting a node.
+- `labels::Vector{Union{Number, String}}`: the target labels
+- `splitting_criterion`: a function indicating some notion of gain from splitting a node. If not provided, default criteria for classification and regression are used.
 - `column_data::Bool`: whether the datapoints are contained in dataset columnwise
 (OneTwoTree provides the following splitting criteria for classification: gini_gain, information_gain; and for regression: variance_gain. If you'd like to define a splitting criterion yourself, you need to consider the following:
 
 1. The function must calculate a 'gain'-value for a split of a node, meaning that larger values are considered better.
-2. The function signature must conform to `my_func(features::AbstractMatrix, labels::AbstractVector, node_data::Vector{Int64}, decision_fn::Function, decision_param::Union{Real, String}, decision_feature::Int64))` where features is the total data matrix, labels the total label vector and node_data is an index array, that indexes into the former to define a subset of the data to be considered. The last three values define a split of the data.
-3. You can get the split labelsets for your computation by taking analogous steps as in the OneTwoTree.split_indices method.)
+2. The function signature must conform to `my_func(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)` where parent_labels is a set of datapoint labels, which is split into two subsets true_child_labels & false_child_labels by some discriminating function. (Each label in parent_labels is contained in exactly one of the two subsets.)
 """
 function fit!(tree::AbstractDecisionTree, features::AbstractMatrix, labels::Vector{T}; splitting_criterion=nothing, column_data=false) where {T<:Union{Number, String}}
     _verify_fit!_args(tree, features, labels, column_data)
@@ -169,7 +147,7 @@ Traverses the tree for a given datapoint x and returns that trees prediction.
 """
 function predict(tree::AbstractDecisionTree, X::Union{AbstractMatrix, AbstractVector})
     if isnothing(tree.root)
-        error("Cannot predict from an empty tree.")
+        throw(ArgumentError("Cannot predict from an empty tree. Maybe you forgot to fit your model?"))
     end
 
     return predict(tree.root, X)
@@ -214,7 +192,7 @@ Calculates the accuracy of the predictions compared to the labels.
 """
 function calc_accuracy(labels::AbstractArray{S}, predictions::AbstractArray{T}) where {S , T}
     if length(labels) != length(predictions)
-        error("Length of labels and predictions must be equal.")
+        throw(ArgumentError("Length of labels and predictions must be equal."))
     end
 
     if length(labels) == 0
