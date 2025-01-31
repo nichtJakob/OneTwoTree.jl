@@ -24,18 +24,6 @@ using OneTwoTree
     inds4 = [2, 6, 4, 5, 7]
     inds5 = [11, 3, 8, 9, 4, 1, 2]
 
-    @testset "Subset Splitting" begin
-        # TODO: Test split_indices
-    end
-
-    @testset "Class Frequency" begin
-        # TODO: Test most_frequent_class
-    end
-
-    @testset "Class Collection" begin
-        # TODO: Test collect_classes
-    end
-
     @testset "Subset Mean" begin
         @test OneTwoTree.label_mean(nums1, inds3) == 64.75
         @test OneTwoTree.label_mean(nums2, inds4) == 56.8

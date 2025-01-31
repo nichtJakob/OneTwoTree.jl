@@ -1,5 +1,3 @@
-# TODO: arguments are probably too generic. Limit scope to Union{Real, String}
-# TODO: replace decision_fn, decision_param, decision_feature by a single Decision struct for compactness
 # split node_data indices according to decision function
 """
     function split_indices(dataset::AbstractMatrix, node_data::Vector{Int64}, decision_fn::Function, decision_param::T, decision_feature::Int64) where {T<:Union{Real, String}}
@@ -71,8 +69,6 @@ Collect all unique classes among a subset of the specified column of the dataset
 """
 function collect_classes(dataset::AbstractMatrix, indices::Vector{Int64}, column::Int64)
     classes = Dict{String, Bool}()
-    # TODO: check if passed column is out of bounds
-    # TODO: check if passed column is categorical
     rows = size(dataset[indices])[1]
     for i in indices
         value = dataset[i, column]
