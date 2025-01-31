@@ -157,7 +157,7 @@ end
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, [], labels, column_data)
     #maxDepth @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, labels, column_data)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], false)
-    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes"], true)
+    @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", "no", "yes", "yes"], true)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree, dataset, ["yes", 4], column_data)
     @test_throws ArgumentError OneTwoTree._verify_fit!_args(tree_regressor, dataset, labels, column_data)
 
