@@ -150,6 +150,7 @@ where `parent_labels` is a set of datapoint labels, which is split into two subs
 """
 function fit!(forest::AbstractForest, dataset::AbstractMatrix{S}, labels::AbstractVector{T}; splitting_criterion=nothing, column_data=false) where {S, T<:Union{Real, String}}
     is_classifier = (forest isa ForestClassifier)
+    forest.trees = Vector{DecisionTreeRegressor}()
 
     for i in 1:forest.n_trees
         # get random dataset of size forest.n_features_per_tree
