@@ -1,7 +1,7 @@
 """
     gini_gain(parent_labels::AbstractVector, true_child_labels::AbstractVector, false_child_labels::AbstractVector)::Float64
 
-This function calculates the gain in Gini impurity for a split in a decision tree. The split is characterized by the partition of the parent_labels into true_child_labels and false_child_labels according to some discriminant function.
+This function calculates the gain in Gini impurity for a split in a decision tree. The split is characterized by the partition of the `parent_labels` into `true_child_labels` and `false_child_labels` according to some discriminant function.
 
 # Arguments:
 - `parent_labels`: A vector of data labels (e.g., classes or numerical values in the case of regression).
