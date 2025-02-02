@@ -96,7 +96,9 @@ using OneTwoTree
     @testset "Argument Errors" begin
         @test_throws ArgumentError ForestClassifier(n_trees=0, n_features_per_tree=1, max_depth=1)
         @test_throws ArgumentError ForestClassifier(n_trees=1, n_features_per_tree=0, max_depth=1)
-        @test_throws ArgumentError ForestClassifier(n_trees=1, n_features_per_tree=1, max_depth=0)
+        @test_throws ArgumentError ForestClassifier(n_trees=1, n_features_per_tree=1, max_depth=-2)
+        ForestClassifier(n_trees=1, n_features_per_tree=1, max_depth=-1)
+        ForestClassifier(n_trees=1, n_features_per_tree=1)
 
         forest = ForestRegressor(n_trees=5, n_features_per_tree=40, max_depth=30)
         X_test = [2.4; 3.0; -9.2]
