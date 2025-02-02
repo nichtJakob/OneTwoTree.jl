@@ -66,13 +66,13 @@ function verify_forest_args(n_trees::Int, n_features_per_tree::Int, max_depth::I
         throw(ArgumentError("A RandomForest needs more than 0 features per Tree.\n (Currently n_features_per_tree == $n_features_per_tree)"))
     end
 
-    if max_depth <= 0
+    if max_depth < -1
         throw(ArgumentError("A RandomForest needs more than 0 max depth per Tree.\n (Currently max_depth == $max_depth)"))
     end
 end
 
 """
-    ForestClassifier(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    ForestClassifier(;n_trees::Int, n_features_per_tree::Int, max_depth::Int=-1)
 
 Constructs a ForestClassifier instance.
 
@@ -84,14 +84,14 @@ Constructs a ForestClassifier instance.
 # Returns:
 A `ForestClassifier` instance.
 """
-function ForestClassifier(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+function ForestClassifier(;n_trees::Int, n_features_per_tree::Int, max_depth::Int=-1)
     verify_forest_args(n_trees, n_features_per_tree, max_depth)
 
     ForestClassifier(Vector{DecisionTreeClassifier}(), n_trees, n_features_per_tree, max_depth)
 end
 
 """
-    ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+    ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int=-1)
 
 Constructs a ForestRegressor instance.
 
@@ -103,7 +103,7 @@ Constructs a ForestRegressor instance.
 # Returns:
 A `ForestRegressor` instance.
 """
-function ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int)
+function ForestRegressor(;n_trees::Int, n_features_per_tree::Int, max_depth::Int=-1)
     verify_forest_args(n_trees, n_features_per_tree, max_depth)
 
     ForestRegressor(Vector{DecisionTreeRegressor}(), n_trees, n_features_per_tree, max_depth)
