@@ -68,6 +68,12 @@ using OneTwoTree
         #TODO: check datatypes: Int, Float, String, Mixed
         #println("f0 Print: ---------------------------------------------------")
         #print_forest(f0)
+
+        t_mixfs = DecisionTreeClassifier(max_depth=3)
+        fit!(t_mixfs, dataset_mixfs, abcd_labels)
+        pred_mixfs = predict(t_mixfs, dataset_mixfs)
+        @test length(pred_mixfs) == 4
+        @test calc_accuracy(abcd_labels, pred_mixfs) > 0.2
     end
 
     #@testset "Printing" begin
