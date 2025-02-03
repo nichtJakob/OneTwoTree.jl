@@ -168,7 +168,7 @@ function fit!(forest::AbstractForest, dataset::AbstractMatrix{S}, labels::Abstra
 end
 
 """
-    predict(forest::AbstractForest, X::Union{AbstractMatrix{S}, AbstractVector{S}}) where S<:Union{Real, String}
+    predict(forest::AbstractForest, X::Union{AbstractMatrix, AbstractVector})
 
 Outputs the forest-prediction for a given datapoint X.
 The prediction is based on the aggregation of the tree decisions.
@@ -177,7 +177,7 @@ For aggregation in a classification scenario the most voted class label is used.
 
 # Arguments:
 - `forest::AbstractForest`: The trained forest.
-- `X::Union{AbstractMatrix{S}, AbstractVector{S}}`: The input data for which a prediction is searched.
+- `X::Union{AbstractMatrix, AbstractVector}`: The input data for which a prediction is searched.
 
 # Returns:
 Predictions for the input data X, aggregated across all trees in the forest.
@@ -185,7 +185,7 @@ Predictions for the input data X, aggregated across all trees in the forest.
 # Errors:
 Raises an error if the forest contains no trained trees.
 """
-function predict(forest::AbstractForest, X::Union{AbstractMatrix{S}, AbstractVector{S}}) where S<:Union{Real, String}
+function predict(forest::AbstractForest, X::Union{AbstractMatrix, AbstractVector})
     if isempty(forest.trees)
         throw(ArgumentError("Prediction failed because there are no trees. (Maybe you forgot to fit?)"))
     end
